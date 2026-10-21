@@ -598,7 +598,7 @@ class NostrService {
       };
       connection.send(request);
     }
-    handle.onClose = () {
+    handle.onClose = () async {
       for (final connection in _liveRelays) {
         connection.handlers.remove(id);
         connection.send(jsonEncode(<dynamic>['CLOSE', id]));

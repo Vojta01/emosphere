@@ -1,15 +1,26 @@
 // EmoSphere localization — a small CZ/EN dictionary for every user-facing text.
 //
 // Usage in widgets:
-//   final t = Strings.of(appState.language);
-//   Text(t.checkinTitle)
+//   final s = Strings(app.language);
+//   Text(s.tr('checkin.title'))
+//   Text(s.checkinTitle)   // equivalent named getter
+//
+// Key namespaces: common.*, onb.*, checkin.*, hist.*, home.*, nav.* and the
+// legacy flat keys kept for the named getters. test/strings_test.dart checks
+// that every `tr('…')` key used in lib/ exists here in both languages.
 
 /// Localized strings for one language (`cs` or `en`).
 class Strings {
+  /// Creates the strings of [code] (`'cs'` or `'en'`); anything else is Czech.
+  const Strings(String code) : this._(code == 'en' ? 'en' : 'cs');
+
   const Strings._(this.code);
 
   /// Language code (`'cs'` or `'en'`).
   final String code;
+
+  /// Alias of [code] used by widgets (`Strings(app.language)`).
+  String get language => code;
 
   /// Supported language codes.
   static const List<String> supportedCodes = <String>['cs', 'en'];
@@ -34,6 +45,12 @@ class Strings {
     }
     return entry[code] ?? entry['en'] ?? entry['cs'] ?? key;
   }
+
+  /// Dot-notation lookup used by the screens (`s.tr('checkin.title')`).
+  String tr(String key) => t(key);
+
+  /// `true` when [key] exists in the dictionary (used by tests).
+  bool hasKey(String key) => _values.containsKey(key);
 
   // -- App ---------------------------------------------------------------
   String get appName => t('appName');
@@ -142,7 +159,7 @@ class Strings {
   String get relaysHint => t('relaysHint');
   String get relaysSaved => t('relaysSaved');
   String get locationPrecision => t('locationPrecision');
-  String get language => t('language');
+  String get languageLabel => t('language');
   String get keyBackup => t('keyBackup');
   String get deleteMyData => t('deleteMyData');
   String get deleteMyDataBody => t('deleteMyDataBody');
@@ -454,5 +471,159 @@ class Strings {
     'version': <String, String>{'cs': 'Verze', 'en': 'Version'},
     'justNow': <String, String>{'cs': 'právě teď', 'en': 'just now'},
     'yesterday': <String, String>{'cs': 'včera', 'en': 'yesterday'},
+
+    // -- Dot-notation keys (looked up via `tr('…')`) ------------------------
+    'common.npubCopied': <String, String>{
+      'cs': 'npub zkopírováno',
+      'en': 'npub copied',
+    },
+    'common.nsecCopied': <String, String>{
+      'cs': 'nsec zkopírováno',
+      'en': 'nsec copied',
+    },
+    'onb.next': <String, String>{'cs': 'Pokračovat', 'en': 'Continue'},
+    'onb.back': <String, String>{'cs': 'Zpět', 'en': 'Back'},
+    'onb.finish': <String, String>{'cs': 'Dokončit', 'en': 'Finish'},
+    'onb.step1.title': <String, String>{
+      'cs': 'Vítej v EmoSphere',
+      'en': 'Welcome to EmoSphere',
+    },
+    'onb.step1.body': <String, String>{
+      'cs': 'EmoSphere je světová mapa nálad postavená na protokolu Nostr. '
+          'Bez registrace, bez e-mailu, bez jména.',
+      'en': 'EmoSphere is a global mood map built on the Nostr protocol. '
+          'No sign-up, no email, no name.',
+    },
+    'onb.step1.p1': <String, String>{
+      'cs': 'Řekni světu, jak se cítíš — jedním klepnutím.',
+      'en': 'Tell the world how you feel — in one tap.',
+    },
+    'onb.step1.p2': <String, String>{
+      'cs': 'Sleduj náladu planety v reálném čase.',
+      'en': 'Watch the mood of the planet in real time.',
+    },
+    'onb.step1.p3': <String, String>{
+      'cs': 'Lokalita zůstává hrubá. Přesná poloha se nikdy neposílá.',
+      'en': 'Location stays coarse. The exact position is never sent.',
+    },
+    'onb.step2.title': <String, String>{
+      'cs': 'Tvůj klíč, tvá identita',
+      'en': 'Your key, your identity',
+    },
+    'onb.step2.body': <String, String>{
+      'cs': 'Identita je klíč, který zůstává jen v tvém zařízení. '
+          'Nikdo ho za tebe nemůže obnovit.',
+      'en': 'Your identity is a key that stays on your device. '
+          'Nobody can recover it for you.',
+    },
+    'onb.step2.generate': <String, String>{
+      'cs': 'Vygenerovat nový klíč',
+      'en': 'Generate a new key',
+    },
+    'onb.step2.generating': <String, String>{
+      'cs': 'Generuji…',
+      'en': 'Generating…',
+    },
+    'onb.step2.done': <String, String>{
+      'cs': 'Klíč je připravený — můžeš pokračovat.',
+      'en': 'Your key is ready — you can continue.',
+    },
+    'onb.step2.npubLabel': <String, String>{
+      'cs': 'Tvůj veřejný klíč (npub)',
+      'en': 'Your public key (npub)',
+    },
+    'onb.step2.import': <String, String>{
+      'cs': 'Mám už klíč (nsec)',
+      'en': 'I already have a key (nsec)',
+    },
+    'onb.step2.importHint': <String, String>{
+      'cs': 'Vlož svůj nsec klíč',
+      'en': 'Paste your nsec key',
+    },
+    'onb.step2.importAction': <String, String>{
+      'cs': 'Obnovit identitu',
+      'en': 'Restore identity',
+    },
+    'onb.step2.importBad': <String, String>{
+      'cs': 'Tenhle klíč není platný.',
+      'en': 'That key is not valid.',
+    },
+    'onb.step3.title': <String, String>{
+      'cs': 'Záloha klíče',
+      'en': 'Key backup',
+    },
+    'onb.step3.body': <String, String>{
+      'cs': 'Ulož si klíč na bezpečné místo. Bez něj o svou identitu '
+          'navždy přijdeš.',
+      'en': 'Store your key somewhere safe. Without it you lose your '
+          'identity forever.',
+    },
+    'onb.step3.nsecLabel': <String, String>{
+      'cs': 'Tvůj nsec (tajný klíč)',
+      'en': 'Your nsec (secret key)',
+    },
+    'onb.step3.qrHint': <String, String>{
+      'cs': 'Naskenuj QR kód a ulož si klíč.',
+      'en': 'Scan the QR code to save your key.',
+    },
+    'onb.step3.confirm': <String, String>{
+      'cs': 'Klíč mám uložený',
+      'en': 'I saved my key',
+    },
+    'onb.step3.warning': <String, String>{
+      'cs': 'Klíč nikomu nesděluj. Kdokoli s ním může mluvit za tebe.',
+      'en': 'Never share your key. Anyone with it can act as you.',
+    },
+    'checkin.title': <String, String>{
+      'cs': 'Jak se cítíš?',
+      'en': 'How do you feel?',
+    },
+    'checkin.intensity': <String, String>{
+      'cs': 'Intenzita',
+      'en': 'Intensity',
+    },
+    'checkin.noteHint': <String, String>{
+      'cs': 'Co se děje? (nepovinné, veřejné)',
+      'en': 'What is going on? (optional, public)',
+    },
+    'checkin.location': <String, String>{'cs': 'Lokalita', 'en': 'Location'},
+    'checkin.locOff': <String, String>{'cs': 'Vypnuto', 'en': 'Off'},
+    'checkin.locArea': <String, String>{'cs': 'Oblast', 'en': 'Area'},
+    'checkin.locCity': <String, String>{'cs': 'Město', 'en': 'City'},
+    'checkin.locHint': <String, String>{
+      'cs': 'Přesná poloha se nikdy neposílá — jen hrubá oblast.',
+      'en': 'The exact position is never sent — only a coarse area.',
+    },
+    'checkin.send': <String, String>{'cs': 'Odeslat', 'en': 'Send'},
+    'checkin.sending': <String, String>{'cs': 'Odesílám…', 'en': 'Sending…'},
+    'checkin.sent': <String, String>{'cs': 'Odesláno!', 'en': 'Sent!'},
+    'checkin.failed': <String, String>{
+      'cs': 'Odeslání se nepovedlo. Zkus to znovu.',
+      'en': 'Sending failed. Try again.',
+    },
+    'hist.title': <String, String>{
+      'cs': 'Moje check-iny',
+      'en': 'My check-ins',
+    },
+    'hist.empty': <String, String>{
+      'cs': 'Zatím nemáš žádné check-iny.',
+      'en': 'You have no check-ins yet.',
+    },
+    'hist.total': <String, String>{
+      'cs': 'Celkem check-inů',
+      'en': 'Total check-ins',
+    },
+    'hist.now': <String, String>{'cs': 'právě teď', 'en': 'just now'},
+    'hist.minAgo': <String, String>{'cs': 'před {n} min', 'en': '{n} min ago'},
+    'hist.hAgo': <String, String>{'cs': 'před {n} h', 'en': '{n} h ago'},
+    'hist.dAgo': <String, String>{'cs': 'před {n} dny', 'en': '{n} days ago'},
+    'home.fab': <String, String>{
+      'cs': 'Jak se cítíš?',
+      'en': 'How do you feel?',
+    },
+    'nav.map': <String, String>{'cs': 'Mapa', 'en': 'Map'},
+    'nav.feed': <String, String>{'cs': 'Feed', 'en': 'Feed'},
+    'nav.history': <String, String>{'cs': 'Historie', 'en': 'History'},
+    'nav.settings': <String, String>{'cs': 'Nastavení', 'en': 'Settings'},
   };
 }
