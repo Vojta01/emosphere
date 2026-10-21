@@ -610,18 +610,24 @@ class _KeyQrDialogState extends State<_KeyQrDialog> {
               ],
             ),
             const SizedBox(height: 12),
+            // A tight box stops the AlertDialog intrinsic measurement before
+            // it reaches the QR widget's LayoutBuilder.
             Center(
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: QrImageView(
-                  data: widget.value,
-                  version: QrVersions.auto,
-                  size: 168,
-                  backgroundColor: Colors.white,
+              child: SizedBox(
+                width: 192,
+                height: 192,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: QrImageView(
+                    data: widget.value,
+                    version: QrVersions.auto,
+                    size: 168,
+                    backgroundColor: Colors.white,
+                  ),
                 ),
               ),
             ),
