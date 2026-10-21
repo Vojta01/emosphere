@@ -238,6 +238,28 @@ void main() {
     expect(find.text('Unavený den'), findsWidgets);
   });
 
+  testWidgets('a friend chip opens their key with copy and remove', (
+    tester,
+  ) async {
+    final app = await _pumpFeed(tester, friends: <String>[friendNpub]);
+
+    await tester.tap(find.byKey(const Key('friend_chip_3bf0c6…')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('friends_npub_value')), findsOneWidget);
+    expect(find.text(encodeNpub(friendHex)), findsOneWidget);
+    expect(find.byKey(const Key('friends_copy_npub')), findsOneWidget);
+    expect(find.byKey(const Key('friends_remove')), findsOneWidget);
+
+    // The remove button of the sheet asks for confirmation, too.
+    await tester.tap(find.byKey(const Key('friends_remove')));
+    await tester.pumpAndSettle();
+    expect(find.text('Odebrat přítele?'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('friends_remove_confirm')));
+    await tester.pumpAndSettle();
+    expect(app.friends, isEmpty);
+  });
+
   testWidgets('sharing my npub opens the QR dialog', (tester) async {
     await _pumpFeed(tester, friends: <String>[friendNpub]);
 

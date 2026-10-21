@@ -118,14 +118,16 @@ List<CheckinEvent> _world() => <CheckinEvent>[
 Future<AppState> _pumpMap(
   WidgetTester tester, {
   List<String> friends = const <String>[],
+  List<CheckinEvent>? checkins,
 }) async {
   await tester.binding.setSurfaceSize(const Size(500, 1200));
   addTearDown(() => tester.binding.setSurfaceSize(null));
   SharedPreferences.setMockInitialValues(<String, Object>{});
+  final world = checkins ?? _world();
 
   final service = FakeRelayService(
-    mine: <CheckinEvent>[_world().first],
-    world: _world(),
+    mine: world.isEmpty ? const <CheckinEvent>[] : <CheckinEvent>[world.first],
+    world: world,
     profiles: <String, NostrProfile>{
       friendHex: NostrProfile(pubkey: friendHex, name: 'Áňa'),
     },
@@ -199,6 +201,16 @@ void main() {
     for (final emotion in Emotion.values) {
       expect(find.text(emotion.label('cs')), findsWidgets);
     }
+  });
+
+  testWidgets('shows the empty state when nothing was shared', (tester) async {
+    await _pumpMap(tester, checkins: const <CheckinEvent>[]);
+
+    expect(find.text('V tomto okně zatím nikdo nic nesdílel.'), findsOneWidget);
+    expect(find.byType(CircleLayer<Object>), findsNothing);
+    // The legend and the window switcher stay visible without data.
+    expect(find.text('Radost'), findsOneWidget);
+    expect(find.byKey(const Key('map_window_switcher')), findsOneWidget);
   });
 
   testWidgets('rings the cells that hold a friend check-in', (tester) async {
