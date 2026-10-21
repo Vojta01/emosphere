@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+<radialGradient id="bg" cx="50%" cy="42%" r="78%">
+<stop offset="0%" stop-color="#182448"/><stop offset="55%" stop-color="#0D1330"/><stop offset="100%" stop-color="#070A18"/>
+</radialGradient>
+<radialGradient id="halo" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#6366F1" stop-opacity="0.40"/><stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="sph" cx="38%" cy="32%" r="82%">
+<stop offset="0%" stop-color="#33549F"/><stop offset="45%" stop-color="#16264F"/><stop offset="100%" stop-color="#0A1128"/>
+</radialGradient>
+<radialGradient id="neb1"><stop offset="0%" stop-color="#FFD93D" stop-opacity="0.30"/><stop offset="100%" stop-color="#FFD93D" stop-opacity="0"/></radialGradient>
+<radialGradient id="neb2"><stop offset="0%" stop-color="#F472B6" stop-opacity="0.28"/><stop offset="100%" stop-color="#F472B6" stop-opacity="0"/></radialGradient>
+<radialGradient id="neb3"><stop offset="0%" stop-color="#60A5FA" stop-opacity="0.26"/><stop offset="100%" stop-color="#60A5FA" stop-opacity="0"/></radialGradient>
+<radialGradient id="neb4"><stop offset="0%" stop-color="#4ADE80" stop-opacity="0.22"/><stop offset="100%" stop-color="#4ADE80" stop-opacity="0"/></radialGradient>
+<clipPath id="clip"><circle cx="512" cy="512" r="310"/></clipPath>
+<linearGradient id="smile2" x1="330" y1="548" x2="694" y2="640" gradientUnits="userSpaceOnUse">
+<stop offset="0%" stop-color="#FFD93D"/><stop offset="50%" stop-color="#FB923C"/><stop offset="100%" stop-color="#F472B6"/>
+</linearGradient>
+</defs>
+<rect width="1024" height="1024" fill="url(#bg)"/>
+<circle cx="512" cy="512" r="430" fill="url(#halo)"/><g clip-path="url(#clip)"><circle cx="512" cy="512" r="310" fill="url(#sph)"/><circle cx="430" cy="380" r="210" fill="url(#neb1)"/><circle cx="650" cy="470" r="215" fill="url(#neb2)"/><circle cx="470" cy="655" r="235" fill="url(#neb3)"/><circle cx="375" cy="565" r="185" fill="url(#neb4)"/></g><circle cx="512" cy="512" r="310" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="4"/><ellipse cx="512" cy="512" rx="310" ry="118" fill="none" stroke="#FFFFFF" stroke-opacity="0.07" stroke-width="2"/><ellipse cx="512" cy="512" rx="148" ry="310" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="2"/><ellipse cx="415" cy="355" rx="185" ry="115" fill="#FFFFFF" opacity="0.06" transform="rotate(-28 415 355)"/><circle cx="512" cy="292" r="58" fill="#FFD93D" opacity="0.25"/><circle cx="512" cy="292" r="34" fill="#FFD93D" opacity="0.96"/><circle cx="512" cy="292" r="12" fill="#FFFFFF" opacity="0.6"/><circle cx="695" cy="425" r="44" fill="#F472B6" opacity="0.25"/><circle cx="695" cy="425" r="26" fill="#F472B6" opacity="0.96"/><circle cx="695" cy="425" r="9" fill="#FFFFFF" opacity="0.6"/><circle cx="655" cy="625" r="41" fill="#FB923C" opacity="0.25"/><circle cx="655" cy="625" r="24" fill="#FB923C" opacity="0.96"/><circle cx="655" cy="625" r="9" fill="#FFFFFF" opacity="0.6"/><circle cx="505" cy="725" r="51" fill="#4ADE80" opacity="0.25"/><circle cx="505" cy="725" r="30" fill="#4ADE80" opacity="0.96"/><circle cx="505" cy="725" r="11" fill="#FFFFFF" opacity="0.6"/><circle cx="345" cy="635" r="44" fill="#60A5FA" opacity="0.25"/><circle cx="345" cy="635" r="26" fill="#60A5FA" opacity="0.96"/><circle cx="345" cy="635" r="9" fill="#FFFFFF" opacity="0.6"/><circle cx="305" cy="425" r="48" fill="#EF4444" opacity="0.25"/><circle cx="305" cy="425" r="28" fill="#EF4444" opacity="0.96"/><circle cx="305" cy="425" r="10" fill="#FFFFFF" opacity="0.6"/><circle cx="395" cy="335" r="37" fill="#A78BFA" opacity="0.25"/><circle cx="395" cy="335" r="22" fill="#A78BFA" opacity="0.96"/><circle cx="395" cy="335" r="8" fill="#FFFFFF" opacity="0.6"/><circle cx="598" cy="498" r="31" fill="#94A3B8" opacity="0.25"/><circle cx="598" cy="498" r="18" fill="#94A3B8" opacity="0.96"/><circle cx="598" cy="498" r="6" fill="#FFFFFF" opacity="0.6"/></svg>
