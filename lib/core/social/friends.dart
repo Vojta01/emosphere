@@ -34,15 +34,22 @@ class AddFriendResult {
 /// Returns `null` for empty, malformed or checksum-broken input.
 String? parseFriendInput(String input) => normalizePubkeyInput(input);
 
-/// Removes duplicates (case-insensitive) while keeping first-seen order.
+/// Removes duplicates while keeping first-seen order.
 ///
-/// Blank entries are dropped.
+/// A key given as `npub…` collapses into its hex form, so the same friend
+/// pasted in both notations appears once. Blank entries are dropped and
+/// unparsable entries are kept lowercased, so junk in the stored preferences
+/// cannot be listed twice either.
 List<String> dedupeFriendKeys(Iterable<String> keys) {
   final seen = <String>{};
   final result = <String>[];
   for (final key in keys) {
-    final normalized = key.trim().toLowerCase();
-    if (normalized.isEmpty || !seen.add(normalized)) {
+    final trimmed = key.trim();
+    if (trimmed.isEmpty) {
+      continue;
+    }
+    final normalized = parseFriendInput(trimmed) ?? trimmed.toLowerCase();
+    if (!seen.add(normalized)) {
       continue;
     }
     result.add(normalized);

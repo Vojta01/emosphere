@@ -16,8 +16,9 @@ const double _metersPerDegree = 111320;
 
 /// Geohash precision used at [zoom] — coarser cells while zoomed out.
 ///
-/// The bands keep a heat cell at roughly a fifth of the visible world width:
-/// precision 1 ≈ 5000 km, 2 ≈ 625 km, 3 ≈ 78 km, 4 ≈ 20 km, 5 ≈ 4.9 km.
+/// The bands keep a heat cell at roughly a fifth of the visible world width.
+/// Mean side of the cell at the equator: precision 1 ≈ 5000 km, 2 ≈ 880 km,
+/// 3 ≈ 156 km, 4 ≈ 28 km, 5 ≈ 4.9 km.
 int precisionForZoom(double zoom) {
   if (zoom < 4) {
     return 1;

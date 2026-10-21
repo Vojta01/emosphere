@@ -125,6 +125,20 @@ class Strings {
   String get checkInsShort => t('checkInsShort');
   String windowLabel(String windowKey) => t('window_$windowKey');
 
+  /// "1 buňka" / "3 buňky" / "8 buněk" (Czech plural rules).
+  String mapCellsCount(int count) {
+    if (isEnglish) {
+      return '$count ${count == 1 ? t('map.cellOne') : t('map.cellMany')}';
+    }
+    if (count == 1) {
+      return '1 ${t('map.cellOne')}';
+    }
+    if (count >= 2 && count <= 4) {
+      return '$count ${t('map.cellFew')}';
+    }
+    return '$count ${t('map.cellMany')}';
+  }
+
   // -- Feed --------------------------------------------------------------
   String get feed => t('feed');
   String get friendsSection => t('friendsSection');
@@ -661,7 +675,9 @@ class Strings {
     },
 
     // -- Card 3: map, feed and friends --------------------------------------
-    'map.cells': <String, String>{'cs': 'buněk', 'en': 'cells'},
+    'map.cellOne': <String, String>{'cs': 'buňka', 'en': 'cell'},
+    'map.cellFew': <String, String>{'cs': 'buňky', 'en': 'cells'},
+    'map.cellMany': <String, String>{'cs': 'buněk', 'en': 'cells'},
     'map.friendRing': <String, String>{
       'cs': 'kroužek = check-in přítele',
       'en': 'ring = a friend checked in',

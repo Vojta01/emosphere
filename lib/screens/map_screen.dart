@@ -20,6 +20,7 @@ import '../core/geo/aggregate.dart';
 import '../core/geo/geohash.dart';
 import '../core/geo/heat.dart';
 import '../core/i18n/strings.dart';
+import '../core/models/checkin.dart';
 import '../core/models/emotion.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
@@ -63,11 +64,20 @@ class _MapScreenState extends State<MapScreen> {
   // ---------------------------------------------------------------------
 
   /// Re-aggregates only when the zoom band changes (not on every frame).
+  ///
+  /// The initial camera fit runs inside the first build, so the new precision
+  /// is stored right away and the rebuild is deferred to the next frame.
   void _onPositionChanged(MapCamera camera, bool hasGesture) {
     final precision = precisionForZoom(camera.zoom);
-    if (precision != _precision) {
-      setState(() => _precision = precision);
+    if (precision == _precision) {
+      return;
     }
+    _precision = precision;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   void _onMapTap(
@@ -103,18 +113,57 @@ class _MapScreenState extends State<MapScreen> {
     _controller.move(_fallbackCenter, _initialZoom);
   }
 
-  LatLng _initialCenter(List<CellAggregate> cells) {
+  LatLng _initialCenter(List<LatLng> points, List<CellAggregate> cells) {
     final mine = sortByNewest(widget.app.myCheckins);
     final hash = mine.isEmpty ? null : mine.first.geohash;
     if (hash != null && hash.isNotEmpty) {
       final center = Geohash.decode(hash);
       return LatLng(center.latitude, center.longitude);
     }
+    if (points.isNotEmpty) {
+      return points.first;
+    }
     if (cells.isNotEmpty) {
       final center = cells.first.center;
       return LatLng(center.latitude, center.longitude);
     }
     return _fallbackCenter;
+  }
+
+  /// Locations of [events] that carry a geohash, newest first.
+  ///
+  /// The first camera is fitted to these raw points instead of the aggregated
+  /// cells: the aggregation precision depends on the zoom, which the fit itself
+  /// determines, so fitting cells would open the map on a continent-sized cell
+  /// centre.
+  List<LatLng> _checkinPoints(List<CheckinEvent> events) {
+    final points = <LatLng>[];
+    for (final event in events) {
+      final geohash = event.geohash;
+      if (geohash == null || geohash.isEmpty) {
+        continue;
+      }
+      final point = Geohash.decode(geohash);
+      points.add(LatLng(point.latitude, point.longitude));
+    }
+    return points;
+  }
+
+  /// First camera: shows every check-in location of the current window.
+  ///
+  /// Returns `null` when no check-in carries a location — the map then opens on
+  /// [_initialCenter] at [_initialZoom]. [maxZoom] keeps a single point from
+  /// filling the screen with a degenerate (zero-area) fit.
+  CameraFit? _cameraFit(List<LatLng> points) {
+    if (points.isEmpty) {
+      return null;
+    }
+    return CameraFit.coordinates(
+      coordinates: points,
+      padding: const EdgeInsets.fromLTRB(56, 186, 56, 208),
+      maxZoom: 6,
+      minZoom: 1.5,
+    );
   }
 
   // ---------------------------------------------------------------------
@@ -137,9 +186,10 @@ class _MapScreenState extends State<MapScreen> {
             app.friends,
             precision: _precision,
           );
+          final points = _checkinPoints(windowed);
           return Stack(
             children: [
-              Positioned.fill(child: _map(cells, friendCells)),
+              Positioned.fill(child: _map(cells, friendCells, points)),
               Positioned(
                 top: 10,
                 left: 10,
@@ -164,12 +214,17 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Widget _map(List<CellAggregate> cells, Set<String> friendCells) {
+  Widget _map(
+    List<CellAggregate> cells,
+    Set<String> friendCells,
+    List<LatLng> points,
+  ) {
     return FlutterMap(
       mapController: _controller,
       options: MapOptions(
-        initialCenter: _initialCenter(cells),
+        initialCenter: _initialCenter(points, cells),
         initialZoom: _initialZoom,
+        initialCameraFit: _cameraFit(points),
         minZoom: 1.5,
         maxZoom: 18,
         backgroundColor: AppTheme.backgroundTop,
@@ -278,7 +333,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
                   Text(
-                    '${cells.length} ${s.tr('map.cells')}',
+                    s.mapCellsCount(cells.length),
                     key: const Key('map_cell_count'),
                     style: TextStyle(
                       fontSize: 11,
