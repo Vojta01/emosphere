@@ -31,11 +31,11 @@ class _HomeShellState extends State<HomeShell> {
       initialPrecision: widget.app.locationPrecision,
       publish: (emotion, intensity, note, precision) =>
           widget.app.publishCheckin(
-        emotion: emotion,
-        intensity: intensity,
-        note: note,
-        precision: precision,
-      ),
+            emotion: emotion,
+            intensity: intensity,
+            note: note,
+            precision: precision,
+          ),
     );
     if (published == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -58,8 +58,9 @@ class _HomeShellState extends State<HomeShell> {
           extendBody: true,
           backgroundColor: Colors.transparent,
           body: Container(
-            decoration:
-                const BoxDecoration(gradient: AppTheme.backgroundGradient),
+            decoration: const BoxDecoration(
+              gradient: AppTheme.backgroundGradient,
+            ),
             child: IndexedStack(
               index: _index,
               children: [
@@ -129,8 +130,9 @@ class _HomeShellState extends State<HomeShell> {
 
   Widget _navItem(int index, IconData icon, String label) {
     final selected = _index == index;
-    final color =
-        selected ? AppTheme.accent : Colors.white.withValues(alpha: 0.45);
+    final color = selected
+        ? AppTheme.accent
+        : Colors.white.withValues(alpha: 0.45);
     return GestureDetector(
       key: Key('nav_$index'),
       behavior: HitTestBehavior.opaque,
@@ -142,8 +144,7 @@ class _HomeShellState extends State<HomeShell> {
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: BoxDecoration(
                 color: selected
                     ? AppTheme.accent.withValues(alpha: 0.16)

@@ -348,8 +348,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                       IconButton(
-                        onPressed: () =>
-                            _copy(npub, s.tr('common.npubCopied')),
+                        onPressed: () => _copy(npub, s.tr('common.npubCopied')),
                         icon: const Icon(Icons.copy, size: 16),
                         color: AppTheme.accent,
                         visualDensity: VisualDensity.compact,
@@ -460,8 +459,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () =>
-                          _copy(nsec, s.tr('common.nsecCopied')),
+                      onPressed: () => _copy(nsec, s.tr('common.nsecCopied')),
                       icon: const Icon(Icons.copy, size: 16),
                       color: AppTheme.accent,
                       visualDensity: VisualDensity.compact,

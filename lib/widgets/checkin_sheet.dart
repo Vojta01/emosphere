@@ -53,13 +53,24 @@ class CheckinSheet extends StatefulWidget {
   State<CheckinSheet> createState() => _CheckinSheetState();
 }
 
-class _CheckinSheetState extends State<CheckinSheet> {
+class _CheckinSheetState extends State<CheckinSheet>
+    with SingleTickerProviderStateMixin {
   Emotion? _emotion;
   int _intensity = 3;
   final TextEditingController _note = TextEditingController();
   late LocationPrecision _precision = widget.initialPrecision;
   bool _sending = false;
   bool _sent = false;
+
+  /// Drives the success overlay (scrim fade + check mark pop).
+  late final AnimationController _confirm = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 420),
+  );
+  late final Animation<double> _confirmScale = CurvedAnimation(
+    parent: _confirm,
+    curve: Curves.easeOutBack,
+  );
 
   static const Color _sheetTop = Color(0xFF141A31);
   static const Color _sheetBottom = Color(0xFF0E1430);
@@ -68,6 +79,7 @@ class _CheckinSheetState extends State<CheckinSheet> {
 
   @override
   void dispose() {
+    _confirm.dispose();
     _note.dispose();
     super.dispose();
   }
@@ -77,19 +89,15 @@ class _CheckinSheetState extends State<CheckinSheet> {
     if (emotion == null || _sending || _sent) return;
     setState(() => _sending = true);
     try {
-      await widget.publish(
-        emotion,
-        _intensity,
-        _note.text.trim(),
-        _precision,
-      );
+      await widget.publish(emotion, _intensity, _note.text.trim(), _precision);
       if (!mounted) return;
       HapticFeedback.heavyImpact();
+      _confirm.forward(from: 0);
       setState(() {
         _sending = false;
         _sent = true;
       });
-      await Future<void>.delayed(const Duration(milliseconds: 650));
+      await Future<void>.delayed(const Duration(milliseconds: 900));
       if (!mounted) return;
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop(true);
@@ -122,45 +130,100 @@ class _CheckinSheetState extends State<CheckinSheet> {
           ),
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
-        child: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
+        child: Stack(
+          children: [
+            SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.22),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      s.tr('checkin.title'),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _emotionGrid(s),
+                    const SizedBox(height: 22),
+                    _intensityRow(s),
+                    const SizedBox(height: 12),
+                    _noteField(s),
+                    const SizedBox(height: 16),
+                    _locationPicker(s),
+                    const SizedBox(height: 22),
+                    _sendButton(s),
+                  ],
+                ),
+              ),
+            ),
+            if (_sent) Positioned.fill(child: _confirmationOverlay(s)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Success overlay: a scrim with a popping check mark in the emotion colour.
+  Widget _confirmationOverlay(Strings s) {
+    final color = _emotion?.color ?? AppTheme.accent;
+    return IgnorePointer(
+      child: Container(
+        decoration: BoxDecoration(
+          color: _sheetBottom.withValues(alpha: 0.93),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Center(
+          child: FadeTransition(
+            opacity: _confirm,
+            child: ScaleTransition(
+              scale: _confirmScale,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 96,
+                    height: 96,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.22),
-                      borderRadius: BorderRadius.circular(2),
+                      shape: BoxShape.circle,
+                      color: color.withValues(alpha: 0.18),
+                      boxShadow: AppTheme.glow(
+                        color,
+                        opacity: 0.45,
+                        blur: 36,
+                        spread: 2,
+                      ),
+                    ),
+                    child: Icon(Icons.check_rounded, size: 52, color: color),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    s.tr('checkin.sent'),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
                     ),
                   ),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  s.tr('checkin.title'),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                _emotionGrid(s),
-                const SizedBox(height: 22),
-                _intensityRow(s),
-                const SizedBox(height: 12),
-                _noteField(s),
-                const SizedBox(height: 16),
-                _locationPicker(s),
-                const SizedBox(height: 22),
-                _sendButton(s),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -176,7 +239,9 @@ class _CheckinSheetState extends State<CheckinSheet> {
       mainAxisSpacing: 10,
       crossAxisSpacing: 10,
       childAspectRatio: 0.88,
-      children: [for (final emotion in Emotion.values) _emotionTile(emotion, s)],
+      children: [
+        for (final emotion in Emotion.values) _emotionTile(emotion, s),
+      ],
     );
   }
 
@@ -297,17 +362,17 @@ class _CheckinSheetState extends State<CheckinSheet> {
           color: Colors.white.withValues(alpha: 0.30),
           fontSize: 11,
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(
-            color: AppTheme.accent.withValues(alpha: 0.7),
-          ),
+          borderSide: BorderSide(color: AppTheme.accent.withValues(alpha: 0.7)),
         ),
       ),
     );
@@ -368,8 +433,8 @@ class _CheckinSheetState extends State<CheckinSheet> {
 
   Widget _sendButton(Strings s) {
     final color = _emotion?.color ?? AppTheme.accent;
-    final foreground = ThemeData.estimateBrightnessForColor(color) ==
-            Brightness.dark
+    final foreground =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.dark
         ? Colors.white
         : Colors.black87;
     return SizedBox(
@@ -399,27 +464,27 @@ class _CheckinSheetState extends State<CheckinSheet> {
                   ],
                 )
               : _sending
-                  ? Row(
-                      key: const ValueKey('sending'),
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(s.tr('checkin.sending')),
-                      ],
-                    )
-                  : Text(
-                      s.tr('checkin.send'),
-                      key: const ValueKey('send'),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
+              ? Row(
+                  key: const ValueKey('sending'),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     ),
+                    const SizedBox(width: 10),
+                    Text(s.tr('checkin.sending')),
+                  ],
+                )
+              : Text(
+                  s.tr('checkin.send'),
+                  key: const ValueKey('send'),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
         ),
       ),
     );

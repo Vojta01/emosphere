@@ -629,5 +629,35 @@ class Strings {
     'nav.feed': <String, String>{'cs': 'Feed', 'en': 'Feed'},
     'nav.history': <String, String>{'cs': 'Historie', 'en': 'History'},
     'nav.settings': <String, String>{'cs': 'Nastavení', 'en': 'Settings'},
+    'set.keyBody': <String, String>{
+      'cs':
+          'Tajný klíč (nsec) je jediná záloha tvé identity. '
+          'Ulož si ho mimo tohle zařízení.',
+      'en':
+          'The secret key (nsec) is the only backup of your identity. '
+          'Store it outside this device.',
+    },
+    'set.revealKey': <String, String>{
+      'cs': 'Zobrazit klíč',
+      'en': 'Reveal key',
+    },
+    'set.hideKey': <String, String>{'cs': 'Skrýt klíč', 'en': 'Hide key'},
+    'set.copyKey': <String, String>{'cs': 'Kopírovat klíč', 'en': 'Copy key'},
+    'set.keyQrHint': <String, String>{
+      'cs': 'Naskenuj QR kód a ulož si klíč na bezpečné místo.',
+      'en': 'Scan the QR code and store your key in a safe place.',
+    },
+    'set.shareNpub': <String, String>{
+      'cs': 'Sdílet můj npub',
+      'en': 'Share my npub',
+    },
+    'set.npubQrHint': <String, String>{
+      'cs': 'Naskenuj a přidej si mě.',
+      'en': 'Scan to add me.',
+    },
+    'hist.last7': <String, String>{
+      'cs': 'Posledních 7 dní',
+      'en': 'Last 7 days',
+    },
   };
 }

@@ -14,9 +14,7 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: checkins.isEmpty ? _empty() : _content(),
-    );
+    return SafeArea(child: checkins.isEmpty ? _empty() : _content());
   }
 
   Widget _empty() {
