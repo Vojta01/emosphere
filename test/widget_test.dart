@@ -1,30 +1,30 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Smoke tests for the theme tokens the screens build on.
 
+import 'package:emosphere/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:emosphere/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  test('SPEC colours: accent and background gradient', () {
+    expect(AppTheme.accent, const Color(0xFF6366F1));
+    expect(AppTheme.backgroundGradient.colors.first, const Color(0xFF0B1020));
+    expect(AppTheme.backgroundGradient.colors.last, const Color(0xFF0E1430));
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  test('emotion palette exposes all eight colours', () {
+    expect(AppTheme.emotionColors, hasLength(8));
+    expect(AppTheme.emotionColors.first, const Color(0xFFFFD93D));
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('GlassCard renders inside the dark theme', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.dark(),
+        home: const Scaffold(
+          body: Center(child: GlassCard(child: Text('EmoSphere'))),
+        ),
+      ),
+    );
+    expect(find.text('EmoSphere'), findsOneWidget);
   });
 }

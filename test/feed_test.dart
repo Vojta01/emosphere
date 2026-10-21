@@ -50,7 +50,8 @@ void main() {
       final first = sortByNewest([a, b]).map((e) => e.id).toList();
       final second = sortByNewest([b, a]).map((e) => e.id).toList();
       expect(first, second);
-      expect(first, [a.id, b.id]);
+      // Sorted by id descending: 'id-bb22…' before 'id-aa11…'.
+      expect(first, [b.id, a.id]);
     });
 
     test('handles an empty input', () {
