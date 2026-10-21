@@ -31,11 +31,13 @@ flutter:
   uses-material-design: true
 
 # ---------------------------------------------------------------------------
-# Branding codegen. Regenerate the source art first:
+# Branding codegen. Order matters - flutter_launcher_icons rewrites
+# web/icons, web/favicon.png and web/manifest.json, so re-render the web set
+# afterwards:
 #   cd assets/branding && python3 build_svgs.py && ./render_icons.sh
-# then rerun the two generators:
 #   dart run flutter_launcher_icons
 #   dart run flutter_native_splash:create
+#   cd assets/branding && ./render_icons.sh && python3 verify_assets.py
 # ---------------------------------------------------------------------------
 
 # Launcher icon: legacy mipmaps + Android adaptive icon + web/PWA icons.

@@ -5,6 +5,16 @@
 # from icon_source.svg, the v4 "nebula planet" variant Vojta picked).
 # Regenerate the SVGs first if the geometry changed:  python3 build_svgs.py
 #
+# ORDER MATTERS: flutter_launcher_icons rewrites web/icons and web/favicon.png
+# (and re-serialises web/manifest.json) from the master icon. Run this script
+# again after the two generators so the web set keeps the brand art, including
+# the padded maskable variant:
+#   python3 build_svgs.py && ./render_icons.sh
+#   dart run flutter_launcher_icons
+#   dart run flutter_native_splash:create
+#   ./render_icons.sh
+#   python3 verify_assets.py
+#
 # Usage: ./render_icons.sh   (from anywhere; paths resolve from this file)
 set -euo pipefail
 cd "$(dirname "$0")"

@@ -148,8 +148,12 @@ def defs(bg=True):
     return "".join(out)
 
 
-def planet(scale=1.0, dx=0.0, dy=0.0, rim=True):
-    """The planet: disc, six-colour nebula wash, one orbit ring, eight dots."""
+def planet(scale=1.0, dx=CX, dy=CY, rim=True):
+    """The planet: disc, six-colour nebula wash, one orbit ring, eight dots.
+
+    [dx], [dy] is where the planet centre lands; scaling happens about it, so
+    the default keeps the planet centred on the canvas.
+    """
     g = []
     t = f'translate({dx},{dy}) scale({scale:g}) translate({-CX},{-CY})' if scale != 1.0 else None
     if t:
@@ -221,9 +225,9 @@ def main():
     )))
 
     # 2. Android adaptive foreground: transparent, art inside the 66/108 safe zone.
-    safe = 300 / R  # planet radius 300 -> 58.6% of the canvas, inside 61.1%
+    safe = 295 / R  # planet radius 295 -> rim stays well inside the 66/108 zone
     write("emosphere_adaptive_foreground.svg", svg(1024, 1024, defs(bg=False) + (
-        f'<circle cx="{CX}" cy="{CY}" r="330" fill="url(#halo)"/>'
+        f'<circle cx="{CX}" cy="{CY}" r="300" fill="url(#halo)"/>'
         + planet(scale=safe)
     )))
 
