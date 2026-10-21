@@ -103,6 +103,9 @@ class AppState extends ChangeNotifier {
   /// Maximum number of my check-ins kept in memory (and on disk).
   static const int myCheckinsLimit = 500;
 
+  /// Maximum number of my friends' check-ins kept in memory (card 3).
+  static const int friendCheckinsLimit = 100;
+
   final NostrService _service;
   SharedPreferences? _prefs;
 
@@ -110,6 +113,7 @@ class AppState extends ChangeNotifier {
   LocationPrecision _locationPrecision = LocationPrecision.off;
   final List<CheckinEvent> _myCheckins = <CheckinEvent>[];
   final List<CheckinEvent> _worldCheckins = <CheckinEvent>[];
+  final List<CheckinEvent> _friendCheckins = <CheckinEvent>[];
   final Map<String, NostrProfile> _profiles = <String, NostrProfile>{};
   List<String> _friends = <String>[];
   bool _syncInProgress = false;
@@ -201,6 +205,7 @@ class AppState extends ChangeNotifier {
     await _service.clearIdentity();
     _myCheckins.clear();
     _worldCheckins.clear();
+    _friendCheckins.clear();
     _profiles.clear();
     await _persistMyCheckins();
     _notify();
@@ -294,7 +299,7 @@ class AppState extends ChangeNotifier {
     return checkin;
   }
 
-  /// Fetches my check-ins, the world window and friend profiles from relays.
+  /// Fetches my check-ins, the world window, my friends and their profiles.
   ///
   /// Never throws: offline use simply keeps the cached lists.
   Future<void> refresh({bool includeProfiles = true}) async {
@@ -316,6 +321,9 @@ class AppState extends ChangeNotifier {
       _merge(_worldCheckins, world, limit: worldLimit);
     } on NostrException {
       // Keep whatever we already have.
+    }
+    if (_friends.isNotEmpty) {
+      await refreshFriendCheckins();
     }
     if (includeProfiles && _friends.isNotEmpty) {
       await refreshProfiles();
@@ -353,28 +361,65 @@ class AppState extends ChangeNotifier {
 
   /// Adds a friend from an `npub...` or hex key; stores the list.
   ///
-  /// The returned [AddFriendOutcome] tells the UI what happened.
+  /// The returned [AddFriendOutcome] tells the UI what happened. A successful
+  /// add fetches the friend's profile (kind 0) and their latest check-ins in
+  /// the background.
   AddFriendOutcome addFriend(String input) {
     final result = addFriendKey(_friends, input);
     if (result.outcome == AddFriendOutcome.added) {
       _friends = result.keys;
       unawaited(_prefs?.setStringList(keyFriends, _friends));
       unawaited(refreshProfiles());
+      unawaited(refreshFriendCheckins());
       _notify();
     }
     return result.outcome;
   }
 
   /// Removes a friend by `npub...` or hex key. Returns `true` when removed.
+  ///
+  /// The removed author's check-ins leave the friend list as well, so the feed
+  /// and the map update immediately.
   bool removeFriend(String input) {
     final updated = removeFriendKey(_friends, input);
     if (updated.length == _friends.length) {
       return false;
     }
     _friends = updated;
+    _friendCheckins.removeWhere(
+      (checkin) => !_friends.contains(checkin.pubkey.trim().toLowerCase()),
+    );
     unawaited(_prefs?.setStringList(keyFriends, _friends));
     _notify();
     return true;
+  }
+
+  /// My friends' check-ins from the last [worldWindow], newest first.
+  ///
+  /// Fetched by author (not part of [worldCheckins]), so the friends section of
+  /// the feed keeps working when the world pool is capped by recency.
+  List<CheckinEvent> get friendCheckins =>
+      List<CheckinEvent>.unmodifiable(_friendCheckins);
+
+  /// Fetches the newest check-ins of my friends from relays.
+  ///
+  /// Never throws: offline use keeps the cached list.
+  Future<void> refreshFriendCheckins() async {
+    if (_friends.isEmpty) {
+      return;
+    }
+    try {
+      final since = DateTime.now().toUtc().subtract(worldWindow);
+      final fetched = await _service.fetchCheckins(
+        since: since,
+        authors: List<String>.of(_friends),
+        limit: friendCheckinsLimit,
+      );
+      _merge(_friendCheckins, fetched, limit: friendCheckinsLimit);
+      _notify();
+    } on NostrException {
+      // Offline — keep the cache.
+    }
   }
 
   /// Known kind 0 profiles keyed by hex pubkey.
@@ -418,8 +463,13 @@ class AppState extends ChangeNotifier {
         .listen(
           (checkin) {
             _merge(_worldCheckins, <CheckinEvent>[checkin], limit: worldLimit);
-            if (checkin.pubkey.toLowerCase() ==
-                (pubkeyHex ?? '').toLowerCase()) {
+            final author = checkin.pubkey.trim().toLowerCase();
+            if (_friends.contains(author)) {
+              _merge(_friendCheckins, <CheckinEvent>[
+                checkin,
+              ], limit: friendCheckinsLimit);
+            }
+            if (author == (pubkeyHex ?? '').toLowerCase()) {
               _merge(_myCheckins, <CheckinEvent>[
                 checkin,
               ], limit: myCheckinsLimit);

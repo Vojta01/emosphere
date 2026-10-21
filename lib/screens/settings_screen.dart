@@ -1,15 +1,12 @@
 // Settings screen — relays, location precision, language, key, data.
-//
-// Minimal scaffold for the core (card 1); card 2 extends it (key backup with
-// QR, about dialog, haptics).
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 import '../core/i18n/strings.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
+import '../widgets/key_qr_dialog.dart';
 
 /// Settings: profile key, language, location precision, relays, my data.
 class SettingsScreen extends StatefulWidget {
@@ -205,16 +202,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _showNpubQr(String npub) async {
     HapticFeedback.lightImpact();
-    await showDialog<void>(
-      context: context,
-      builder: (context) => _KeyQrDialog(
-        s: widget.s,
-        title: widget.s.tr('profile'),
-        value: npub,
-        hint: widget.s.tr('set.npubQrHint'),
-        copyMessage: widget.s.tr('common.npubCopied'),
-        warning: null,
-      ),
+    await showKeyQrDialog(
+      context,
+      s: widget.s,
+      title: widget.s.tr('profile'),
+      value: npub,
+      hint: widget.s.tr('set.npubQrHint'),
+      copyMessage: widget.s.tr('common.npubCopied'),
+      // A public key needs no masking.
+      masked: false,
     );
   }
 
@@ -286,16 +282,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return;
     }
     HapticFeedback.lightImpact();
-    await showDialog<void>(
-      context: context,
-      builder: (context) => _KeyQrDialog(
-        s: widget.s,
-        title: widget.s.tr('keyBackup'),
-        value: nsec,
-        hint: widget.s.tr('set.keyQrHint'),
-        copyMessage: widget.s.tr('common.nsecCopied'),
-        warning: widget.s.tr('onb.step3.warning'),
-      ),
+    await showKeyQrDialog(
+      context,
+      s: widget.s,
+      title: widget.s.tr('keyBackup'),
+      value: nsec,
+      hint: widget.s.tr('set.keyQrHint'),
+      copyMessage: widget.s.tr('common.nsecCopied'),
+      warning: widget.s.tr('onb.step3.warning'),
     );
   }
 
@@ -449,207 +443,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Modal that shows a Nostr key (`nsec` or `npub`) as masked text, with a
-/// reveal toggle, a copy button and a QR code.
-///
-/// Used by Settings for the key backup ([nsec]) and for sharing the public
-/// key ([npub]); [warning] is only shown for the secret key.
-class _KeyQrDialog extends StatefulWidget {
-  const _KeyQrDialog({
-    required this.s,
-    required this.title,
-    required this.value,
-    required this.hint,
-    required this.copyMessage,
-    this.warning,
-  });
-
-  /// Localized strings of the current app language.
-  final Strings s;
-
-  /// Dialog title (already localized).
-  final String title;
-
-  /// Key shown as text and encoded into the QR code.
-  final String value;
-
-  /// Hint printed under the QR code.
-  final String hint;
-
-  /// Snack bar text after a successful copy.
-  final String copyMessage;
-
-  /// Optional warning banner (secret key).
-  final String? warning;
-
-  @override
-  State<_KeyQrDialog> createState() => _KeyQrDialogState();
-}
-
-class _KeyQrDialogState extends State<_KeyQrDialog> {
-  bool _revealed = false;
-
-  Future<void> _copy() async {
-    await Clipboard.setData(ClipboardData(text: widget.value));
-    if (!mounted) {
-      return;
-    }
-    HapticFeedback.lightImpact();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(widget.copyMessage),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final warning = widget.warning;
-    return AlertDialog(
-      title: Row(
-        children: [
-          const Icon(Icons.key, size: 18, color: AppTheme.accent),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              widget.title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (warning != null) ...[
-              Container(
-                padding: const EdgeInsets.all(11),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFBBF24).withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFFFBBF24).withValues(alpha: 0.35),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.warning_amber_rounded,
-                      size: 17,
-                      color: Color(0xFFFBBF24),
-                    ),
-                    const SizedBox(width: 9),
-                    Expanded(
-                      child: Text(
-                        warning,
-                        style: TextStyle(
-                          fontSize: 11,
-                          height: 1.4,
-                          color: const Color(0xFFFBBF24)
-                              .withValues(alpha: 0.95),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
-            ],
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-              ),
-              child: SelectableText(
-                _revealed ? widget.value : '•' * 20,
-                key: const Key('settings_key_value'),
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 11,
-                  height: 1.5,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton.icon(
-                    key: const Key('settings_key_toggle'),
-                    onPressed: () => setState(() => _revealed = !_revealed),
-                    icon: Icon(
-                      _revealed ? Icons.visibility_off : Icons.visibility,
-                      size: 16,
-                    ),
-                    label: Text(
-                      widget.s.tr(_revealed ? 'set.hideKey' : 'set.revealKey'),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  key: const Key('settings_key_copy'),
-                  tooltip: widget.copyMessage,
-                  color: AppTheme.accent,
-                  icon: const Icon(Icons.copy, size: 18),
-                  onPressed: _copy,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // A tight box stops the AlertDialog intrinsic measurement before
-            // it reaches the QR widget's LayoutBuilder.
-            Center(
-              child: SizedBox(
-                width: 192,
-                height: 192,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: QrImageView(
-                    data: widget.value,
-                    version: QrVersions.auto,
-                    size: 168,
-                    backgroundColor: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              widget.hint,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11,
-                height: 1.4,
-                color: Colors.white.withValues(alpha: 0.5),
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(widget.s.tr('close')),
-        ),
-      ],
     );
   }
 }

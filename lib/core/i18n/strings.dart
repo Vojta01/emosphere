@@ -659,5 +659,70 @@ class Strings {
       'cs': 'Posledních 7 dní',
       'en': 'Last 7 days',
     },
+
+    // -- Card 3: map, feed and friends --------------------------------------
+    'map.cells': <String, String>{'cs': 'buněk', 'en': 'cells'},
+    'map.friendRing': <String, String>{
+      'cs': 'kroužek = check-in přítele',
+      'en': 'ring = a friend checked in',
+    },
+    'map.recenter': <String, String>{'cs': 'Na mě', 'en': 'Recenter'},
+    'map.breakdown': <String, String>{
+      'cs': 'Rozpad emocí',
+      'en': 'Emotion breakdown',
+    },
+    'map.friendsHere': <String, String>{
+      'cs': 'Je tu i někdo z tvých blízkých',
+      'en': 'Someone from your close ones is here',
+    },
+    'map.hint': <String, String>{
+      'cs': 'Klepni na buňku a uvidíš rozpad emocí.',
+      'en': 'Tap a cell to see the emotion breakdown.',
+    },
+    'friends.addHint': <String, String>{
+      'cs': 'Vlož npub přítele (npub1…)',
+      'en': "Paste your friend's npub (npub1…)",
+    },
+    'friends.addAction': <String, String>{
+      'cs': 'Přidat přítele',
+      'en': 'Add friend',
+    },
+    'friends.valid': <String, String>{
+      'cs': 'Platný npub — můžeš přidat.',
+      'en': 'Valid npub — you can add it.',
+    },
+    'friends.duplicate': <String, String>{
+      'cs': 'Tenhle npub už v seznamu je.',
+      'en': 'That npub is already in your list.',
+    },
+    'friends.removeConfirm': <String, String>{
+      'cs': 'Odebrat přítele?',
+      'en': 'Remove friend?',
+    },
+    'friends.removeBody': <String, String>{
+      'cs': 'Jeho check-iny zmizí ze sekce Moji blízcí.',
+      'en': 'Their check-ins disappear from My close ones.',
+    },
+    'friends.loadProfiles': <String, String>{
+      'cs': 'Načíst profily',
+      'en': 'Load profiles',
+    },
+    'friends.profilesLoading': <String, String>{
+      'cs': 'Načítám profily…',
+      'en': 'Loading profiles…',
+    },
+    'friends.noCheckins': <String, String>{
+      'cs': 'zatím bez check-inu',
+      'en': 'no check-in yet',
+    },
+    'friends.lastCheckin': <String, String>{
+      'cs': 'Poslední check-in',
+      'en': 'Latest check-in',
+    },
+    'friends.list': <String, String>{
+      'cs': 'Seznam přátel',
+      'en': 'Friend list',
+    },
+    'feed.posts': <String, String>{'cs': 'check-inů', 'en': 'check-ins'},
   };
 }

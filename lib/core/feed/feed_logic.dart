@@ -39,6 +39,25 @@ List<CheckinEvent> filterByAuthors(
   ];
 }
 
+/// Merges the world stream with the check-ins of my friends.
+///
+/// Deduplicated by event id (a friend's check-in is normally part of the world
+/// stream too) and sorted newest first. This is the pool the world feed, the
+/// friends section and the map heat layer work on.
+List<CheckinEvent> checkinPool(
+  Iterable<CheckinEvent> world,
+  Iterable<CheckinEvent> friends,
+) {
+  final byId = <String, CheckinEvent>{};
+  for (final event in world) {
+    byId[event.id] = event;
+  }
+  for (final event in friends) {
+    byId[event.id] = event;
+  }
+  return sortByNewest(byId.values);
+}
+
 /// Returns the newest check-in of every author, newest first.
 List<CheckinEvent> latestPerAuthor(Iterable<CheckinEvent> events) {
   final newest = <String, CheckinEvent>{};
