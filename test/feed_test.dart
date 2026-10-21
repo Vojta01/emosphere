@@ -143,4 +143,64 @@ void main() {
       expect(friendsFeed(events, [alice, bob]), isEmpty);
     });
   });
+
+  group('checkinPool', () {
+    test('merges world and friend check-ins, newest first', () {
+      final shared = checkin(bob, base.add(const Duration(hours: 1)));
+      final pool = checkinPool(
+        [checkin(alice, base), shared],
+        [shared, checkin(carol, base.add(const Duration(hours: 2)))],
+      );
+      expect(pool.map((e) => e.pubkey), [carol, bob, alice]);
+    });
+
+    test('keeps a single copy of an event that is in both lists', () {
+      final world = CheckinEvent(
+        id: 'same-id',
+        pubkey: bob,
+        emotion: Emotion.joy,
+        intensity: 3,
+        createdAt: base,
+      );
+      final friend = CheckinEvent(
+        id: 'same-id',
+        pubkey: bob,
+        emotion: Emotion.joy,
+        intensity: 4,
+        note: 'ahoj',
+        createdAt: base,
+      );
+      final pool = checkinPool([world], [friend]);
+      expect(pool, hasLength(1));
+      // The friend query carries the freshest copy of the event.
+      expect(pool.single.intensity, 4);
+      expect(pool.single.note, 'ahoj');
+    });
+
+    test('works with either side empty', () {
+      final only = checkin(alice, base);
+      expect(
+        checkinPool(const <CheckinEvent>[], const <CheckinEvent>[]),
+        isEmpty,
+      );
+      expect(checkinPool([only], const <CheckinEvent>[]).single.id, only.id);
+      expect(checkinPool(const <CheckinEvent>[], [only]).single.id, only.id);
+    });
+
+    test('is the source for the world feed and the friends section', () {
+      final friendCheckin = checkin(
+        alice,
+        base.add(const Duration(minutes: 5)),
+      );
+      final pool = checkinPool(
+        [
+          checkin(bob, base),
+          checkin(carol, base.add(const Duration(minutes: 9))),
+        ],
+        [friendCheckin],
+      );
+      expect(worldFeed(pool, limit: 2).map((e) => e.pubkey), [carol, alice]);
+      expect(friendsFeed(pool, [alice]).single.id, friendCheckin.id);
+    });
+  });
 }

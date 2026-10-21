@@ -116,21 +116,28 @@ void main() {
   });
 
   group('dedupeFriendKeys', () {
-    test('removes duplicates case-insensitively, keeps order', () {
+    test('collapses npub and hex forms of the same key into hex', () {
       final deduped = dedupeFriendKeys(<String>[
         hexKey,
-        npubKey, // same key in npub form -> different string, still listed
+        npubKey, // same key in npub form
         hexKey.toUpperCase(),
         '  $hexKey  ',
         'aa${'0' * 60}',
       ]);
-      // dedupe operates on raw hex strings; the npub form is a different
-      // string and the caller normalizes input before calling it.
-      expect(deduped, [hexKey, npubKey, 'aa${'0' * 60}']);
+      expect(deduped, [hexKey, 'aa${'0' * 60}']);
+    });
+
+    test('keeps the first-seen order of distinct keys', () {
+      final second = 'aa${'0' * 60}';
+      expect(dedupeFriendKeys([second, npubKey]), [second, hexKey]);
     });
 
     test('drops blank entries', () {
       expect(dedupeFriendKeys(['', '  ', hexKey]), [hexKey]);
+    });
+
+    test('keeps unparsable entries once, lowercased', () {
+      expect(dedupeFriendKeys(['Garbage', 'garbage', ' x ']), ['garbage', 'x']);
     });
   });
 
