@@ -73,4 +73,4 @@ Check back soon for screenshots and the first release.
 
 ## License
 
-TBD.
+MIT — see [LICENSE](LICENSE).
