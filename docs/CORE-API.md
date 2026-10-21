@@ -148,20 +148,59 @@ code is missing from either language.
 
 - `lib/main.dart` — bootstrap wired: splash → onboarding (no key) →
   `HomeShell`. Keep `AppTheme.dark()` and the `AppState` lifecycle here.
-- `lib/screens/home_shell.dart` — bottom nav + FAB; passes `AppState` into
-  `MapScreen`, `FeedScreen`, `HistoryScreen`, `SettingsScreen`.
-- `lib/screens/feed_screen.dart`, `map_screen.dart`, `settings_screen.dart` —
-  minimal scaffolds written for card 1 so the project compiles and runs;
-  card 2/3 replaces them with the full versions (flutter_map tiles, friends
-  section, key backup with QR, …). Constructor signatures to keep:
-  `FeedScreen({required AppState app})`, `MapScreen({required AppState app})`,
+- `lib/screens/home_shell.dart` — bottom nav (Mapa / Feed / Historie /
+  Nastavení) + `FloatingActionButton.extended` ("Jak se cítíš?") that opens the
+  check-in sheet. Passes `AppState` into the four screens.
+- `lib/screens/onboarding_screen.dart` — **full** (card 2): 3 steps (welcome →
+  key generation/import → nsec backup as text + QR), `PageView` with a step
+  indicator, CZ/EN.
+- `lib/widgets/checkin_sheet.dart` — **full** (card 2): `showCheckinSheet(...)`
+  → `CheckinSheet` with 8 emotion tiles, intensity 1–5, note (140 chars),
+  location picker and the send button; success = heavy haptic + animated check
+  overlay, then the sheet pops with `true`. Failure keeps the sheet open and
+  shows `checkin.failed`.
+- `lib/screens/history_screen.dart` — **full** (card 2): timeline + per-emotion
+  bars + seven-day mini chart (`_DayBucket`, dominant emotion weighted by
+  intensity).
+- `lib/screens/settings_screen.dart` — **full** (card 2): profile (npub copy +
+  QR share), key backup (`_KeyQrDialog`: masked nsec, reveal, copy, QR),
+  language, location precision, relay editor, delete my data (NIP-09) and about.
+- `lib/screens/feed_screen.dart`, `map_screen.dart` — minimal scaffolds written
+  for card 1 so the project compiles and runs; card 3 replaces them with the
+  full versions (flutter_map tiles, friends section). Constructor signatures to
+  keep: `FeedScreen({required AppState app})`,
+  `MapScreen({required AppState app})`,
   `SettingsScreen({required AppState app, required Strings s})`.
+
+## Widget-test pitfalls
+
+- `FlutterSecureStorage` (channel
+  `plugins.it_nomads.com/flutter_secure_storage`) has no handler in
+  `flutter test` and its `read` future **never completes**. Any test that calls
+  `AppState.init` must install a mock, or the test hangs forever:
+
+  ```dart
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(_secureStorageChannel, (call) async => null);
+  ```
+
+  `SharedPreferences.setMockInitialValues({})` alone is not enough. With the
+  mock in place `AppState.generateIdentity()` works headless.
+- `QrImageView` (qr_flutter) always builds a `LayoutBuilder`, which cannot
+  answer intrinsic-dimension queries — so it must never sit inside an
+  `AlertDialog` content subtree without a tight `SizedBox` wrapper around it.
+- The check-in sheet animates a `CircularProgressIndicator` while sending:
+  prefer explicit `pump(Duration(...))` over `pumpAndSettle()` between the tap
+  and the auto-close.
+- Screens are taller than the default 800×600 test surface — set a tall
+  surface (`tester.binding.setSurfaceSize(const Size(500, 1600))`) so
+  lazy `ListView` children are built and tappable.
 
 ## Checks
 
 ```
 flutter analyze                 # clean
-flutter test                    # 97 tests
+flutter test                    # 115 tests
 dart format lib test            # Dart style (not enforced by CI, run it)
 ```
 
