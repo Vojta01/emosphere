@@ -1,12 +1,19 @@
 {
-    "name": "emosphere",
-    "short_name": "emosphere",
+    "name": "EmoSphere",
+    "short_name": "EmoSphere",
+    "description": "Podívej se, jak se svět právě teď cítí — globální mapa nálad na Nostr.",
+    "lang": "cs",
     "start_url": ".",
+    "scope": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
     "orientation": "portrait-primary",
+    "background_color": "#0B1020",
+    "theme_color": "#0B1020",
+    "categories": [
+        "lifestyle",
+        "social",
+        "health"
+    ],
     "prefer_related_applications": false,
     "icons": [
         {

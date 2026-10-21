@@ -247,6 +247,10 @@ def main():
           f'font-weight="bold" font-size="116" letter-spacing="2" fill="url(#wm)">{WORDMARK}</text>'
     )))
 
+    # 5b. Logo only, no wordmark: the Android 12 system splash crops the icon
+    #     to a circle of 2/3 of the image, so keep the art well inside that.
+    write("emosphere_logo.svg", svg(1024, 1024, defs(bg=False) + planet(scale=0.9)))
+
     # 6. Splash portrait (phone) and landscape (tablet/desktop) backdrops.
     write("emosphere_splash_portrait.svg", svg(1080, 2340, defs() + (
         '<rect width="1080" height="2340" fill="url(#bg)"/>'

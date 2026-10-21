@@ -34,6 +34,8 @@ $R -w 192 -h 192 emosphere_maskable.svg -o emosphere_maskable_192.png
 
 # --- Splash screens + hero --------------------------------------------------
 $R -w 1024 -h 1024 emosphere_splash_hero.svg -o emosphere_splash_hero_1024.png
+$R -w 1024 -h 1024 emosphere_logo.svg -o emosphere_logo_1024.png
+$R -w  512 -h  512 emosphere_logo.svg -o emosphere_logo_512.png
 $R -w 1080 -h 2340 emosphere_splash_portrait.svg -o splash_portrait.png
 $R -w 2340 -h 1080 emosphere_splash_landscape.svg -o splash_landscape.png
 

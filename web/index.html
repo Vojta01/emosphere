@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="cs">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -12,25 +12,35 @@
     * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
 
     This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
+    the `--base-href` argument provided by `flutter build`.
   -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Podívej se, jak se svět právě teď cítí — globální mapa nálad na Nostr.">
+
+  <!-- Dark premium app: colour the browser chrome and avoid a white flash
+       before the Flutter engine paints its first frame. -->
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0B1020">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="emosphere">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EmoSphere">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>emosphere</title>
+  <title>EmoSphere</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    html, body { margin: 0; height: 100%; background-color: #0B1020; }
+  </style>
 </head>
 <body>
   <!--
