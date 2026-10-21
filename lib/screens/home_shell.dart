@@ -63,8 +63,8 @@ class _HomeShellState extends State<HomeShell> {
             child: IndexedStack(
               index: _index,
               children: [
-                const MapScreen(),
-                const FeedScreen(),
+                MapScreen(app: widget.app),
+                FeedScreen(app: widget.app),
                 HistoryScreen(s: s, checkins: widget.app.myCheckins),
                 SettingsScreen(app: widget.app, s: s),
               ],
