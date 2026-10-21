@@ -59,6 +59,8 @@ class HistoryScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         _statsCard(counts),
+        const SizedBox(height: 12),
+        _weekCard(),
         const SizedBox(height: 18),
         for (final checkin in checkins) ...[
           _checkinCard(checkin),
@@ -96,6 +98,7 @@ class HistoryScreen extends StatelessWidget {
               ),
               Text(
                 '$total',
+                key: const Key('hist_total'),
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
@@ -165,6 +168,117 @@ class HistoryScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// One column per day of the last seven days: bar height = check-in count,
+  /// colour = the day's dominant emotion (weighted by intensity).
+  Widget _weekCard() {
+    final buckets = _lastSevenDays();
+    final maxCount = buckets.fold<int>(
+      1,
+      (best, bucket) => bucket.count > best ? bucket.count : best,
+    );
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            s.tr('hist.last7'),
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.white.withValues(alpha: 0.65),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 104,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                for (final bucket in buckets)
+                  Expanded(child: _dayColumn(bucket, maxCount)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dayColumn(_DayBucket bucket, int maxCount) {
+    final dominant = bucket.dominant;
+    final color = dominant?.color ?? Colors.white.withValues(alpha: 0.35);
+    final barHeight = bucket.count == 0
+        ? 4.0
+        : 14 + (bucket.count / maxCount) * 44;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Text(
+          bucket.count == 0 ? '' : '${bucket.count}',
+          key: Key('day_count_${bucket.day.weekday}'),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: Colors.white.withValues(alpha: 0.6),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          height: barHeight,
+          width: 18,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: bucket.count == 0 ? 0.5 : 0.9),
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: bucket.count == 0
+                ? null
+                : AppTheme.glow(color, opacity: 0.35, blur: 12, spread: 0),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          _weekdayLabel(bucket.day),
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.white.withValues(alpha: 0.45),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The seven day buckets of the current week, oldest first.
+  List<_DayBucket> _lastSevenDays() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final buckets = <_DayBucket>[
+      for (var offset = 6; offset >= 0; offset--)
+        _DayBucket(day: today.subtract(Duration(days: offset))),
+    ];
+    for (final checkin in checkins) {
+      final local = checkin.createdAt.toLocal();
+      final day = DateTime(local.year, local.month, local.day);
+      for (final bucket in buckets) {
+        if (bucket.day == day) {
+          bucket.add(checkin);
+          break;
+        }
+      }
+    }
+    return buckets;
+  }
+
+  String _weekdayLabel(DateTime day) {
+    const czech = <String>['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'];
+    const english = <String>['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    final labels = s.language == 'en' ? english : czech;
+    return labels[day.weekday - 1];
   }
 
   Widget _checkinCard(CheckinEvent checkin) {
@@ -297,4 +411,41 @@ class HistoryScreen extends StatelessWidget {
     }
     return '${time.day}. ${time.month}.';
   }
+}
+
+/// Check-ins of one local day (used by the seven-day mini chart).
+class _DayBucket {
+  _DayBucket({required this.day});
+
+  /// Local midnight of the day.
+  final DateTime day;
+
+  /// Check-ins published on [day].
+  final List<CheckinEvent> items = <CheckinEvent>[];
+
+  /// Number of check-ins on [day].
+  int get count => items.length;
+
+  /// The day's dominant emotion — the highest total intensity; ties fall back
+  /// to the first check-in. `null` when nothing was published.
+  Emotion? get dominant {
+    if (items.isEmpty) {
+      return null;
+    }
+    final weights = <Emotion, int>{};
+    for (final item in items) {
+      weights[item.emotion] = (weights[item.emotion] ?? 0) + item.intensity;
+    }
+    var best = items.first.emotion;
+    var bestWeight = -1;
+    for (final entry in weights.entries) {
+      if (entry.value > bestWeight) {
+        best = entry.key;
+        bestWeight = entry.value;
+      }
+    }
+    return best;
+  }
+
+  void add(CheckinEvent checkin) => items.add(checkin);
 }
