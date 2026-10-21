@@ -88,6 +88,19 @@ CellAggregate: geohash, center, count, counts, weights, dominant,
                totalWeight, shareOf(emotion)
 ```
 
+`heat.dart` — pure heat-layer geometry used by `map_screen.dart` (no
+flutter_map import, so it stays unit-testable):
+
+```dart
+precisionForZoom(zoom)      // 1 (zoom <4) … 5 (zoom ≥12); cell ≈ 1/5 of the view
+cellSizeMeters(geohash)     // mean side of the cell from Geohash.bounds
+heatRadiusMeters(geohash, {factor = 0.62})  // clamped to 400 m … 2600 km
+heatOpacity(count, {maxCount, min = 0.24, max = 0.74})  // logarithmic
+distanceMeters(a, b)        // haversine
+cellAt(cells, point, {tolerance = 1.6})     // nearest cell containing the tap
+friendCellHashes(events, friendPubkeys, {required precision})
+```
+
 ## State — `lib/core/state/app_state.dart`
 
 `AppState extends ChangeNotifier` — pass the instance to screens and listen
@@ -118,16 +131,23 @@ startLiveUpdates() / stopLiveUpdates()
 
 // friends
 friends (hex keys) / addFriend(npubOrHex) → AddFriendOutcome / removeFriend() → bool
+friendCheckins (last worldWindow, newest first) / refreshFriendCheckins()
+friendCheckinsLimit = 100
 profiles / profileOf(hex) / refreshProfiles()
 ```
+
+`refresh()` fetches my check-ins, the world window and (when friends exist)
+their check-ins plus kind 0 metadata. The live subscription merges new events
+into `worldCheckins` and into `friendCheckins` when the author is a friend.
 
 Preference keys: `AppState.keyLanguage`, `keyLocationPrecision`, `keyRelays`,
 `keyFriends`, `keyMyCheckins` (JSON cache of my check-ins). Test helper:
 `SharedPreferences.setMockInitialValues({})` + `AppState(..., autoSync: false)`.
 
 Other helpers: `lib/core/social/friends.dart` (npub add/remove/dedupe,
-`AddFriendOutcome`), `lib/core/feed/feed_logic.dart` (`sortByNewest`,
-`filterByAuthors`, `latestPerAuthor`, `worldFeedLimit = 50`).
+`AddFriendOutcome` — `dedupeFriendKeys` collapses an `npub…` entry into its hex
+form), `lib/core/feed/feed_logic.dart` (`sortByNewest`, `filterByAuthors`,
+`latestPerAuthor`, `checkinPool`, `worldFeedLimit = 50`).
 
 ## i18n — `lib/core/i18n/strings.dart`
 
@@ -136,7 +156,7 @@ final s = Strings(app.language);   // 'cs' | 'en' (unknown → 'cs')
 s.tr('checkin.title')              // dot-notation keys used by the screens
 s.t('checkinTitle')                // raw lookup (same dictionary)
 s.hasKey(key)                      // test helper
-s.timeAgo(utcDateTime) / s.checkinsCount(n) / named getters (s.cancel, …)
+s.timeAgo(utcDateTime) / s.checkinsCount(n) / s.mapCellsCount(n) / named getters (s.cancel, …)
 Strings.cs / Strings.en / Strings.of(code) / Strings.supportedCodes
 ```
 
@@ -144,7 +164,7 @@ Adding text = add one entry to the `_values` map (both `cs` and `en`).
 `test/strings_test.dart` scans `lib/` and fails when a `tr('…')` key used in
 code is missing from either language.
 
-## Screens status (for cards 2/3)
+## Screens status (for cards 3+)
 
 - `lib/main.dart` — bootstrap wired: splash → onboarding (no key) →
   `HomeShell`. Keep `AppTheme.dark()` and the `AppState` lifecycle here.
@@ -163,14 +183,36 @@ code is missing from either language.
   bars + seven-day mini chart (`_DayBucket`, dominant emotion weighted by
   intensity).
 - `lib/screens/settings_screen.dart` — **full** (card 2): profile (npub copy +
-  QR share), key backup (`_KeyQrDialog`: masked nsec, reveal, copy, QR),
-  language, location precision, relay editor, delete my data (NIP-09) and about.
-- `lib/screens/feed_screen.dart`, `map_screen.dart` — minimal scaffolds written
-  for card 1 so the project compiles and runs; card 3 replaces them with the
-  full versions (flutter_map tiles, friends section). Constructor signatures to
-  keep: `FeedScreen({required AppState app})`,
-  `MapScreen({required AppState app})`,
-  `SettingsScreen({required AppState app, required Strings s})`.
+  QR share), key backup (masked nsec, reveal, copy, QR), language, location
+  precision, relay editor, delete my data (NIP-09) and about. The QR dialog
+  itself lives in `lib/widgets/key_qr_dialog.dart` (card 3):
+  `showKeyQrDialog(context, {s, title, value, hint, copyMessage, warning,
+  keyPrefix = 'settings', masked = true})` — widget keys are prefixed with
+  `keyPrefix` (`<prefix>_key_value`, `_key_toggle`, `_key_copy`), so tests can
+  address the dialog of a given screen.
+- `lib/screens/feed_screen.dart` — **full** (card 3): "Moji blízcí" (friend
+  chips with add / remove / share-npub and the latest check-in card per friend,
+  kind 0 name + avatar with an initial fallback) and "Právě teď ve světě"
+  (`worldFeedLimit` newest check-ins of the pool, my own excluded; card =
+  emotion colour, relative time, intensity dots, note, coarse geohash). Both
+  sections read `checkinPool(app.worldCheckins, app.friendCheckins)`, so a
+  friend's check-in is never listed twice. Keys: `feed_add_friend`,
+  `feed_share_npub`, `feed_reload_friends`, `friends_npub_field`,
+  `friends_add_confirm`, `friend_chip_<short key>`.
+- `lib/screens/map_screen.dart` — **full** (card 3):
+  `MapScreen({required AppState app, TileProvider? tileProvider})` (the
+  provider is the test seam). flutter_map 8 + OSM tiles (`darkModeTileBuilder`
+  invert/hue-rotate, `errorTileCallback` swallows offline tiles), heat
+  `CircleLayer` from `aggregateByCell(windowed, precision: precisionForZoom)`
+  — colour = dominant emotion, radius = `heatRadiusMeters`, opacity =
+  `heatOpacity` — plus a white ring on cells holding a friend check-in.
+  Window switcher (1 h / 24 h / 7 d), 8-colour legend, cell count, recentre
+  button, hint, and a tap → bottom sheet with the emotion breakdown and count.
+  The first camera is fitted to the *raw check-in points* of the window
+  (`CameraFit.coordinates`, `maxZoom: 6`) — fitting aggregated cells would open
+  the map on a continent-sized cell centre, because the precision follows the
+  zoom. Location shows as the published geohash: the app has no reverse
+  geocoding (no city names yet).
 
 ## Widget-test pitfalls
 
@@ -195,12 +237,29 @@ code is missing from either language.
 - Screens are taller than the default 800×600 test surface — set a tall
   surface (`tester.binding.setSurfaceSize(const Size(500, 1600))`) so
   lazy `ListView` children are built and tappable.
+- flutter_map: a tap only reaches `MapOptions.onTap` after the double-tap delay
+  (250 ms). `pumpAndSettle()` does not advance the clock when nothing animates,
+  so tap with `tapAt(...)`, then `pump(const Duration(milliseconds: 400))`
+  before `pumpAndSettle()` — otherwise the sheet never opens and the test fails
+  with "A Timer is still pending".
+- flutter_map tiles: pass an in-memory `TileProvider` (a `MemoryImage` of a 1×1
+  PNG) to the screen under test, or every tile request is a network call.
+- `SimpleAttributionWidget` cannot wrap its text: with the test font (Ahem, all
+  glyphs are square) the credit overflows a phone-sized surface and fails the
+  test. `map_screen.dart` therefore draws its own compact credit chip.
+- `CameraFit` runs inside the first build and calls `onPositionChanged`
+  synchronously — a `setState` there throws. Store the value and rebuild from a
+  post-frame callback (see `_MapScreenState._onPositionChanged`).
+- Widget tests over `AppState` get their data from `test/support/
+  fake_relay_service.dart` (`FakeRelayService`): it overrides the `NostrService`
+  query methods *and* the `pubkeyHex` / `npub` getters, so a test can act as a
+  signed-in user without secure storage or relays.
 
 ## Checks
 
 ```
 flutter analyze                 # clean
-flutter test                    # 115 tests
+flutter test                    # 151 tests
 dart format lib test            # Dart style (not enforced by CI, run it)
 ```
 
