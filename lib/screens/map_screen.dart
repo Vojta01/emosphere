@@ -188,10 +188,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                     Text(
                       dominant?.label(s.language) ?? '',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: color,
-                      ),
+                      style: TextStyle(fontSize: 12, color: color),
                     ),
                   ],
                 ),
@@ -214,7 +211,10 @@ class _MapScreenState extends State<MapScreen> {
                 for (final emotion in Emotion.values)
                   if ((cell.weights[emotion] ?? 0) > 0)
                     Expanded(
-                      flex: ((cell.shareOf(emotion) * 1000).round()).clamp(1, 1000),
+                      flex: ((cell.shareOf(emotion) * 1000).round()).clamp(
+                        1,
+                        1000,
+                      ),
                       child: Container(
                         height: 8,
                         color: emotion.color.withValues(alpha: 0.9),

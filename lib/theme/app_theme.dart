@@ -50,8 +50,9 @@ class AppTheme {
   );
 
   /// The eight emotion colours in canonical [Emotion] order (map legend).
-  static List<Color> get emotionColors =>
-      <Color>[for (final emotion in Emotion.values) emotion.color];
+  static List<Color> get emotionColors => <Color>[
+    for (final emotion in Emotion.values) emotion.color,
+  ];
 
   /// Soft glow shadow in [color] (selected emotion tiles, FAB, heat cells).
   static List<BoxShadow> glow(
@@ -106,10 +107,7 @@ class AppTheme {
     final scheme = ColorScheme.fromSeed(
       seedColor: accent,
       brightness: Brightness.dark,
-    ).copyWith(
-      primary: accent,
-      surface: surface,
-    );
+    ).copyWith(primary: accent, surface: surface);
     final base = ThemeData(useMaterial3: true, colorScheme: scheme);
     return base.copyWith(
       scaffoldBackgroundColor: Colors.transparent,
@@ -129,9 +127,7 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: surfaceHigh,
         contentTextStyle: const TextStyle(color: Colors.white),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -163,9 +159,7 @@ class AppTheme {
       dividerColor: Colors.white.withValues(alpha: 0.08),
       dialogTheme: DialogThemeData(
         backgroundColor: surfaceHigh,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: Colors.transparent,

@@ -25,8 +25,9 @@ class FeedScreen extends StatelessWidget {
         listenable: app,
         builder: (context, _) {
           final s = Strings(app.language);
-          final feed =
-              sortByNewest(app.worldCheckins).take(worldFeedLimit).toList();
+          final feed = sortByNewest(app.worldCheckins)
+              .take(worldFeedLimit)
+              .toList();
           return RefreshIndicator(
             color: AppTheme.accent,
             backgroundColor: AppTheme.surfaceHigh,
@@ -117,9 +118,7 @@ class _CheckinTile extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: emotion.color.withValues(alpha: 0.16),
-              border: Border.all(
-                color: emotion.color.withValues(alpha: 0.5),
-              ),
+              border: Border.all(color: emotion.color.withValues(alpha: 0.5)),
             ),
             child: Text(emotion.emoji, style: const TextStyle(fontSize: 20)),
           ),

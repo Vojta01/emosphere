@@ -86,7 +86,10 @@ void main() {
     test('1 h keeps only the last hour', () {
       final result = filterByWindow(events, MapWindow.hours1, now: now);
       expect(result, hasLength(1));
-      expect(result.single.createdAt, now.subtract(const Duration(minutes: 30)));
+      expect(
+        result.single.createdAt,
+        now.subtract(const Duration(minutes: 30)),
+      );
     });
 
     test('24 h keeps the last day', () {
@@ -99,8 +102,7 @@ void main() {
       expect(result, hasLength(3));
       expect(
         result.any(
-          (event) =>
-              event.createdAt == now.subtract(const Duration(days: 8)),
+          (event) => event.createdAt == now.subtract(const Duration(days: 8)),
         ),
         isFalse,
       );
@@ -160,10 +162,7 @@ void main() {
         checkin(Emotion.joy, now, geohash: 'u2fkb'),
         checkin(Emotion.calm, now, geohash: 'u2fzz'),
       ];
-      final merged = aggregateByCell(
-        events,
-        precision: Geohash.areaPrecision,
-      );
+      final merged = aggregateByCell(events, precision: Geohash.areaPrecision);
       expect(merged, hasLength(1));
       expect(merged.single.geohash, 'u2f');
       expect(merged.single.count, 2);
@@ -184,12 +183,24 @@ void main() {
   group('aggregateWindow', () {
     test('filters by window and aggregates the rest', () {
       final events = <CheckinEvent>[
-        checkin(Emotion.joy, now.subtract(const Duration(minutes: 10)),
-            intensity: 2, geohash: 'u2fkb'),
-        checkin(Emotion.sadness, now.subtract(const Duration(hours: 5)),
-            intensity: 5, geohash: 'u2fkb'),
-        checkin(Emotion.anger, now.subtract(const Duration(days: 3)),
-            intensity: 5, geohash: 'u2fkb'),
+        checkin(
+          Emotion.joy,
+          now.subtract(const Duration(minutes: 10)),
+          intensity: 2,
+          geohash: 'u2fkb',
+        ),
+        checkin(
+          Emotion.sadness,
+          now.subtract(const Duration(hours: 5)),
+          intensity: 5,
+          geohash: 'u2fkb',
+        ),
+        checkin(
+          Emotion.anger,
+          now.subtract(const Duration(days: 3)),
+          intensity: 5,
+          geohash: 'u2fkb',
+        ),
       ];
 
       final lastHour = aggregateWindow(events, MapWindow.hours1, now: now);
@@ -210,10 +221,16 @@ void main() {
 
     test('area precision collapses neighbouring cities', () {
       final events = <CheckinEvent>[
-        checkin(Emotion.joy, now.subtract(const Duration(hours: 1)),
-            geohash: 'u2fkb'),
-        checkin(Emotion.joy, now.subtract(const Duration(hours: 2)),
-            geohash: 'u2fzz'),
+        checkin(
+          Emotion.joy,
+          now.subtract(const Duration(hours: 1)),
+          geohash: 'u2fkb',
+        ),
+        checkin(
+          Emotion.joy,
+          now.subtract(const Duration(hours: 2)),
+          geohash: 'u2fzz',
+        ),
       ];
       final cells = aggregateWindow(
         events,

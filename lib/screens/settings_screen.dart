@@ -25,8 +25,9 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  late final TextEditingController _relays =
-      TextEditingController(text: widget.app.relays.join('\n'));
+  late final TextEditingController _relays = TextEditingController(
+    text: widget.app.relays.join('\n'),
+  );
 
   @override
   void dispose() {
@@ -237,10 +238,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 10),
           Align(
             alignment: Alignment.centerRight,
-            child: FilledButton(
-              onPressed: _saveRelays,
-              child: Text(s.save),
-            ),
+            child: FilledButton(onPressed: _saveRelays, child: Text(s.save)),
           ),
         ],
       ),

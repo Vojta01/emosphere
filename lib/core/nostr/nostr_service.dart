@@ -45,9 +45,9 @@ class NostrService {
     FlutterSecureStorage? secureStorage,
     this.readTimeout = const Duration(seconds: 8),
     this.publishTimeout = const Duration(seconds: 10),
-  })  : relays = List<String>.of(relays ?? defaultRelays),
-        _channelFactory = channelFactory ?? _defaultChannelFactory,
-        _storage = secureStorage ?? const FlutterSecureStorage();
+  }) : relays = List<String>.of(relays ?? defaultRelays),
+       _channelFactory = channelFactory ?? _defaultChannelFactory,
+       _storage = secureStorage ?? const FlutterSecureStorage();
 
   /// Default relays from the SPEC (the user can edit them in Settings).
   static const List<String> defaultRelays = <String>[
@@ -246,9 +246,8 @@ class NostrService {
   List<String> get connectedRelays =>
       _liveRelays.map((connection) => connection.url).toList();
 
-  List<_RelayConnection> get _liveRelays => _connections.values
-      .where((connection) => !connection.closed)
-      .toList();
+  List<_RelayConnection> get _liveRelays =>
+      _connections.values.where((connection) => !connection.closed).toList();
 
   /// Connects to [relayUrls] (or the configured [relays] when omitted).
   ///
@@ -289,10 +288,7 @@ class NostrService {
         continue;
       }
       _connections[url] = connection;
-      await connection.ready.timeout(
-        readTimeout,
-        onTimeout: () {},
-      );
+      await connection.ready.timeout(readTimeout, onTimeout: () {});
       if (connection.lastError != null || connection.closed) {
         await _connections.remove(url)?.close();
       }
@@ -488,14 +484,11 @@ class NostrService {
       return <String, NostrProfile>{};
     }
     await _ensureConnected();
-    final handle = _openSubscription(
-      <String, dynamic>{
-        'kinds': <int>[0],
-        'authors': authors,
-        'limit': authors.length,
-      },
-      autoCloseOnEose: true,
-    );
+    final handle = _openSubscription(<String, dynamic>{
+      'kinds': <int>[0],
+      'authors': authors,
+      'limit': authors.length,
+    }, autoCloseOnEose: true);
     final timer = Timer(timeout ?? readTimeout, handle.close);
     final profiles = <String, NostrProfile>{};
     try {
@@ -505,7 +498,8 @@ class NostrService {
           continue;
         }
         final existing = profiles[profile.pubkey];
-        final isNewer = existing == null ||
+        final isNewer =
+            existing == null ||
             (profile.updatedAt != null &&
                 (existing.updatedAt == null ||
                     profile.updatedAt!.isAfter(existing.updatedAt!)));
@@ -630,16 +624,18 @@ class NostrService {
 /// One live relay WebSocket connection.
 class _RelayConnection {
   _RelayConnection(this.url, this._channel) {
-    _ready = _channel.ready.then((_) {
-      if (!opened.isCompleted) {
-        opened.complete();
-      }
-    }).catchError((Object error) {
-      lastError = error;
-      if (!opened.isCompleted) {
-        opened.complete();
-      }
-    });
+    _ready = _channel.ready
+        .then((_) {
+          if (!opened.isCompleted) {
+            opened.complete();
+          }
+        })
+        .catchError((Object error) {
+          lastError = error;
+          if (!opened.isCompleted) {
+            opened.complete();
+          }
+        });
     _subscription = _channel.stream.listen(
       _handleMessage,
       onError: (Object error) {
@@ -659,7 +655,7 @@ class _RelayConnection {
 
   /// Subscription handlers keyed by subscription id.
   final Map<String, void Function(String type, List<dynamic> message)>
-      handlers = {};
+  handlers = {};
 
   final Map<String, Completer<bool>> _okWaiters = {};
 
@@ -698,7 +694,9 @@ class _RelayConnection {
       final note = message.length > 3 ? '${message[3]}' : '';
       if (id is String) {
         final waiter = _okWaiters.remove(id);
-        waiter?.complete(accepted || note.toLowerCase().startsWith('duplicate'));
+        waiter?.complete(
+          accepted || note.toLowerCase().startsWith('duplicate'),
+        );
       }
       return;
     }

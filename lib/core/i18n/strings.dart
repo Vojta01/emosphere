@@ -213,8 +213,8 @@ class Strings {
     return '$day.$month.${local.year}';
   }
 
-  static const Map<String, Map<String, String>> _values =
-      <String, Map<String, String>>{
+  static const Map<String, Map<String, String>>
+  _values = <String, Map<String, String>>{
     'appName': <String, String>{'cs': 'EmoSphere', 'en': 'EmoSphere'},
     'tagline': <String, String>{
       'cs': 'Podívej se, jak se svět právě teď cítí.',
@@ -248,9 +248,11 @@ class Strings {
       'en': 'Welcome to EmoSphere',
     },
     'onb1Body': <String, String>{
-      'cs': 'EmoSphere je světová mapa nálad na protokolu Nostr. '
+      'cs':
+          'EmoSphere je světová mapa nálad na protokolu Nostr. '
           'Bez registrace, bez e-mailu, bez jména.',
-      'en': 'EmoSphere is a global mood map built on the Nostr protocol. '
+      'en':
+          'EmoSphere is a global mood map built on the Nostr protocol. '
           'No sign-up, no email, no name.',
     },
     'onb2Title': <String, String>{
@@ -258,16 +260,20 @@ class Strings {
       'en': 'Your key, your identity',
     },
     'onb2Body': <String, String>{
-      'cs': 'Identitu tvoří klíč, který zůstává jen v tvém zařízení. '
+      'cs':
+          'Identitu tvoří klíč, který zůstává jen v tvém zařízení. '
           'Nikdo ho za tebe nemůže obnovit.',
-      'en': 'Your identity is a key that stays on your device. '
+      'en':
+          'Your identity is a key that stays on your device. '
           'Nobody can recover it for you.',
     },
     'onb3Title': <String, String>{'cs': 'Záloha klíče', 'en': 'Key backup'},
     'onb3Body': <String, String>{
-      'cs': 'Ulož si klíč na bezpečné místo. Bez něj o svou identitu '
+      'cs':
+          'Ulož si klíč na bezpečné místo. Bez něj o svou identitu '
           'navždy přijdeš.',
-      'en': 'Store your key somewhere safe. Without it you lose your '
+      'en':
+          'Store your key somewhere safe. Without it you lose your '
           'identity forever.',
     },
     'generateKey': <String, String>{
@@ -296,9 +302,11 @@ class Strings {
       'en': 'Never share your key. Anyone with it can act as you.',
     },
     'webKeyNote': <String, String>{
-      'cs': 'Ve webové verzi se klíč ukládá do úložiště prohlížeče. '
+      'cs':
+          'Ve webové verzi se klíč ukládá do úložiště prohlížeče. '
           'Na sdíleném počítači ho po použití smaž.',
-      'en': 'In the web version the key is stored in browser storage. '
+      'en':
+          'In the web version the key is stored in browser storage. '
           'On a shared computer, delete it when you finish.',
     },
     'keyCreated': <String, String>{
@@ -353,10 +361,7 @@ class Strings {
       'cs': 'Nejdřív si vytvoř klíč.',
       'en': 'Create a key first.',
     },
-    'checkingIn': <String, String>{
-      'cs': 'Odesílám…',
-      'en': 'Sending…',
-    },
+    'checkingIn': <String, String>{'cs': 'Odesílám…', 'en': 'Sending…'},
     'map': <String, String>{'cs': 'Mapa', 'en': 'Map'},
     'legend': <String, String>{'cs': 'Legenda', 'en': 'Legend'},
     'mapEmpty': <String, String>{
@@ -390,14 +395,8 @@ class Strings {
       'en': 'Your close ones have not shared anything yet.',
     },
     'friends': <String, String>{'cs': 'Přátelé', 'en': 'Friends'},
-    'addFriend': <String, String>{
-      'cs': 'Přidat přítele',
-      'en': 'Add a friend',
-    },
-    'friendNpub': <String, String>{
-      'cs': 'npub přítele',
-      'en': "Friend's npub",
-    },
+    'addFriend': <String, String>{'cs': 'Přidat přítele', 'en': 'Add a friend'},
+    'friendNpub': <String, String>{'cs': 'npub přítele', 'en': "Friend's npub"},
     'myNpub': <String, String>{'cs': 'Můj npub', 'en': 'My npub'},
     'qrShare': <String, String>{
       'cs': 'Naskenuj a přidej si mě',
@@ -457,9 +456,11 @@ class Strings {
       'en': 'Delete my data',
     },
     'deleteMyDataBody': <String, String>{
-      'cs': 'Odešle se žádost o smazání (NIP-09) a tvoje check-iny '
+      'cs':
+          'Odešle se žádost o smazání (NIP-09) a tvoje check-iny '
           'zmizí z relayů. Akci nelze vzít zpět.',
-      'en': 'A deletion request (NIP-09) is published and your check-ins '
+      'en':
+          'A deletion request (NIP-09) is published and your check-ins '
           'disappear from relays. This cannot be undone.',
     },
     'deleted': <String, String>{'cs': 'Smazáno.', 'en': 'Deleted.'},
@@ -489,9 +490,11 @@ class Strings {
       'en': 'Welcome to EmoSphere',
     },
     'onb.step1.body': <String, String>{
-      'cs': 'EmoSphere je světová mapa nálad postavená na protokolu Nostr. '
+      'cs':
+          'EmoSphere je světová mapa nálad postavená na protokolu Nostr. '
           'Bez registrace, bez e-mailu, bez jména.',
-      'en': 'EmoSphere is a global mood map built on the Nostr protocol. '
+      'en':
+          'EmoSphere is a global mood map built on the Nostr protocol. '
           'No sign-up, no email, no name.',
     },
     'onb.step1.p1': <String, String>{
@@ -511,9 +514,11 @@ class Strings {
       'en': 'Your key, your identity',
     },
     'onb.step2.body': <String, String>{
-      'cs': 'Identita je klíč, který zůstává jen v tvém zařízení. '
+      'cs':
+          'Identita je klíč, který zůstává jen v tvém zařízení. '
           'Nikdo ho za tebe nemůže obnovit.',
-      'en': 'Your identity is a key that stays on your device. '
+      'en':
+          'Your identity is a key that stays on your device. '
           'Nobody can recover it for you.',
     },
     'onb.step2.generate': <String, String>{
@@ -553,9 +558,11 @@ class Strings {
       'en': 'Key backup',
     },
     'onb.step3.body': <String, String>{
-      'cs': 'Ulož si klíč na bezpečné místo. Bez něj o svou identitu '
+      'cs':
+          'Ulož si klíč na bezpečné místo. Bez něj o svou identitu '
           'navždy přijdeš.',
-      'en': 'Store your key somewhere safe. Without it you lose your '
+      'en':
+          'Store your key somewhere safe. Without it you lose your '
           'identity forever.',
     },
     'onb.step3.nsecLabel': <String, String>{
@@ -578,10 +585,7 @@ class Strings {
       'cs': 'Jak se cítíš?',
       'en': 'How do you feel?',
     },
-    'checkin.intensity': <String, String>{
-      'cs': 'Intenzita',
-      'en': 'Intensity',
-    },
+    'checkin.intensity': <String, String>{'cs': 'Intenzita', 'en': 'Intensity'},
     'checkin.noteHint': <String, String>{
       'cs': 'Co se děje? (nepovinné, veřejné)',
       'en': 'What is going on? (optional, public)',

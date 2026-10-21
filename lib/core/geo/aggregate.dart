@@ -121,8 +121,8 @@ Emotion? dominantEmotion(Iterable<CheckinEvent> events) {
       continue;
     }
     final count = counts[emotion] ?? 0;
-    final isBetter = weight > bestWeight ||
-        (weight == bestWeight && count > bestCount);
+    final isBetter =
+        weight > bestWeight || (weight == bestWeight && count > bestCount);
     if (isBetter) {
       best = emotion;
       bestWeight = weight;
@@ -156,8 +156,7 @@ List<CellAggregate> aggregateByCell(
     final weights = <Emotion, double>{};
     for (final event in cellEvents) {
       counts[event.emotion] = (counts[event.emotion] ?? 0) + 1;
-      weights[event.emotion] =
-          (weights[event.emotion] ?? 0) + event.intensity;
+      weights[event.emotion] = (weights[event.emotion] ?? 0) + event.intensity;
     }
     cells.add(
       CellAggregate(

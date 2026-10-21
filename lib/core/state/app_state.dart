@@ -74,8 +74,8 @@ enum LocationPrecision {
 /// Central application state: identity, check-ins, friends and settings.
 class AppState extends ChangeNotifier {
   AppState({NostrService? service, SharedPreferences? preferences})
-      : _service = service ?? NostrService(),
-        _prefs = preferences;
+    : _service = service ?? NostrService(),
+      _prefs = preferences;
 
   // -- Storage keys --------------------------------------------------------
 
@@ -129,8 +129,9 @@ class AppState extends ChangeNotifier {
     _prefs ??= await SharedPreferences.getInstance();
     final prefs = _prefs!;
     _language = prefs.getString(keyLanguage) ?? 'cs';
-    _locationPrecision =
-        LocationPrecision.fromName(prefs.getString(keyLocationPrecision));
+    _locationPrecision = LocationPrecision.fromName(
+      prefs.getString(keyLocationPrecision),
+    );
     _friends = dedupeFriendKeys(prefs.getStringList(keyFriends) ?? const []);
     final relays = prefs.getStringList(keyRelays);
     if (relays != null && relays.isNotEmpty) {
@@ -259,7 +260,8 @@ class AppState extends ChangeNotifier {
   // ---------------------------------------------------------------------
 
   /// My check-ins, newest first.
-  List<CheckinEvent> get myCheckins => List<CheckinEvent>.unmodifiable(_myCheckins);
+  List<CheckinEvent> get myCheckins =>
+      List<CheckinEvent>.unmodifiable(_myCheckins);
 
   /// Check-ins of the whole world (last [worldWindow]), newest first.
   List<CheckinEvent> get worldCheckins =>
@@ -414,19 +416,22 @@ class AppState extends ChangeNotifier {
     _liveSub = _service
         .subscribeCheckins(since: DateTime.now().toUtc().subtract(worldWindow))
         .listen(
-      (checkin) {
-        _merge(_worldCheckins, <CheckinEvent>[checkin], limit: worldLimit);
-        if (checkin.pubkey.toLowerCase() == (pubkeyHex ?? '').toLowerCase()) {
-          _merge(_myCheckins, <CheckinEvent>[checkin], limit: myCheckinsLimit);
-          unawaited(_persistMyCheckins());
-        }
-        _notify();
-      },
-      onError: (Object _) {
-        // A dropped relay must not kill the UI.
-      },
-      cancelOnError: false,
-    );
+          (checkin) {
+            _merge(_worldCheckins, <CheckinEvent>[checkin], limit: worldLimit);
+            if (checkin.pubkey.toLowerCase() ==
+                (pubkeyHex ?? '').toLowerCase()) {
+              _merge(_myCheckins, <CheckinEvent>[
+                checkin,
+              ], limit: myCheckinsLimit);
+              unawaited(_persistMyCheckins());
+            }
+            _notify();
+          },
+          onError: (Object _) {
+            // A dropped relay must not kill the UI.
+          },
+          cancelOnError: false,
+        );
   }
 
   /// Stops the live subscription.
@@ -542,9 +547,9 @@ class AppState extends ChangeNotifier {
     if (prefs == null) {
       return;
     }
-    final payload = jsonEncode(
-      <Map<String, dynamic>>[for (final c in _myCheckins) c.toJson()],
-    );
+    final payload = jsonEncode(<Map<String, dynamic>>[
+      for (final c in _myCheckins) c.toJson(),
+    ]);
     await prefs.setString(keyMyCheckins, payload);
   }
 }

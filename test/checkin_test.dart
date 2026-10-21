@@ -16,7 +16,8 @@ const String otherPubkey =
     'aa11aa11aa11aa11aa11aa11aa11aa11aa11aa11aa11aa11aa11aa11aa11aa11';
 
 /// Repeats [unit] [times] times (Dart has no string multiplication).
-String repeat(String unit, int times) => List<String>.filled(times, unit).join();
+String repeat(String unit, int times) =>
+    List<String>.filled(times, unit).join();
 
 /// Builds a relay-style EVENT message and parses it, so negative tests can
 /// craft arbitrary (even invalid) events.
@@ -40,8 +41,9 @@ NostrEvent relayEvent({
       'pubkey': pubkey,
       'created_at':
           (createdAt ?? DateTime.utc(2026, 10, 21)).millisecondsSinceEpoch ~/
-              1000,
-      'tags': tags ??
+          1000,
+      'tags':
+          tags ??
           <List<String>>[
             <String>['t', CheckinEvent.hashtag],
             <String>['e', 'joy'],
@@ -70,10 +72,7 @@ void main() {
       expect(Emotion.anger.color, const Color(0xFFEF4444));
       expect(Emotion.fear.color, const Color(0xFFA78BFA));
       expect(Emotion.tiredness.color, const Color(0xFF94A3B8));
-      expect(
-        Emotion.values.map((e) => e.slug).toSet(),
-        hasLength(8),
-      );
+      expect(Emotion.values.map((e) => e.slug).toSet(), hasLength(8));
     });
 
     test('resolves slugs and localizes labels', () {
@@ -163,10 +162,7 @@ void main() {
         ),
       );
       // The signature is valid for the generated id.
-      expect(
-        NostrKeyPairs.verify(testPubkey, event.id!, event.sig!),
-        isTrue,
-      );
+      expect(NostrKeyPairs.verify(testPubkey, event.id!, event.sig!), isTrue);
     });
 
     test('keeps an empty note empty and truncates to 140 characters', () {
@@ -201,10 +197,7 @@ void main() {
         createdAt: withMillis,
       ).toNostrEvent(keys);
       expect(event.createdAt!.millisecond, 0);
-      expect(
-        event.createdAt,
-        DateTime.utc(2026, 10, 21, 20, 30, 45),
-      );
+      expect(event.createdAt, DateTime.utc(2026, 10, 21, 20, 30, 45));
     });
   });
 
@@ -232,80 +225,93 @@ void main() {
       expect(parsed.createdAt, createdAt);
     });
 
-    test('ignores events of other kinds, without the t tag or unknown slug',
-        () {
-      expect(
-        CheckinEvent.fromNostrEvent(relayEvent(kind: 1)),
-        isNull,
-      );
-      expect(
-        CheckinEvent.fromNostrEvent(
-          relayEvent(tags: <List<String>>[
-            <String>['e', 'joy'],
-            <String>['i', '3'],
-          ]),
-        ),
-        isNull,
-      );
-      expect(
-        CheckinEvent.fromNostrEvent(
-          relayEvent(tags: <List<String>>[
-            <String>['t', 'emosphere'],
-            <String>['e', 'confusion'],
-            <String>['i', '3'],
-          ]),
-        ),
-        isNull,
-      );
-    });
+    test(
+      'ignores events of other kinds, without the t tag or unknown slug',
+      () {
+        expect(CheckinEvent.fromNostrEvent(relayEvent(kind: 1)), isNull);
+        expect(
+          CheckinEvent.fromNostrEvent(
+            relayEvent(
+              tags: <List<String>>[
+                <String>['e', 'joy'],
+                <String>['i', '3'],
+              ],
+            ),
+          ),
+          isNull,
+        );
+        expect(
+          CheckinEvent.fromNostrEvent(
+            relayEvent(
+              tags: <List<String>>[
+                <String>['t', 'emosphere'],
+                <String>['e', 'confusion'],
+                <String>['i', '3'],
+              ],
+            ),
+          ),
+          isNull,
+        );
+      },
+    );
 
     test('defaults a missing or malformed intensity to 3', () {
       final withoutIntensity = CheckinEvent.fromNostrEvent(
-        relayEvent(tags: <List<String>>[
-          <String>['t', 'emosphere'],
-          <String>['e', 'joy'],
-        ]),
+        relayEvent(
+          tags: <List<String>>[
+            <String>['t', 'emosphere'],
+            <String>['e', 'joy'],
+          ],
+        ),
       );
       expect(withoutIntensity!.intensity, CheckinEvent.defaultIntensity);
 
       final malformed = CheckinEvent.fromNostrEvent(
-        relayEvent(tags: <List<String>>[
-          <String>['t', 'emosphere'],
-          <String>['e', 'joy'],
-          <String>['i', 'abc'],
-        ]),
+        relayEvent(
+          tags: <List<String>>[
+            <String>['t', 'emosphere'],
+            <String>['e', 'joy'],
+            <String>['i', 'abc'],
+          ],
+        ),
       );
       expect(malformed!.intensity, 3);
     });
 
     test('clamps out-of-range intensity from the relay', () {
       final high = CheckinEvent.fromNostrEvent(
-        relayEvent(tags: <List<String>>[
-          <String>['t', 'emosphere'],
-          <String>['e', 'joy'],
-          <String>['i', '42'],
-        ]),
+        relayEvent(
+          tags: <List<String>>[
+            <String>['t', 'emosphere'],
+            <String>['e', 'joy'],
+            <String>['i', '42'],
+          ],
+        ),
       );
       expect(high!.intensity, 5);
 
       final low = CheckinEvent.fromNostrEvent(
-        relayEvent(tags: <List<String>>[
-          <String>['t', 'emosphere'],
-          <String>['e', 'joy'],
-          <String>['i', '-3'],
-        ]),
+        relayEvent(
+          tags: <List<String>>[
+            <String>['t', 'emosphere'],
+            <String>['e', 'joy'],
+            <String>['i', '-3'],
+          ],
+        ),
       );
       expect(low!.intensity, 1);
     });
 
     test('drops an empty geohash tag', () {
       final parsed = CheckinEvent.fromNostrEvent(
-        relayEvent(tags: <List<String>>[
-          <String>['t', 'emosphere'],
-          <String>['e', 'joy'],
-          <String>['i', '3'],
-          <String>['g', ''],
-        ]),
+        relayEvent(
+          tags: <List<String>>[
+            <String>['t', 'emosphere'],
+            <String>['e', 'joy'],
+            <String>['i', '3'],
+            <String>['g', ''],
+          ],
+        ),
       );
       expect(parsed!.geohash, isNull);
     });

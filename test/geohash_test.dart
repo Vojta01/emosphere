@@ -47,7 +47,10 @@ void main() {
       expect(bounds.latMax, greaterThanOrEqualTo(50.0755));
       expect(bounds.lonMin, lessThanOrEqualTo(14.4378));
       expect(bounds.lonMax, greaterThanOrEqualTo(14.4378));
-      expect(bounds.center.latitude, closeTo(Geohash.decode('u2fkb').latitude, 1e-9));
+      expect(
+        bounds.center.latitude,
+        closeTo(Geohash.decode('u2fkb').latitude, 1e-9),
+      );
     });
 
     test('an area cell fully contains its city cells', () {

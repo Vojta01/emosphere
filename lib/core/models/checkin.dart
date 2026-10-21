@@ -104,11 +104,7 @@ class CheckinEvent {
       kind: kindValue,
       content: normalizeNote(note),
       keyPairs: keyPairs,
-      tags: buildTags(
-        emotion: emotion,
-        intensity: intensity,
-        geohash: geohash,
-      ),
+      tags: buildTags(emotion: emotion, intensity: intensity, geohash: geohash),
       createdAt: seconds,
     );
   }
@@ -192,7 +188,10 @@ class CheckinEvent {
       intensity: normalizeIntensity((json['intensity'] as num?)?.toInt() ?? 0),
       note: (json['note'] as String?) ?? '',
       geohash: json['geohash'] as String?,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(seconds * 1000, isUtc: true),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        seconds * 1000,
+        isUtc: true,
+      ),
     );
   }
 

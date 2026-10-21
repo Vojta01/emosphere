@@ -169,6 +169,5 @@ class GeohashBounds {
   final double lonMax;
 
   /// Centre of the box.
-  GeoPoint get center =>
-      GeoPoint((latMin + latMax) / 2, (lonMin + lonMax) / 2);
+  GeoPoint get center => GeoPoint((latMin + latMax) / 2, (lonMin + lonMax) / 2);
 }
