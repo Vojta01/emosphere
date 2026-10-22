@@ -10,7 +10,7 @@ import '../widgets/key_qr_dialog.dart';
 import '../widgets/user_avatar.dart';
 
 /// Version shown in the About card — keep in sync with `pubspec.yaml`.
-const String appVersionLabel = 'v0.3.0';
+const String appVersionLabel = 'v0.3.1';
 
 /// Settings: profile key, language, location precision, relays, my data.
 class SettingsScreen extends StatefulWidget {

@@ -30,17 +30,33 @@ class EmoSphereApp extends StatefulWidget {
   State<EmoSphereApp> createState() => _EmoSphereAppState();
 }
 
-class _EmoSphereAppState extends State<EmoSphereApp> {
+class _EmoSphereAppState extends State<EmoSphereApp>
+    with WidgetsBindingObserver {
   late final AppState _app = widget.app ?? AppState();
   late final bool _ownsApp = widget.app == null;
   late final Future<void> _ready = _app.init(autoSync: widget.autoSync);
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     if (_ownsApp) {
       _app.dispose();
     }
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Coming back from the background: relay sockets may have died silently.
+    if (state == AppLifecycleState.resumed) {
+      _app.handleAppResumed();
+    }
   }
 
   @override

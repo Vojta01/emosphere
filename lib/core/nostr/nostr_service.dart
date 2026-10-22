@@ -89,6 +89,12 @@ class NostrService {
   Future<void>? _connecting;
   int _subCounter = 0;
 
+  /// Open subscriptions keyed by subscription id; replayed after reconnects.
+  final Map<String, _SubRecord> _activeSubs = <String, _SubRecord>{};
+
+  /// Publish attempts; the second one reconnects first (stale-socket cure).
+  static const int _publishAttempts = 2;
+
   /// Ids whose BIP-340 signature was verified in this session.
   ///
   /// The id is a SHA-256 of the serialized fields, so an id in this set
@@ -291,22 +297,29 @@ class NostrService {
         await _connections.remove(url)?.close();
       }
     }
-    for (final url in relays) {
-      if (_connections.containsKey(url)) {
-        continue;
-      }
-      _RelayConnection connection;
-      try {
-        connection = _RelayConnection(url, _channelFactory(Uri.parse(url)));
-      } on Object {
-        continue;
-      }
-      _connections[url] = connection;
-      await connection.ready.timeout(readTimeout, onTimeout: () {});
-      if (connection.lastError != null || connection.closed) {
-        await _connections.remove(url)?.close();
-      }
+    // Connect the missing relays in parallel — a slow relay must not delay
+    // the others by a whole [readTimeout] each.
+    await Future.wait(<Future<void>>[
+      for (final url in relays)
+        if (!_connections.containsKey(url)) _connectOne(url),
+    ]);
+  }
+
+  /// Opens a single relay connection and replays active subscriptions.
+  Future<void> _connectOne(String url) async {
+    _RelayConnection connection;
+    try {
+      connection = _RelayConnection(url, _channelFactory(Uri.parse(url)));
+    } on Object {
+      return;
     }
+    _connections[url] = connection;
+    await connection.ready.timeout(readTimeout, onTimeout: () {});
+    if (connection.lastError != null || connection.closed) {
+      await _connections.remove(url)?.close();
+      return;
+    }
+    _replaySubscriptions(connection);
   }
 
   /// Closes all relay connections.
@@ -336,6 +349,29 @@ class NostrService {
     if (_liveRelays.isEmpty) {
       throw NostrException('Could not connect to any relay.');
     }
+  }
+
+  /// Replaces relay connections that have been silent for [maxIdle].
+  ///
+  /// A socket can die without `onDone` firing (phone sleep, NAT timeout), so
+  /// silence is the best staleness signal available. Called when the app
+  /// resumes, so the next publish goes through a fresh socket. Active
+  /// subscriptions replay on the new connections.
+  Future<void> refreshStaleConnections({
+    Duration maxIdle = const Duration(minutes: 3),
+  }) async {
+    final cutoff = DateTime.now().subtract(maxIdle);
+    final stale = _liveRelays
+        .where((connection) => connection.lastInboundAt.isBefore(cutoff))
+        .toList();
+    for (final connection in stale) {
+      _connections.remove(connection.url);
+      await connection.close();
+    }
+    if (stale.isEmpty && _liveRelays.isNotEmpty) {
+      return;
+    }
+    await connect();
   }
 
   // ---------------------------------------------------------------------
@@ -463,29 +499,58 @@ class NostrService {
   }
 
   /// Signs and publishes a raw event, waiting for a relay `OK`.
+  ///
+  /// When no relay acknowledges the first attempt, every connection is
+  /// dropped and re-opened before the retry — a stale socket silently buffers
+  /// writes into a dead connection, so reconnecting is the reliable cure.
+  /// Relays that already stored the event answer `duplicate`, which counts
+  /// as accepted.
   Future<void> publishEvent(NostrEvent event, {Duration? timeout}) async {
     final id = event.id;
     if (id == null) {
       throw NostrException('Event has no id.');
     }
-    await _ensureConnected();
     final payload = jsonEncode(<dynamic>['EVENT', event.toMap()]);
-    final waiters = <Future<bool>>[];
-    for (final connection in _liveRelays) {
-      try {
-        connection.send(payload);
-        waiters.add(connection.waitForOk(id, timeout ?? publishTimeout));
-      } on Object {
-        // Ignore a single broken connection.
+    Object? lastError;
+    for (var attempt = 1; attempt <= _publishAttempts; attempt++) {
+      if (attempt > 1) {
+        await _resetConnections();
       }
+      try {
+        await _ensureConnected();
+      } on NostrException catch (error) {
+        lastError = error;
+        continue;
+      }
+      final waiters = <Future<bool>>[];
+      for (final connection in _liveRelays) {
+        try {
+          connection.send(payload);
+          waiters.add(connection.waitForOk(id, timeout ?? publishTimeout));
+        } on Object {
+          // Ignore a single broken connection.
+        }
+      }
+      if (waiters.isEmpty) {
+        lastError = NostrException('Could not connect to any relay.');
+        continue;
+      }
+      final results = await Future.wait(waiters);
+      if (results.any((accepted) => accepted)) {
+        return;
+      }
+      lastError = NostrException('All relays rejected the event.');
     }
-    if (waiters.isEmpty) {
-      throw NostrException('Could not connect to any relay.');
+    throw lastError ?? NostrException('All relays rejected the event.');
+  }
+
+  /// Drops every relay connection and opens fresh ones (subscriptions replay).
+  Future<void> _resetConnections() async {
+    for (final connection in _connections.values.toList()) {
+      await connection.close();
     }
-    final results = await Future.wait(waiters);
-    if (!results.any((accepted) => accepted)) {
-      throw NostrException('All relays rejected the event.');
-    }
+    _connections.clear();
+    await connect();
   }
 
   /// Live stream of check-ins matching [since]/[authors].
@@ -795,29 +860,13 @@ class NostrService {
       relayCount: _liveRelays.length,
       autoCloseOnEose: autoCloseOnEose,
     );
-    final request = jsonEncode(<dynamic>['REQ', id, filter]);
+    final record = _SubRecord(filter: filter, handle: handle);
+    _activeSubs[id] = record;
     for (final connection in _liveRelays) {
-      connection.handlers[id] = (type, message) {
-        if (handle.closed) {
-          return;
-        }
-        switch (type) {
-          case 'EVENT':
-            final event = _parseEvent(message);
-            if (event != null &&
-                handle.addIfNew(event) &&
-                !controller.isClosed) {
-              controller.add(event);
-            }
-          case 'EOSE':
-            handle.noteEose(connection.url);
-          case 'CLOSED':
-            handle.noteEose(connection.url);
-        }
-      };
-      connection.send(request);
+      _attachSubscription(connection, record);
     }
     handle.onClose = () async {
+      _activeSubs.remove(id);
       for (final connection in _liveRelays) {
         connection.handlers.remove(id);
         connection.send(jsonEncode(<dynamic>['CLOSE', id]));
@@ -828,6 +877,41 @@ class NostrService {
     };
     controller.onCancel = handle.close;
     return handle;
+  }
+
+  /// Attaches [record]'s handler to [connection] and (re)sends its REQ.
+  void _attachSubscription(_RelayConnection connection, _SubRecord record) {
+    final handle = record.handle;
+    connection.handlers[handle.id] = (type, message) {
+      if (handle.closed) {
+        return;
+      }
+      switch (type) {
+        case 'EVENT':
+          final event = _parseEvent(message);
+          if (event != null &&
+              handle.addIfNew(event) &&
+              !handle.controller.isClosed) {
+            handle.controller.add(event);
+          }
+        case 'EOSE':
+          handle.noteEose(connection.url);
+        case 'CLOSED':
+          handle.noteEose(connection.url);
+      }
+    };
+    connection.send(jsonEncode(<dynamic>['REQ', handle.id, record.filter]));
+  }
+
+  /// Replays every open subscription on [connection] (after a reconnect).
+  void _replaySubscriptions(_RelayConnection connection) {
+    for (final record in _activeSubs.values.toList()) {
+      if (record.handle.closed) {
+        _activeSubs.remove(record.handle.id);
+        continue;
+      }
+      _attachSubscription(connection, record);
+    }
   }
 
   NostrEvent? _parseEvent(List<dynamic> message) {
@@ -932,9 +1016,14 @@ class _RelayConnection {
   bool closed = false;
   Object? lastError;
 
+  /// When the last message from the relay arrived; a socket that stays silent
+  /// may be dead without `onDone` ever firing (see [refreshStaleConnections]).
+  DateTime lastInboundAt = DateTime.now();
+
   Future<void> get ready => _ready;
 
   void _handleMessage(dynamic raw) {
+    lastInboundAt = DateTime.now();
     if (raw is! String) {
       return;
     }
@@ -1014,6 +1103,14 @@ class _RelayConnection {
       // Socket already gone.
     }
   }
+}
+
+/// One open subscription: its filter (for replay after reconnects) + handle.
+class _SubRecord {
+  _SubRecord({required this.filter, required this.handle});
+
+  final Map<String, dynamic> filter;
+  final _SubHandle handle;
 }
 
 /// Bookkeeping for one relay subscription (dedup + EOSE tracking).

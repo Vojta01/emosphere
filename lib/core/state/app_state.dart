@@ -202,6 +202,19 @@ class AppState extends ChangeNotifier {
     super.dispose();
   }
 
+  /// Called when the app returns to the foreground.
+  ///
+  /// Heals relay sockets that died while the device slept (they never fire
+  /// `onDone`), so the next publish does not fail on a dead connection.
+  void handleAppResumed() {
+    if (_disposed) {
+      return;
+    }
+    unawaited(
+      _service.refreshStaleConnections().catchError((Object _) {}),
+    );
+  }
+
   void _notify() {
     if (!_disposed) {
       notifyListeners();
