@@ -80,11 +80,11 @@ Město** — proto to působí matoucím dojmem.
 |---|---|---|---|
 | Vypnuto | – | – | beze změny |
 | **Město** | 5 | ≈ 4,9 × 3 km | dnešní „city" |
-| **Oblast** | 6 | ≈ 1,2 × 0,4–0,6 km | NOVÉ — „tvoje okolí / čtvrť" |
+| **Oblast** | 6 | ≈ 1,2 × 0,4 km (okruh ~0,5 km) | NOVÉ — „tvoje okolí / čtvrť" |
 
 - `Geohash.areaPrecision: 3 → 6`; `LocationPrecision.area` nově mapuje na 6.
 - UI: pořadí dle Vojty **Vypnuto · Město · Oblast** (vzrůstající přesnost);
-  popisky s velikostí („Oblast (~1 km)", „Město (~5 km)").
+  popisky s velikostí („Oblast (okruh ~0,5 km)", „Město (~5 km)").
 - Soukromí: stále nikdy přesná poloha; text v UI doplnit o konkrétní velikost.
 - Zpětná kompatibilita: staré geohash-3 eventy se agregují beze změny
   (`Geohash.parent()`), nové už se neposílají.
@@ -209,7 +209,9 @@ záloha; GitHub secrets = standardní praxe.
 ## K rozhodnutí Vojtou
 
 - (a) Barvy: varianta **A** (zachovat paletu + OKLab), nebo **B** (přerovnat do valence)?
-- (b) „Oblast" ≈ **1 km** (g6), nebo ≈ 150 m (g7)?
+- (b) „Oblast" = geohash-6, tj. **okruh ~0,5 km** — sedí do tvého rozmezí
+  500 m–1 km (doporučuji). Alternativa g7 (≈ 150 m) je přesnější, ale méně
+  soukromá. Souhlasíš s ~0,5 km?
 - (c) DM: **NIP-04** (v1 rychle), nebo NIP-17 (privacy-first, déle)?
 - (d) Zprávy: **badge v hlavičce** feedu, nebo 5. záložka?
 - (e) Souhlas s pořadím R6 → R2 → R3/R4 → R1 → R5?
