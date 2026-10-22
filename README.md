@@ -2,9 +2,10 @@
 
 > **Share how you feel with the world.** A global mood map built on [Nostr](https://nostr.com).
 
-📱 **Android app (APK)** &nbsp;·&nbsp; 🌐 **Web / PWA (installable on iPhone)**
+[![CI](https://github.com/Vojta01/emosphere/actions/workflows/ci.yml/badge.svg)](https://github.com/Vojta01/emosphere/actions/workflows/ci.yml)
+[![Deploy to GitHub Pages](https://github.com/Vojta01/emosphere/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Vojta01/emosphere/actions/workflows/deploy-pages.yml)
 
----
+🌐 **Web / PWA:** https://vojta01.github.io/emosphere/ &nbsp;·&nbsp; 📱 **Android APK:** [download the latest release](https://github.com/Vojta01/emosphere/releases/latest)
 
 ## What is EmoSphere?
 
@@ -14,62 +15,98 @@ right now.
 
 - **No accounts.** Your identity is a Nostr key generated on your device.
 - **Privacy first.** Location is coarse only (area / city) or off. No emails, no names.
-- **Decentralized.** Check-ins are signed Nostr events published to public relays.
-  No central server owns your data.
+- **Decentralized.** Check-ins are signed Nostr events published to public relays —
+  no central server owns your data.
 
-## Emocions / Emotions (8)
+## Screenshots
 
-| Emotion    | Color   |
-|------------|---------|
-| Joy        | #FFD93D |
-| Calm       | #4ADE80 |
-| Love       | #F472B6 |
-| Surprise   | #FB923C |
-| Sadness    | #60A5FA |
-| Anger      | #EF4444 |
-| Fear       | #A78BFA |
-| Tiredness  | #94A3B8 |
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/01-onboarding.png" width="230" alt="Onboarding"><br><sub>Onboarding — welcome</sub></td>
+    <td align="center"><img src="docs/screenshots/02-onboarding-key.png" width="230" alt="Generate or import your key"><br><sub>Generate or import your Nostr key</sub></td>
+    <td align="center"><img src="docs/screenshots/03-mapa.png" width="230" alt="World mood map"><br><sub>World mood map (empty state)</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/04-checkin-sheet.png" width="230" alt="Check-in"><br><sub>Check-in — emotion, intensity, note</sub></td>
+    <td align="center"><img src="docs/screenshots/05-feed.png" width="230" alt="Feed"><br><sub>Feed — my people &amp; the world</sub></td>
+    <td align="center"><img src="docs/screenshots/06-nastaveni.png" width="230" alt="Settings"><br><sub>Settings — profile, key, language</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/07-historie.png" width="230" alt="History"><br><sub>History — my check-ins</sub></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
-Each check-in has an intensity from 1 to 5 and an optional public note (max 140 chars).
+The screenshots show the Czech UI — the app ships in Czech and English.
 
-## Platforms
+## Get the app
 
-| Platform | How to get it |
-|----------|---------------|
-| Android  | APK from [Releases](../../releases) |
-| iPhone   | Open the web app in Safari → Share → *Add to Home Screen* |
-| Web      | https://vojta01.github.io/emosphere/ |
+| Platform | How to install |
+|---|---|
+| **Android** | Download `app-release.apk` from the [latest release](https://github.com/Vojta01/emosphere/releases/latest), allow installation from unknown sources and open the file. Android 7.0+ (API 24+). |
+| **iPhone / iPad** | Open https://vojta01.github.io/emosphere/ in **Safari** → *Share* → **Add to Home Screen**. It then behaves like a native app — no App Store, no Mac needed. |
+| **Web** | https://vojta01.github.io/emosphere/ — an installable PWA, works in any modern browser. |
 
 ## Features
 
-- 🌍 **World mood map** — heat cells colored by the dominant emotion, brightness by activity
-- ✍️ **Check-in** — pick an emotion, set intensity, add a note, choose location precision
-- 👥 **Friends** — follow npubs, highlight their emotions on the map and in the feed
-- 📜 **History** — your check-ins with simple statistics
-- 🌐 **Languages** — Czech & English
-- 🌙 **Design** — dark, premium, glass-style UI
+- 🌍 **World mood map** — heat cells where colour = dominant emotion and glow = activity; windows 1 h / 24 h / 7 days; tap a cell for the breakdown. Friend cells are highlighted.
+- ✍️ **Check-in** — pick 1 of 8 emotions, set intensity 1–5, add an optional public note (max 140 chars), choose location precision (off / area / city).
+- 👥 **Friends** — follow people by npub, share your own npub (copy or QR code); names and avatars come from their Nostr profiles (kind 0).
+- 📜 **History** — your check-ins on a timeline, plus simple statistics (per emotion, per day).
+- 🗑️ **My data** — delete your check-ins from the relays (NIP-09) and from the device.
+- 🔐 **Key** — generated on your device; back it up (nsec, QR) or import an existing key; reveal it again in Settings.
+- 🌐 **Languages** — Czech & English.
+- 🌙 **Design** — dark, premium, glass-style UI with emotion-coloured glow.
+
+## The eight emotions
+
+| Emotion | Colour |
+|---------|--------|
+| Joy | #FFD93D |
+| Calm | #4ADE80 |
+| Love | #F472B6 |
+| Surprise | #FB923C |
+| Sadness | #60A5FA |
+| Anger | #EF4444 |
+| Fear | #A78BFA |
+| Tiredness | #94A3B8 |
+
+Each check-in carries one emotion plus an intensity from 1 to 5.
 
 ## Tech
 
-- [Flutter](https://flutter.dev) (Dart) — one codebase for Android + Web/PWA
-- [Nostr](https://nostr.com) — custom event kind `1074` (`#t=emosphere`)
-- [flutter_map](https://pub.dev/packages/flutter_map) + OpenStreetMap tiles
-- `dart_nostr` for relay communication
+- **[Flutter](https://flutter.dev) (Dart)** — one codebase for Android and the web/PWA.
+- **[Nostr](https://nostr.com)** — check-ins are custom kind `1074` events (`#t=emosphere`) signed on the device and published to public relays; `dart_nostr` handles relay I/O. There is no backend.
+- **[flutter_map](https://pub.dev/packages/flutter_map)** + OpenStreetMap tiles for the mood map.
+- **Storage** — the key lives in `flutter_secure_storage` on Android and in `localStorage` on the web; preferences in `shared_preferences`.
+- **CI/CD** — GitHub Actions: analyze + tests + web build on every push ([ci.yml](.github/workflows/ci.yml)), GitHub Pages deployment ([deploy-pages.yml](.github/workflows/deploy-pages.yml)) and an on-demand / release APK build ([android-build.yml](.github/workflows/android-build.yml)).
 
 ## Development
 
 ```bash
 flutter pub get
-flutter run                # run on device/emulator
-flutter test               # unit + widget tests
-flutter build apk          # Android build
-flutter build web --base-href /emosphere/   # PWA build
+flutter run                                       # on a device / emulator
+flutter analyze                                   # static analysis
+flutter test                                      # unit + widget tests
+flutter build apk --release                       # Android APK
+flutter build web --base-href /emosphere/ --pwa-strategy offline-first   # PWA
 ```
+
+Repo layout: `lib/core` (models, Nostr service, geo, storage, i18n) · `lib/screens` · `lib/widgets` · `lib/theme`.
+
+More docs: [docs/SPEC.md](docs/SPEC.md) · [docs/CORE-API.md](docs/CORE-API.md) · [docs/BRANDING.md](docs/BRANDING.md).
 
 ## Status
 
-🚧 **In active development** — the MVP is being built right now.
-Check back soon for screenshots and the first release.
+**v0.1.0 — MVP, released 22 Oct 2026.** All planned MVP features are in: onboarding + key backup, check-in, world mood map, feed, friends, history, settings, Czech/English UI — shipped as an Android APK and an installable PWA. 156 unit/widget tests are green and CI is green on `main`.
+
+Remaining work:
+
+- **UI polish** — the check-in "Send" button can sit partially under the system navigation bar, and the floating "How do you feel?" button overlaps the language selector in Settings.
+- **PWA** — Flutter currently registers the service worker from its bootstrap; switch to an app-owned registration once upstream lands ([flutter#156910](https://github.com/flutter/flutter/issues/156910)).
+- **Android release** — the APK is signed with the Android debug key (sideload only). A production keystore and a Play Store listing are not set up yet.
+- **iOS** — no native iOS app; the PWA is the iOS path (by design).
 
 ## License
 
