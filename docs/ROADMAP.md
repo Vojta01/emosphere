@@ -64,6 +64,9 @@ glow podle počtu (`lib/core/geo/aggregate.dart`, `heat.dart`).
   cílem je, aby i míchané barvy „říkaly" pozitivitu. Riziko: mění schválený
   vizuál. Doporučení: nasadit **A**, B zvážit, jen pokud budou mixy působit
   neprůhledně (uděláme ukázkovou stránku se vzorky před rozhodnutím).
+- **Co je mezi A a B STEJNÉ:** matematika mixu (OKLab, váhy intenzit) je
+  v obou variantách identická — volba A/B mění jen to, **které barvy se do mixu
+  používají**. Jde čistě o vizuální identitu aplikace, ne o funkci.
 - Legenda: po klepnutí na buňku zobrazit rozpad (emoji + procenta).
 
 ---
@@ -153,6 +156,20 @@ odebrat). World feed = neklikatelný.
 **Varianta B — NIP-17 (kind 14 + seal 13 + gift wrap 1059):**
 - + skrytá metadata, moderní krypto (NIP-44 v2).
 - − výrazně více práce; méně klientů podporuje.
+
+**Co je na síti veřejně vidět (obsah je šifrovaný v OBOU variantách —
+zprávy NEJSOU veřejně čitelné):**
+
+| Co | NIP-04 | NIP-17 |
+|---|---|---|
+| obsah zprávy | šifrovaný (AES-CBC) | šifrovaný (ChaCha20-Poly1305, silnější) |
+| kdo komu píše | **veřejné** (odesílatel i příjemce) | **skryté** (vidět jen příjemce; odesílatel = náhodný klíč) |
+| čas zprávy | přesný a veřejný | posunutý (přibližný) |
+| délka zprávy | přibližně viditelná | skrytá (padding) |
+| kompatibilita | většina klientů | novější, méně klientů |
+
+Poznámka: v obou případech platí, že kdo získá privátní klíč, přečte zprávy —
+šifrování chrání proti relayím a cizím lidem, ne proti úniku klíče.
 
 **Doporučení:** v1 = **A** (rychlé, funkční), design rovnou počítat s přechodem
 na B (stejné UX). Pokud Vojta chce pryvacy-first, dá se jít rovnou na B
