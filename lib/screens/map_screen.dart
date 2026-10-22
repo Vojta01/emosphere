@@ -2,11 +2,11 @@
 //
 // flutter_map with OpenStreetMap tiles (attribution bottom right, darkened with
 // the package's invert + hue-rotate filter so the emotion colours stay the only
-// bright thing on screen). The heat layer is aggregated from the check-in pool:
-// circle colour = blended mix of the cell's check-ins (R1), radius = the
-// geohash cell size,
-// opacity = the number of check-ins. Cells that hold a friend's check-in get a
-// white ring. Tapping a cell opens the emotion breakdown.
+// bright thing on screen). The heat layer (R8) is aggregated from the check-in
+// pool: one soft additive blob per cell — colour = blended mix of the cell's
+// check-ins (R1), radius = the geohash cell size, glow = the number of
+// check-ins. Cells that hold a friend's check-in get a white ring. Tapping a
+// cell opens the emotion breakdown.
 //
 // The geohash precision follows the camera zoom, so the map shows coarse cells
 // from far away and city-sized cells up close.
@@ -25,6 +25,7 @@ import '../core/models/checkin.dart';
 import '../core/models/emotion.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
+import '../widgets/heat_layer.dart';
 
 /// World mood map: OSM tiles plus the aggregated emotion heat layer.
 class MapScreen extends StatefulWidget {
@@ -282,61 +283,9 @@ class _MapScreenState extends State<MapScreen> {
           errorTileCallback: (tile, error, stackTrace) {},
         ),
         if (cells.isNotEmpty)
-          CircleLayer<Object>(circles: _heatCircles(cells, friendCells)),
+          HeatLayer(cells: cells, friendCells: friendCells),
       ],
     );
-  }
-
-  /// Heat circles: glow, colour fill and the friend ring, in paint order.
-  List<CircleMarker<Object>> _heatCircles(
-    List<CellAggregate> cells,
-    Set<String> friendCells,
-  ) {
-    final maxCount = cells.isEmpty ? 1 : cells.first.count;
-    final markers = <CircleMarker<Object>>[];
-    for (final cell in cells) {
-      if (cell.dominant == null) {
-        continue;
-      }
-      // R1: the cell colour is the blended mix of all check-ins.
-      final color = cell.blended;
-      final point = LatLng(cell.center.latitude, cell.center.longitude);
-      final radius = heatRadiusMeters(cell.geohash);
-      final opacity = heatOpacity(cell.count, maxCount: maxCount);
-      markers.add(
-        CircleMarker<Object>(
-          point: point,
-          radius: radius * 1.55,
-          useRadiusInMeter: true,
-          color: color.withValues(alpha: opacity * 0.22),
-        ),
-      );
-      markers.add(
-        CircleMarker<Object>(
-          point: point,
-          radius: radius,
-          useRadiusInMeter: true,
-          color: color.withValues(alpha: opacity),
-          borderColor: color.withValues(
-            alpha: (opacity + 0.3).clamp(0.0, 1.0),
-          ),
-          borderStrokeWidth: 1.2,
-        ),
-      );
-      if (friendCells.contains(cell.geohash)) {
-        markers.add(
-          CircleMarker<Object>(
-            point: point,
-            radius: radius * 1.12,
-            useRadiusInMeter: true,
-            color: Colors.transparent,
-            borderColor: Colors.white.withValues(alpha: 0.85),
-            borderStrokeWidth: 1.6,
-          ),
-        );
-      }
-    }
-    return markers;
   }
 
   // ---------------------------------------------------------------------

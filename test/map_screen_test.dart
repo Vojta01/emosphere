@@ -9,10 +9,12 @@ import 'package:emosphere/core/models/profile.dart';
 import 'package:emosphere/core/state/app_state.dart';
 import 'package:emosphere/screens/map_screen.dart';
 import 'package:emosphere/theme/app_theme.dart';
+import 'package:emosphere/widgets/heat_layer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/fake_relay_service.dart';
@@ -169,12 +171,12 @@ Future<void> _tapCell(WidgetTester tester) async {
 /// Screen offset of the centre of the first heat cell.
 Offset _cellOffset(WidgetTester tester) {
   final mapTopLeft = tester.getTopLeft(find.byType(FlutterMap));
-  final camera = MapCamera.of(tester.element(find.byType(CircleLayer<Object>)));
-  final circle = tester
-      .widget<CircleLayer<Object>>(find.byType(CircleLayer<Object>))
-      .circles
-      .first;
-  return mapTopLeft + camera.latLngToScreenOffset(circle.point);
+  final camera = MapCamera.of(tester.element(find.byType(HeatLayer)));
+  final cell = tester.widget<HeatLayer>(find.byType(HeatLayer)).cells.first;
+  return mapTopLeft +
+      camera.latLngToScreenOffset(
+        LatLng(cell.center.latitude, cell.center.longitude),
+      );
 }
 
 void main() {
@@ -194,6 +196,7 @@ void main() {
     await _pumpMap(tester);
 
     expect(find.text('1 buňka'), findsOneWidget);
+    expect(find.byType(HeatLayer), findsOneWidget);
     expect(find.byKey(const Key('map_window_switcher')), findsOneWidget);
     // The OSM credit stays visible on the map.
     expect(find.byKey(const Key('map_attribution')), findsOneWidget);
@@ -207,7 +210,7 @@ void main() {
     await _pumpMap(tester, checkins: const <CheckinEvent>[]);
 
     expect(find.text('V tomto okně zatím nikdo nic nesdílel.'), findsOneWidget);
-    expect(find.byType(CircleLayer<Object>), findsNothing);
+    expect(find.byType(HeatLayer), findsNothing);
     // The legend and the window switcher stay visible without data.
     expect(find.text('Radost'), findsOneWidget);
     expect(find.byKey(const Key('map_window_switcher')), findsOneWidget);
@@ -216,28 +219,19 @@ void main() {
   testWidgets('rings the cells that hold a friend check-in', (tester) async {
     await _pumpMap(tester, friends: <String>[friendHex]);
 
-    final circles = tester
-        .widget<CircleLayer<Object>>(find.byType(CircleLayer<Object>))
-        .circles;
-    final rings = circles.where(
-      (circle) => circle.borderColor == Colors.white.withValues(alpha: 0.85),
-    );
-    expect(rings, hasLength(1));
+    final layer = tester.widget<HeatLayer>(find.byType(HeatLayer));
+    // The ring sits on the cell that holds the friend check-in — the cell
+    // geohash is a prefix of the g5 geohash the fixture used.
+    final ringCell = layer.friendCells.single;
+    expect(pragueCell, startsWith(ringCell));
     expect(find.text('kroužek = check-in přítele'), findsOneWidget);
   });
 
   testWidgets('no ring without a friend', (tester) async {
     await _pumpMap(tester);
 
-    final circles = tester
-        .widget<CircleLayer<Object>>(find.byType(CircleLayer<Object>))
-        .circles;
-    expect(
-      circles.where(
-        (circle) => circle.borderColor == Colors.white.withValues(alpha: 0.85),
-      ),
-      isEmpty,
-    );
+    final layer = tester.widget<HeatLayer>(find.byType(HeatLayer));
+    expect(layer.friendCells, isEmpty);
     expect(find.text('kroužek = check-in přítele'), findsNothing);
   });
 
@@ -287,12 +281,12 @@ void main() {
     await tester.pumpAndSettle();
 
     final camera = MapCamera.of(
-      tester.element(find.byType(CircleLayer<Object>)),
+      tester.element(find.byType(HeatLayer)),
     );
     await tester.tap(find.byKey(const Key('map_recenter')));
     await tester.pumpAndSettle();
     final moved = MapCamera.of(
-      tester.element(find.byType(CircleLayer<Object>)),
+      tester.element(find.byType(HeatLayer)),
     );
     expect(moved.zoom, greaterThan(camera.zoom));
   });
