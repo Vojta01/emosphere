@@ -154,4 +154,36 @@ void main() {
       expect(base64.decode(parts[1]).length, 16);
     });
   });
+
+  group('invalid public keys', () {
+    // x = 5: x³ + 7 = 132 is a quadratic non-residue mod p, so no secp256k1
+    // point has this x (checked with an independent Python script).
+    const String offCurve =
+        '0000000000000000000000000000000000000000000000000000000000000005';
+
+    test('sharedSecret rejects an x that is not on the curve', () {
+      expect(() => Nip04.sharedSecret(aPriv, offCurve), throwsFormatException);
+    });
+
+    test('sharedSecret rejects x = 0 and x >= p', () {
+      const String zero =
+          '0000000000000000000000000000000000000000000000000000000000000000';
+      // p itself — the field prime, one above the largest valid x.
+      const String prime =
+          'fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f';
+      expect(() => Nip04.sharedSecret(aPriv, zero), throwsFormatException);
+      expect(() => Nip04.sharedSecret(aPriv, prime), throwsFormatException);
+    });
+
+    test('decrypt returns null for an off-curve sender key', () {
+      expect(
+        Nip04.decrypt(
+          recipientPrivateHex: bPriv,
+          senderPubkeyHex: offCurve,
+          content: c1,
+        ),
+        isNull,
+      );
+    });
+  });
 }

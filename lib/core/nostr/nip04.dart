@@ -77,13 +77,24 @@ class Nip04 {
 
   /// Rebuilds a secp256k1 point from an x-only (BIP-340) public key,
   /// choosing the even Y — the same lift every Nostr implementation uses.
+  ///
+  /// Throws [FormatException] when the key cannot lie on the curve: `x` must
+  /// be a field element (`0 < x < p`) and `x³ + 7` a quadratic residue.
+  /// Without these checks `curve.createPoint` would silently accept a point
+  /// that is not on the curve and yield a garbage shared secret.
   static ECPoint _pointFromX(String pubkeyHex, ECCurve curve) {
-    final x = BigInt.parse(pubkeyHex, radix: 16);
+    final x = BigInt.tryParse(pubkeyHex, radix: 16);
     // Field prime of secp256k1: 2^256 - 2^32 - 977.
     final p = (BigInt.one << 256) - (BigInt.one << 32) - BigInt.from(977);
+    if (x == null || x <= BigInt.zero || x >= p) {
+      throw const FormatException('Public key is not a field element.');
+    }
     final alpha = (x.modPow(BigInt.from(3), p) + BigInt.from(7)) % p;
     // p % 4 == 3, so the square root is alpha^((p+1)/4).
     final beta = alpha.modPow((p + BigInt.one) >> 2, p);
+    if ((beta * beta) % p != alpha) {
+      throw const FormatException('Public key is not on the curve.');
+    }
     final y = beta.isEven ? beta : p - beta;
     return curve.createPoint(x, y);
   }

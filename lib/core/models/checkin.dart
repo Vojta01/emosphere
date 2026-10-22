@@ -39,7 +39,7 @@ class CheckinEvent {
   /// Maximum note length in characters.
   static const int maxNoteLength = 140;
 
-  /// Default intensity used when a received event has no valid `i` tag.
+  /// Default intensity used when a received event has no valid `intensity` tag.
   static const int defaultIntensity = 3;
 
   /// Event id (64 hex chars) as assigned by Nostr.
@@ -57,7 +57,7 @@ class CheckinEvent {
   /// Public note, at most [maxNoteLength] characters.
   final String note;
 
-  /// Coarse location (geohash precision 3 or 5), or `null` when location is off.
+  /// Coarse location (geohash precision 5 or 6), or `null` when location is off.
   final String? geohash;
 
   /// Creation time (UTC).
@@ -96,11 +96,19 @@ class CheckinEvent {
     return value.substring(0, maxNoteLength);
   }
 
-  /// Returns a signed Nostr event (kind 1074) for this check-in.
+  /// Builds and signs a kind 1074 event from raw values.
   ///
-  /// [createdAt] overrides [CheckinEvent.createdAt] (used by tests).
-  NostrEvent toNostrEvent(NostrKeyPairs keyPairs, {DateTime? createdAt}) {
-    final timestamp = (createdAt ?? this.createdAt).toUtc();
+  /// Single source of truth for the wire format — used when publishing (see
+  /// `NostrService.publishCheckin`) and by [toNostrEvent].
+  static NostrEvent buildEvent({
+    required Emotion emotion,
+    required int intensity,
+    required NostrKeyPairs keyPairs,
+    String note = '',
+    String? geohash,
+    DateTime? createdAt,
+  }) {
+    final timestamp = (createdAt ?? DateTime.now()).toUtc();
     final seconds = DateTime.fromMillisecondsSinceEpoch(
       (timestamp.millisecondsSinceEpoch ~/ 1000) * 1000,
       isUtc: true,
@@ -111,6 +119,20 @@ class CheckinEvent {
       keyPairs: keyPairs,
       tags: buildTags(emotion: emotion, intensity: intensity, geohash: geohash),
       createdAt: seconds,
+    );
+  }
+
+  /// Returns a signed Nostr event (kind 1074) for this check-in.
+  ///
+  /// [createdAt] overrides [CheckinEvent.createdAt] (used by tests).
+  NostrEvent toNostrEvent(NostrKeyPairs keyPairs, {DateTime? createdAt}) {
+    return buildEvent(
+      emotion: emotion,
+      intensity: intensity,
+      keyPairs: keyPairs,
+      note: note,
+      geohash: geohash,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 

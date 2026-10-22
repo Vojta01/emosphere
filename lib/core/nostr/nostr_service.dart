@@ -89,6 +89,15 @@ class NostrService {
   Future<void>? _connecting;
   int _subCounter = 0;
 
+  /// Ids whose BIP-340 signature was verified in this session.
+  ///
+  /// The id is a SHA-256 of the serialized fields, so an id in this set
+  /// guarantees the signature was checked for exactly this payload.
+  final Set<String> _verifiedIds = <String>{};
+
+  /// Cap for [_verifiedIds]; the cache is dropped wholesale when it fills.
+  static const int _verifiedIdCacheCap = 5000;
+
   // ---------------------------------------------------------------------
   // Identity
   // ---------------------------------------------------------------------
@@ -360,28 +369,20 @@ class NostrService {
     if (keys == null) {
       throw NostrException('No identity available.');
     }
-    final intensityValue = CheckinEvent.normalizeIntensity(intensity);
-    final noteValue = CheckinEvent.normalizeNote(note);
-    final timestamp = (createdAt ?? DateTime.now()).toUtc();
-    final event = CheckinEvent(
-      id: '',
-      pubkey: keys.public,
+    final event = CheckinEvent.buildEvent(
       emotion: emotion,
-      intensity: intensityValue,
-      note: noteValue,
+      intensity: intensity,
+      note: note,
       geohash: geohash,
-      createdAt: timestamp,
-    ).toNostrEvent(keys);
-    await publishEvent(event);
-    return CheckinEvent(
-      id: event.id!,
-      pubkey: keys.public,
-      emotion: emotion,
-      intensity: intensityValue,
-      note: noteValue,
-      geohash: geohash,
-      createdAt: (event.createdAt ?? timestamp).toUtc(),
+      keyPairs: keys,
+      createdAt: createdAt,
     );
+    await publishEvent(event);
+    final stored = CheckinEvent.fromNostrEvent(event);
+    if (stored == null) {
+      throw NostrException('Could not rebuild the published check-in.');
+    }
+    return stored;
   }
 
   /// Publishes kind 0 metadata for the active identity.
@@ -432,11 +433,16 @@ class NostrService {
     if (!isValidPubkey(recipient)) {
       throw NostrException('Invalid recipient pubkey.');
     }
-    final content = Nip04.encrypt(
-      senderPrivateHex: keys.private,
-      recipientPubkeyHex: recipient,
-      plaintext: text,
-    );
+    final String content;
+    try {
+      content = Nip04.encrypt(
+        senderPrivateHex: keys.private,
+        recipientPubkeyHex: recipient,
+        plaintext: text,
+      );
+    } on FormatException {
+      throw NostrException('Invalid recipient pubkey.');
+    }
     final event = NostrEvent.fromPartialData(
       kind: dmKind,
       content: content,
@@ -619,16 +625,19 @@ class NostrService {
       }
     }
 
-    await collect(<String, dynamic>{
-      'kinds': <int>[dmKind],
-      '#p': <String>[keys.public],
-      'limit': limit,
-    });
-    await collect(<String, dynamic>{
-      'kinds': <int>[dmKind],
-      'authors': <String>[keys.public],
-      'limit': limit,
-    });
+    // Incoming and outgoing are independent — query both in parallel.
+    await Future.wait(<Future<void>>[
+      collect(<String, dynamic>{
+        'kinds': <int>[dmKind],
+        '#p': <String>[keys.public],
+        'limit': limit,
+      }),
+      collect(<String, dynamic>{
+        'kinds': <int>[dmKind],
+        'authors': <String>[keys.public],
+        'limit': limit,
+      }),
+    ]);
     final result = byId.values.toList()
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return result;
@@ -826,11 +835,53 @@ class NostrService {
       return null;
     }
     try {
-      return NostrEvent.fromDecodedMessage(message);
+      final event = NostrEvent.fromDecodedMessage(message);
+      if (!_isAuthentic(event)) {
+        return null;
+      }
+      return event;
     } on Object {
       // Malformed payload from a relay — ignore it.
       return null;
     }
+  }
+
+  /// True when [event] passes the authenticity checks.
+  ///
+  /// The id is always recomputed from the serialized fields (a cheap SHA-256),
+  /// so a compromised relay can neither tamper with fields nor replay a
+  /// signature under a different body. The BIP-340 signature check costs
+  /// milliseconds per event, so it is cached per id — and since the id is a
+  /// hash of the fields, a cached id means exactly this payload was checked.
+  bool _isAuthentic(NostrEvent event) {
+    final id = event.id;
+    final sig = event.sig;
+    final kind = event.kind;
+    final createdAt = event.createdAt;
+    if (id == null || sig == null || kind == null || createdAt == null) {
+      return false;
+    }
+    final expectedId = NostrEvent.getEventId(
+      kind: kind,
+      content: event.content ?? '',
+      createdAt: createdAt,
+      tags: event.tags ?? const <List<String>>[],
+      pubkey: event.pubkey,
+    );
+    if (expectedId != id) {
+      return false;
+    }
+    if (_verifiedIds.contains(id)) {
+      return true;
+    }
+    if (!NostrKeyPairs.verify(event.pubkey, id, sig)) {
+      return false;
+    }
+    if (_verifiedIds.length >= _verifiedIdCacheCap) {
+      _verifiedIds.clear();
+    }
+    _verifiedIds.add(id);
+    return true;
   }
 
   /// Closes all relay connections and subscriptions.
