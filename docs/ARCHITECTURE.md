@@ -44,6 +44,24 @@
 8. **Náročnější vývoj** — protokolová specifika (např. validace tagů relayi),
    vlastní krypto pro DM.
 
+## Bezpečnost a zneužití — co útočník může a nemůže
+
+| Útok | Lze? | Proč / obrana |
+|---|---|---|
+| Padělat zprávu za cizí identitu | ❌ | každý event je podepsán (BIP340); bez `nsec` nelze vytvořit platný podpis |
+| Upravit cizí zprávu na relayi | ❌ | podpis by přestal platit; relaye neplatné eventy odmítají |
+| Relay zamlčí / odmítne zprávy | ⚠️ | relay může cenzurovat (event nevydat); obrana: čteme ze 4 relayů zároveň |
+| Škodlivý relay pošle junk eventy | ⚠️ | jen s vlastními klíči — ne s cizím podpisem; obrana: verifikace podpisů v klientu (R7) |
+| Spam → přebarvení heatmapy | ✅ | klíče jsou zdarma; obrana v R7: agregace per npub/okno, vážení, limity |
+| Ukrást identitu | ⚠️ | kdo získá `nsec`, publikuje za uživatele → záloha klíče, varování v UI |
+| Smazat cizí zprávu | ❌ | smazat lze jen vlastní eventy (NIP-09), a jen pokud relay vyhoví |
+
+Klíčové: **pravost dat zaručuje kryptografie, dostupnost řeší redundance
+(4 relaye) a kvalitu výsledku řídí agregace v klientu.**
+
+Poznámka: podpisy příchozích eventů dnes explicitně neověřujeme — dart_nostr
+`isVerified()` nabízí, ale automaticky nevolá. Doplnit v R7 (levné).
+
 ## Alternativy a proč ne
 
 | Možnost | Plus | Mínus |

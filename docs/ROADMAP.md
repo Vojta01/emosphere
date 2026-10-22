@@ -14,6 +14,7 @@
 | R4 | Feed → klepnutí na check-in → profil uživatele + přidat do přátel | rozhodnuto: badge v hlavičce |
 | R5 | Privátní zprávy (DM) | rozhodnuto: **NIP-04** (v1) |
 | R6 | APK — název `emosphere-<verze>.apk` + stabilní podpis + zachování dat | připraveno |
+| R7 | Odolnost proti spamu (agregace per npub, limity, verifikace podpisů) | pozdější fáze |
 
 ---
 
@@ -215,6 +216,30 @@ záloha; GitHub secrets = standardní praxe.
 
 ---
 
+## R7 — Odolnost proti spamu a zneužití (pozdější fáze, vědomě odloženo)
+
+**Kontext:** Nostr je otevřená síť — kdokoli si zdarma vygeneruje klíče
+a může publikovat check-iny. Podpisy zaručují **pravost** (nikdo nemůže
+vystupovat za cizí identitu), ale nechrání před spamem → teoreticky lze
+přebarvit heatmapu. V alpha fázi bez ochrany (záměrně).
+
+**Vrstvy obrany (od nejúčinnější):**
+1. **Agregace v klientu — hlavní obrana:** do heatmapy počítat **max 1
+   check-in od jednoho npub na buňku/okno** (např. 5 min); vážit podle stáří
+   klíče a vztahu (přátelé výš). I 10 000 eventů jednoho klíče = 1 bod.
+2. **Limit v aplikaci** (nápad Vojty): max 1 check-in za 5 min na npub.
+   Je to pravidlo pro *naše* uživatele (slušnost + nižší zátěž relayů);
+   externí skript appku obejde — není to obrana proti útočníkovi.
+3. **Verifikace podpisů příchozích eventů:** `event.isVerified()` z dart_nostr
+   (knihovna ji nabízí, ale sama ji automaticky nevolá) — zahazovat neplatné
+   eventy. Levné (pár řádků), lze udělat kdykoli.
+4. **Výběr relayů:** preferovat relaye s anti-spam politikou (PoW, rate-limit).
+5. **Později možno:** vlastní relay s vlastními pravidly.
+
+**Fáze:** až po R1–R6 (alpha = bez omezení). Výjimka: bod 3 lze vzít brzy.
+
+---
+
 ## Pořadí a odhady (návrh)
 
 1. **R6** (balení) — malé, odstraní trable s instalací
@@ -230,8 +255,10 @@ záloha; GitHub secrets = standardní praxe.
 - **(b) Oblast = geohash-6** (okruh ~0,5 km); pořadí Vypnuto · Město · Oblast.
 - **(c) DM: NIP-04** pro v1 (NIP-17 ponechat jako budoucí upgrade, stejné UX).
 - **(d) Zprávy: badge v hlavičce** feedu.
-- **(e) Pořadí implementace** (R6 → R2 → R3/R4 → R1 → R5): vysvětleno 22. 10.;
+- **(e) Pořadí implementace** (R6 → R2 → R3/R4 → R1 → R5): **schváleno** 22. 10.;
   čeká se na Vojtovo „jdi".
+- **(f) Anti-spam (R7):** zapsáno, vědomě odloženo na pozdější fázi (diskuse
+  22. 10.). Limit 1 check-in / npub / 5 min = nápad Vojty.
 
 ---
 
