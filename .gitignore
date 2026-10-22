@@ -45,5 +45,10 @@ app.*.map.json
 /android/app/release
 /android/build/
 
+# Signing — never commit keystores or their credentials
+*.jks
+*.keystore
+android/key.properties
+
 # Widget Preview related
 .widget_preview/
