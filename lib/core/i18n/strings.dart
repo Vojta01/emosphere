@@ -609,8 +609,8 @@ class Strings {
     'checkin.locArea': <String, String>{'cs': 'Oblast', 'en': 'Area'},
     'checkin.locCity': <String, String>{'cs': 'Město', 'en': 'City'},
     'checkin.locHint': <String, String>{
-      'cs': 'Přesná poloha se nikdy neposílá — jen hrubá oblast.',
-      'en': 'The exact position is never sent — only a coarse area.',
+      'cs': 'Přesná poloha se nikdy neposílá. Město ≈ 5 km · Oblast ≈ okruh 0,5 km.',
+      'en': 'The exact position is never sent. City ≈ 5 km · Area ≈ 0.5 km radius.',
     },
     'checkin.send': <String, String>{'cs': 'Odeslat', 'en': 'Send'},
     'checkin.sending': <String, String>{'cs': 'Odesílám…', 'en': 'Sending…'},
@@ -740,5 +740,65 @@ class Strings {
       'en': 'Friend list',
     },
     'feed.posts': <String, String>{'cs': 'check-inů', 'en': 'check-ins'},
+
+    // -- R3/R4/R5: profiles, user sheet, messages ---------------------------
+    'messages': <String, String>{'cs': 'Zprávy', 'en': 'Messages'},
+    'messages.empty': <String, String>{
+      'cs': 'Zatím žádné zprávy.',
+      'en': 'No messages yet.',
+    },
+    'messages.emptyHint': <String, String>{
+      'cs': 'Klepni ve feedu na někoho a napiš mu.',
+      'en': 'Tap someone in the feed and write to them.',
+    },
+    'messages.write': <String, String>{
+      'cs': 'Napsat zprávu',
+      'en': 'Write a message',
+    },
+    'messages.inputHint': <String, String>{
+      'cs': 'Napiš zprávu…',
+      'en': 'Write a message…',
+    },
+    'messages.you': <String, String>{'cs': 'Ty', 'en': 'You'},
+    'messages.sendFailed': <String, String>{
+      'cs': 'Zprávu se nepodařilo odeslat.',
+      'en': 'Could not send the message.',
+    },
+    'user.addFriend': <String, String>{
+      'cs': '+ Přidat do přátel',
+      'en': '+ Add friend',
+    },
+    'user.removeFriend': <String, String>{
+      'cs': 'Odebrat z přátel',
+      'en': 'Remove friend',
+    },
+    'user.showOnMap': <String, String>{
+      'cs': 'Zobrazit na mapě',
+      'en': 'Show on map',
+    },
+    'profile.edit': <String, String>{
+      'cs': 'Upravit profil',
+      'en': 'Edit profile',
+    },
+    'profile.name': <String, String>{
+      'cs': 'Jméno / přezdívka',
+      'en': 'Name / nickname',
+    },
+    'profile.about': <String, String>{
+      'cs': 'O mně (nepovinné)',
+      'en': 'About (optional)',
+    },
+    'profile.picture': <String, String>{
+      'cs': 'Adresa obrázku — URL (nepovinné)',
+      'en': 'Image URL (optional)',
+    },
+    'profile.saved': <String, String>{
+      'cs': 'Profil uložen.',
+      'en': 'Profile saved.',
+    },
+    'profile.saveFailed': <String, String>{
+      'cs': 'Profil se nepodařilo uložit.',
+      'en': 'Could not save the profile.',
+    },
   };
 }

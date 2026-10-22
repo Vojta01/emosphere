@@ -76,7 +76,7 @@ static checkinFilter({since, authors, limit})    // REQ filter (kind 1074, #t)
 ## Geo — `lib/core/geo/`
 
 ```dart
-Geohash.encode(lat, lon, {precision = 5})  // areaPrecision = 3, cityPrecision = 5
+Geohash.encode(lat, lon, {precision = 5})  // areaPrecision = 6, cityPrecision = 5
 Geohash.decode(geohash) → GeoPoint         // cell centre
 Geohash.bounds(geohash) → GeohashBounds    // latMin/latMax/lonMin/lonMax/center
 Geohash.parent(geohash, precision)         // truncation to a coarser cell

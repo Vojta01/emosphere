@@ -21,6 +21,8 @@ import '../core/social/friends.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../widgets/key_qr_dialog.dart';
+import '../widgets/user_sheet.dart';
+import 'messages_screen.dart';
 
 /// The world feed with the friends section on top.
 class FeedScreen extends StatefulWidget {
@@ -142,133 +144,21 @@ class _FeedScreenState extends State<FeedScreen> {
     }
   }
 
-  /// Bottom sheet with the npub of one friend and the remove action.
-  Future<void> _openFriend(String pubkey) async {
-    final s = _s;
-    final app = widget.app;
-    final profile = app.profileOf(pubkey);
-    final latest = friendsFeed(
-      checkinPool(app.worldCheckins, app.friendCheckins),
-      <String>[pubkey],
+  /// Bottom sheet with one author: profile, npub and the social actions (R4).
+  Future<void> _openUser(String pubkey, {CheckinEvent? checkin}) async {
+    await showUserSheet(
+      context,
+      app: widget.app,
+      pubkey: pubkey,
+      checkin: checkin,
     );
-    final lastCheckin = latest.isEmpty ? null : latest.first;
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => SafeArea(
-        top: false,
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 22),
-          decoration: AppTheme.glassDecoration(
-            radius: 26,
-            tint: AppTheme.surfaceHigh,
-            opacity: 0.98,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 38,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  _Avatar(profile: profile, pubkey: pubkey, radius: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          profile?.bestName ?? shortenKey(pubkey),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          profile?.nip05 ?? shortenKey(pubkey),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.white.withValues(alpha: 0.5),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              SelectableText(
-                encodeNpub(pubkey),
-                key: const Key('friends_npub_value'),
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 11,
-                  height: 1.5,
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  TextButton.icon(
-                    key: const Key('friends_copy_npub'),
-                    onPressed: () async {
-                      await Clipboard.setData(
-                        ClipboardData(text: encodeNpub(pubkey)),
-                      );
-                      if (sheetContext.mounted) {
-                        _snack(s.tr('common.npubCopied'));
-                      }
-                    },
-                    icon: const Icon(Icons.copy, size: 16),
-                    label: Text(s.copy),
-                  ),
-                  const Spacer(),
-                  Text(
-                    lastCheckin == null
-                        ? s.tr('friends.noCheckins')
-                        : s.timeAgo(lastCheckin.createdAt),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.white.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              OutlinedButton.icon(
-                key: const Key('friends_remove'),
-                onPressed: () {
-                  Navigator.of(sheetContext).pop();
-                  _removeFriend(pubkey);
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFFEF4444),
-                  side: BorderSide(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.5),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                icon: const Icon(Icons.person_remove_alt_1, size: 17),
-                label: Text(s.remove),
-              ),
-            ],
-          ),
-        ),
+  }
+
+  /// Opens the messages screen (R5).
+  void _openMessages() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MessagesScreen(app: widget.app),
       ),
     );
   }
@@ -326,6 +216,46 @@ class _FeedScreenState extends State<FeedScreen> {
             ),
           ),
         ),
+        IconButton(
+          key: const Key('feed_messages'),
+          tooltip: s.tr('messages'),
+          visualDensity: VisualDensity.compact,
+          onPressed: _openMessages,
+          icon: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Icon(
+                Icons.forum_outlined,
+                size: 19,
+                color: Colors.white.withValues(alpha: 0.4),
+              ),
+              if (app.unreadDmCount > 0)
+                Positioned(
+                  right: -5,
+                  top: -4,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 5,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444),
+                      borderRadius: BorderRadius.circular(9),
+                    ),
+                    child: Text(
+                      '${app.unreadDmCount}',
+                      style: const TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 4),
         if (app.isSyncing)
           const SizedBox(
             width: 15,
@@ -498,7 +428,7 @@ class _FeedScreenState extends State<FeedScreen> {
       deleteIconColor: Colors.white.withValues(alpha: 0.5),
       deleteButtonTooltipMessage: s.tr('friends.removeConfirm'),
       onDeleted: () => _removeFriend(pubkey),
-      onPressed: () => _openFriend(pubkey),
+      onPressed: () => _openUser(pubkey),
       tooltip: latest.isEmpty
           ? s.tr('friends.noCheckins')
           : s.timeAgo(latest.first.createdAt),
@@ -555,7 +485,11 @@ class _FeedScreenState extends State<FeedScreen> {
           for (final checkin in world)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: _WorldTile(checkin: checkin, s: s),
+              child: _WorldTile(
+              checkin: checkin,
+              s: s,
+              onTap: () => _openUser(checkin.pubkey, checkin: checkin),
+            ),
             ),
       ],
     );
@@ -738,15 +672,19 @@ class _FriendTile extends StatelessWidget {
 
 /// One card of "right now in the world": emotion colour, time, note, intensity.
 class _WorldTile extends StatelessWidget {
-  const _WorldTile({required this.checkin, required this.s});
+  const _WorldTile({required this.checkin, required this.s, this.onTap});
 
   final CheckinEvent checkin;
   final Strings s;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final emotion = checkin.emotion;
-    return _Surface(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: _Surface(
       color: emotion.color,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -805,6 +743,7 @@ class _WorldTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

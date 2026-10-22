@@ -23,6 +23,25 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    widget.app.addListener(_onAppChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.app.removeListener(_onAppChanged);
+    super.dispose();
+  }
+
+  /// Switches to the map tab when a "show on map" request arrives (R4).
+  void _onAppChanged() {
+    if (widget.app.mapFocusRequest != null && _index != 0) {
+      setState(() => _index = 0);
+    }
+  }
+
   Future<void> _openCheckin() async {
     final s = Strings(widget.app.language);
     final published = await showCheckinSheet(

@@ -24,21 +24,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../geo/geohash.dart';
 import '../i18n/strings.dart';
 import '../models/checkin.dart';
+import '../models/dm.dart';
 import '../models/emotion.dart';
 import '../models/profile.dart';
 import '../nostr/nostr_service.dart';
 import '../social/friends.dart';
 
-/// Coarse location granularity of a check-in (SPEC: off / area / city).
+/// Coarse location granularity of a check-in (SPEC: off / city / area).
 enum LocationPrecision {
   /// No location is attached to check-ins.
   off(0),
 
-  /// Geohash precision 3 — a coarse area (~150 km).
-  area(Geohash.areaPrecision),
-
   /// Geohash precision 5 — a city-sized cell (~5 km).
-  city(Geohash.cityPrecision);
+  city(Geohash.cityPrecision),
+
+  /// Geohash precision 6 — a neighbourhood-sized cell (~0.5 km radius).
+  area(Geohash.areaPrecision);
 
   const LocationPrecision(this.geohashPrecision);
 
@@ -94,6 +95,15 @@ class AppState extends ChangeNotifier {
   /// Preference key of the local my-check-ins cache.
   static const String keyMyCheckins = 'emosphere.myCheckins';
 
+  /// Preference key of the cached kind 0 profiles.
+  static const String keyProfiles = 'emosphere.profiles';
+
+  /// Preference key of the local direct-message cache.
+  static const String keyDms = 'emosphere.dms';
+
+  /// Preference key of the per-conversation read markers.
+  static const String keyDmLastRead = 'emosphere.dmLastRead';
+
   /// Preference key marking that the first-run onboarding (including the
   /// key backup step) has been finished on this device.
   static const String keyOnboardingComplete = 'emosphere.onboardingComplete';
@@ -110,6 +120,12 @@ class AppState extends ChangeNotifier {
   /// Maximum number of my friends' check-ins kept in memory (card 3).
   static const int friendCheckinsLimit = 100;
 
+  /// Maximum number of direct messages kept in memory (and on disk).
+  static const int dmFetchLimit = 300;
+
+  /// How many world-feed authors get a kind 0 profile fetch per refresh.
+  static const int feedProfileLimit = 60;
+
   final NostrService _service;
   SharedPreferences? _prefs;
 
@@ -124,6 +140,22 @@ class AppState extends ChangeNotifier {
   bool _onboardingComplete = false;
   bool _disposed = false;
   StreamSubscription<CheckinEvent>? _liveSub;
+
+  /// Live direct-message subscription (kind 4).
+  StreamSubscription<DmMessage>? _dmSub;
+
+  /// Decrypted direct messages, oldest first.
+  final List<DmMessage> _dms = <DmMessage>[];
+
+  /// Per-conversation read markers (counterparty hex -> ms since epoch).
+  Map<String, int> _dmLastRead = <String, int>{};
+
+  /// Pubkeys whose kind 0 metadata was already requested this session.
+  final Set<String> _profileFetchAttempted = <String>{};
+
+  /// One-shot map focus request (R4: show a check-in on the map).
+  MapFocusRequest? _mapFocusRequest;
+  int _mapFocusCounter = 0;
 
   // ---------------------------------------------------------------------
   // Lifecycle
@@ -148,10 +180,13 @@ class AppState extends ChangeNotifier {
       _service.relays = List<String>.of(relays);
     }
     _restoreMyCheckins(prefs);
+    _restoreProfiles(prefs);
+    _restoreDms(prefs);
     await _service.loadIdentity();
     if (autoSync) {
       unawaited(_syncQuietly());
       startLiveUpdates();
+      startDmLiveUpdates();
     }
     _notify();
   }
@@ -161,6 +196,8 @@ class AppState extends ChangeNotifier {
     _disposed = true;
     _liveSub?.cancel();
     _liveSub = null;
+    _dmSub?.cancel();
+    _dmSub = null;
     _service.dispose();
     super.dispose();
   }
@@ -228,6 +265,10 @@ class AppState extends ChangeNotifier {
     _worldCheckins.clear();
     _friendCheckins.clear();
     _profiles.clear();
+    _dms.clear();
+    _dmLastRead = <String, int>{};
+    _profileFetchAttempted.clear();
+    await _persistDms();
     // A fresh identity needs a fresh backup confirmation.
     _onboardingComplete = false;
     await _prefs?.setBool(keyOnboardingComplete, false);
@@ -349,8 +390,11 @@ class AppState extends ChangeNotifier {
     if (_friends.isNotEmpty) {
       await refreshFriendCheckins();
     }
-    if (includeProfiles && _friends.isNotEmpty) {
+    if (includeProfiles) {
       await refreshProfiles();
+    }
+    if (hasIdentity) {
+      await refreshDms();
     }
     _notify();
   }
@@ -453,26 +497,236 @@ class AppState extends ChangeNotifier {
   /// Profile of [pubkey], or `null` when metadata was not fetched yet.
   NostrProfile? profileOf(String pubkey) => _profiles[pubkey.toLowerCase()];
 
-  /// Fetches kind 0 metadata for friends (and myself).
+  /// Fetches kind 0 metadata for friends, myself and (capped) world-feed
+  /// authors, so the feed cards and the author sheet show names and avatars.
   Future<void> refreshProfiles() async {
     final wanted = <String>[..._friends];
     final me = pubkeyHex;
     if (me != null) {
       wanted.add(me);
     }
+    var extra = 0;
+    for (final checkin in _worldCheckins) {
+      if (extra >= feedProfileLimit) {
+        break;
+      }
+      final key = checkin.pubkey.trim().toLowerCase();
+      if (!_profiles.containsKey(key) && !wanted.contains(key)) {
+        wanted.add(key);
+        extra++;
+      }
+    }
     if (wanted.isEmpty) {
       return;
     }
     try {
       final fetched = await _service.fetchProfiles(wanted);
+      _profileFetchAttempted.addAll(wanted);
       if (fetched.isEmpty) {
         return;
       }
       _profiles.addAll(fetched);
+      await _persistProfiles();
       _notify();
     } on NostrException {
       // Offline — keep the cache.
     }
+  }
+
+  /// Fetches the kind 0 metadata of one author (once per session).
+  ///
+  /// Returns the cached profile immediately when present; `null` while the
+  /// fetch runs (the UI rebuilds when the metadata arrives).
+  Future<NostrProfile?> ensureProfile(String pubkey) async {
+    final key = pubkey.trim().toLowerCase();
+    if (!NostrService.isValidPubkey(key)) {
+      return null;
+    }
+    final cached = _profiles[key];
+    if (cached != null) {
+      return cached;
+    }
+    if (!_profileFetchAttempted.add(key)) {
+      return null;
+    }
+    try {
+      final fetched = await _service.fetchProfiles(<String>[key]);
+      final profile = fetched[key];
+      if (profile != null) {
+        _profiles[key] = profile;
+        await _persistProfiles();
+        _notify();
+      }
+      return profile;
+    } on NostrException {
+      // Allow another attempt after a network failure.
+      _profileFetchAttempted.remove(key);
+      return null;
+    }
+  }
+
+  /// Publishes my kind 0 metadata and caches it locally.
+  Future<NostrProfile> publishProfile({
+    required String name,
+    String about = '',
+    String picture = '',
+  }) async {
+    final profile = await _service.publishProfile(
+      name: name,
+      about: about,
+      picture: picture,
+    );
+    _profiles[profile.pubkey] = profile;
+    await _persistProfiles();
+    _notify();
+    return profile;
+  }
+
+  // ---------------------------------------------------------------------
+  // Direct messages (NIP-04)
+  // ---------------------------------------------------------------------
+
+  /// All decrypted direct messages, oldest first.
+  List<DmMessage> get dms => List<DmMessage>.unmodifiable(_dms);
+
+  /// Messages with [pubkey] (either direction), oldest first.
+  List<DmMessage> conversationWith(String pubkey) {
+    final key = pubkey.trim().toLowerCase();
+    final list = _dms
+        .where((dm) => dm.senderPubkey == key || dm.recipientPubkey == key)
+        .toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return list;
+  }
+
+  /// Conversations, newest first, with the unread count per partner.
+  List<DmConversation> get dmConversations {
+    final me = pubkeyHex?.toLowerCase();
+    if (me == null) {
+      return const <DmConversation>[];
+    }
+    final grouped = <String, List<DmMessage>>{};
+    for (final dm in _dms) {
+      grouped.putIfAbsent(dm.counterparty(me), () => <DmMessage>[]).add(dm);
+    }
+    final conversations = <DmConversation>[
+      for (final entry in grouped.entries)
+        DmConversation(
+          pubkey: entry.key,
+          messages: entry.value
+            ..sort((a, b) => a.createdAt.compareTo(b.createdAt)),
+          unread: _unreadCount(entry.key, entry.value),
+        ),
+    ];
+    conversations.sort((a, b) => b.last.createdAt.compareTo(a.last.createdAt));
+    return conversations;
+  }
+
+  /// Total number of unread incoming messages (feed badge).
+  int get unreadDmCount {
+    var total = 0;
+    for (final conversation in dmConversations) {
+      total += conversation.unread;
+    }
+    return total;
+  }
+
+  /// Fetches recent direct messages from the relays.
+  ///
+  /// Never throws: offline use keeps the cached conversations.
+  Future<void> refreshDms() async {
+    if (!hasIdentity) {
+      return;
+    }
+    try {
+      final fetched = await _service.fetchDms(limit: dmFetchLimit);
+      if (fetched.isEmpty) {
+        return;
+      }
+      _mergeDms(fetched);
+      _initDmReadIfNeeded();
+      await _persistDms();
+      _notify();
+    } on NostrException {
+      // Offline — keep the cache.
+    }
+  }
+
+  /// Publishes an encrypted message to [recipientPubkey].
+  Future<DmMessage> sendDm({
+    required String recipientPubkey,
+    required String text,
+  }) async {
+    final dm = await _service.publishDm(
+      recipientPubkey: recipientPubkey,
+      text: text,
+    );
+    _mergeDms(<DmMessage>[dm]);
+    await _persistDms();
+    _notify();
+    return dm;
+  }
+
+  /// Starts (or restarts) the live direct-message subscription.
+  void startDmLiveUpdates() {
+    if (!hasIdentity) {
+      return;
+    }
+    _dmSub?.cancel();
+    _dmSub = _service.subscribeDms().listen(
+      (dm) {
+        _mergeDms(<DmMessage>[dm]);
+        unawaited(_persistDms());
+        _notify();
+      },
+      onError: (Object _) {
+        // A dropped relay must not kill the UI.
+      },
+      cancelOnError: false,
+    );
+  }
+
+  /// Marks the conversation with [pubkey] as read up to its newest message.
+  void markConversationRead(String pubkey) {
+    final key = pubkey.trim().toLowerCase();
+    var newest = _dmLastRead[key] ?? 0;
+    for (final dm in _dms) {
+      if (dm.senderPubkey != key) {
+        continue;
+      }
+      final stamp = dm.createdAt.millisecondsSinceEpoch;
+      if (stamp > newest) {
+        newest = stamp;
+      }
+    }
+    if (newest == (_dmLastRead[key] ?? 0)) {
+      return;
+    }
+    _dmLastRead[key] = newest;
+    unawaited(_persistDmLastRead());
+    _notify();
+  }
+
+  // ---------------------------------------------------------------------
+  // Map focus (R4)
+  // ---------------------------------------------------------------------
+
+  /// Pending one-shot map focus request, or `null`.
+  MapFocusRequest? get mapFocusRequest => _mapFocusRequest;
+
+  /// Asks the map to centre on [point]; the shell switches to the map tab.
+  void requestMapFocus(GeoPoint point) {
+    _mapFocusCounter++;
+    _mapFocusRequest = MapFocusRequest(point: point, id: _mapFocusCounter);
+    _notify();
+  }
+
+  /// Consumes the request with [id]; no notify (the map already moved).
+  void clearMapFocus(int id) {
+    if (_mapFocusRequest?.id != id) {
+      return;
+    }
+    _mapFocusRequest = null;
   }
 
   // ---------------------------------------------------------------------
@@ -626,4 +880,172 @@ class AppState extends ChangeNotifier {
     ]);
     await prefs.setString(keyMyCheckins, payload);
   }
+
+  void _restoreProfiles(SharedPreferences prefs) {
+    final raw = prefs.getString(keyProfiles);
+    if (raw == null || raw.isEmpty) {
+      return;
+    }
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) {
+        return;
+      }
+      for (final entry in decoded.entries) {
+        final value = entry.value;
+        if (value is Map<String, dynamic>) {
+          _profiles[entry.key] = NostrProfile(
+            pubkey: entry.key,
+            name: value['name'] as String?,
+            displayName: value['display_name'] as String?,
+            about: value['about'] as String?,
+            picture: value['picture'] as String?,
+            nip05: value['nip05'] as String?,
+          );
+        }
+      }
+    } on FormatException {
+      // Corrupted cache — start empty.
+    }
+  }
+
+  Future<void> _persistProfiles() async {
+    final prefs = _prefs;
+    if (prefs == null) {
+      return;
+    }
+    final payload = jsonEncode(<String, Map<String, dynamic>>{
+      for (final entry in _profiles.entries)
+        entry.key: <String, dynamic>{
+          'name': entry.value.name,
+          'display_name': entry.value.displayName,
+          'about': entry.value.about,
+          'picture': entry.value.picture,
+          'nip05': entry.value.nip05,
+        },
+    });
+    await prefs.setString(keyProfiles, payload);
+  }
+
+  void _restoreDms(SharedPreferences prefs) {
+    final raw = prefs.getString(keyDms);
+    if (raw != null && raw.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is List) {
+          final restored = <DmMessage>[];
+          for (final entry in decoded) {
+            if (entry is Map<String, dynamic>) {
+              final message = DmMessage.fromJson(entry);
+              if (message != null) {
+                restored.add(message);
+              }
+            }
+          }
+          _mergeDms(restored);
+        }
+      } on FormatException {
+        // Corrupted cache — start empty.
+      }
+    }
+    final readRaw = prefs.getString(keyDmLastRead);
+    if (readRaw != null && readRaw.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(readRaw);
+        if (decoded is Map<String, dynamic>) {
+          _dmLastRead = <String, int>{
+            for (final entry in decoded.entries)
+              if (entry.value is num) entry.key: (entry.value as num).toInt(),
+          };
+        }
+      } on FormatException {
+        // Ignore malformed markers.
+      }
+    }
+  }
+
+  Future<void> _persistDms() async {
+    final prefs = _prefs;
+    if (prefs == null) {
+      return;
+    }
+    final payload = jsonEncode(<Map<String, dynamic>>[
+      for (final dm in _dms) dm.toJson(),
+    ]);
+    await prefs.setString(keyDms, payload);
+  }
+
+  Future<void> _persistDmLastRead() async {
+    final prefs = _prefs;
+    if (prefs == null) {
+      return;
+    }
+    await prefs.setString(keyDmLastRead, jsonEncode(_dmLastRead));
+  }
+
+  /// Merges [incoming] direct messages, oldest first, deduplicated by id.
+  void _mergeDms(Iterable<DmMessage> incoming) {
+    final byId = <String, DmMessage>{
+      for (final dm in _dms) dm.id: dm,
+      for (final dm in incoming) dm.id: dm,
+    };
+    final merged = byId.values.toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    if (merged.length > dmFetchLimit) {
+      merged.removeRange(0, merged.length - dmFetchLimit);
+    }
+    _dms
+      ..clear()
+      ..addAll(merged);
+  }
+
+  /// Counts unread incoming messages from [partner] in [messages].
+  int _unreadCount(String partner, List<DmMessage> messages) {
+    final since = _dmLastRead[partner] ?? 0;
+    var count = 0;
+    for (final dm in messages) {
+      if (dm.senderPubkey != partner) {
+        continue;
+      }
+      if (dm.createdAt.millisecondsSinceEpoch > since) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  /// On the very first DM sync (no stored read markers) everything that was
+  /// fetched counts as seen — the badge only tracks messages arriving later.
+  void _initDmReadIfNeeded() {
+    if (_dmLastRead.isNotEmpty) {
+      return;
+    }
+    final me = pubkeyHex?.toLowerCase();
+    if (me == null) {
+      return;
+    }
+    final now = DateTime.now().toUtc().millisecondsSinceEpoch;
+    for (final dm in _dms) {
+      if (dm.senderPubkey == me) {
+        continue;
+      }
+      final other = dm.counterparty(me);
+      final existing = _dmLastRead[other] ?? 0;
+      if (now > existing) {
+        _dmLastRead[other] = now;
+      }
+    }
+    unawaited(_persistDmLastRead());
+  }
+}
+
+/// One-shot request to centre the map on a point (R4 show on map).
+class MapFocusRequest {
+  const MapFocusRequest({required this.point, required this.id});
+
+  /// Where to centre the camera.
+  final GeoPoint point;
+
+  /// Monotonic id, so the map handles every request exactly once.
+  final int id;
 }

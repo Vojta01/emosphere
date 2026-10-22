@@ -25,7 +25,8 @@ Mobilní + webová aplikace pro sdílení emocí přes Nostr protokol.
 - Barvy: radost #FFD93D · klid #4ADE80 · láska #F472B6 · překvapení #FB923C ·
   smutek #60A5FA · vztek #EF4444 · strach #A78BFA · únava #94A3B8
 - Poznámka ke check-inu: volitelná, max 140 znaků, veřejná
-- Lokalita: vypnuto / oblast (geohash 3) / město (geohash 5) — nikdy přesná
+- Lokalita: vypnuto / město (geohash 5, ~5 km) / oblast (geohash 6, okruh ~0,5 km)
+  — nikdy přesná
 - Přátelé: součástí této fáze (follow přes npub)
 - Jazyky: CZ + EN
 - Mapa: **styl A** — heat buňky (barva = převládající emoce, záře = počet check-inů);
@@ -60,8 +61,9 @@ Mobilní + webová aplikace pro sdílení emocí přes Nostr protokol.
   wss://relay.nostr.band (uživatel může upravit)
 - Knihovna: dart_nostr v10 (fallback: ndk) — čistě Dart, funguje i na webu
 - Agregace mapy: klient stahuje 1074 eventy s #t=emosphere za zvolené okno,
-  seskupí po geohash buňce (přesnost dle zoomu), převládající emoce (váženo
-  intenzitou) + počet check-inů
+  seskupí po geohash buňce (přesnost dle zoomu); barva buňky = vážený OKLab
+  mix všech check-inů (váha = intenzita), převládající emoce pro rozpad,
+  počet check-inů pro záři (R1)
 
 ## Obrazovky
 - Splash (logo) → Onboarding (3 kroky) → Domů (mapa + tlačítko „Jak se cítíš?")

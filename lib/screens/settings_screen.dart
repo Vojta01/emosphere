@@ -7,6 +7,7 @@ import '../core/i18n/strings.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../widgets/key_qr_dialog.dart';
+import '../widgets/user_avatar.dart';
 
 /// Settings: profile key, language, location precision, relays, my data.
 class SettingsScreen extends StatefulWidget {
@@ -147,6 +148,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (app.pubkeyHex != null) ...[
+            Row(
+              children: [
+                UserAvatar(
+                  profile: app.profileOf(app.pubkeyHex!),
+                  pubkey: app.pubkeyHex!,
+                  radius: 18,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    app.profileOf(app.pubkeyHex!)?.bestName ??
+                        s.tr('profile.name'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                TextButton.icon(
+                  key: const Key('settings_edit_profile'),
+                  onPressed: () => _editProfile(app),
+                  icon: const Icon(Icons.edit_outlined, size: 16),
+                  label: Text(s.tr('profile.edit')),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+          ],
           Row(
             children: [
               Expanded(
@@ -212,6 +245,92 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // A public key needs no masking.
       masked: false,
     );
+  }
+
+  /// Dialog that publishes a fresh kind 0 profile (name, about, picture).
+  Future<void> _editProfile(AppState app) async {
+    final s = widget.s;
+    final me = app.pubkeyHex;
+    if (me == null) {
+      return;
+    }
+    final current = app.profileOf(me);
+    final name = TextEditingController(text: current?.name ?? '');
+    final about = TextEditingController(text: current?.about ?? '');
+    final picture = TextEditingController(text: current?.picture ?? '');
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(s.tr('profile.edit')),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                key: const Key('profile_name_field'),
+                controller: name,
+                maxLength: 40,
+                decoration: InputDecoration(
+                  labelText: s.tr('profile.name'),
+                  counterText: '',
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                key: const Key('profile_about_field'),
+                controller: about,
+                maxLines: 3,
+                maxLength: 200,
+                decoration: InputDecoration(
+                  labelText: s.tr('profile.about'),
+                  counterText: '',
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                key: const Key('profile_picture_field'),
+                controller: picture,
+                maxLength: 300,
+                decoration: InputDecoration(
+                  labelText: s.tr('profile.picture'),
+                  counterText: '',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(s.cancel),
+          ),
+          FilledButton(
+            key: const Key('profile_save'),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(s.save),
+          ),
+        ],
+      ),
+    );
+    if (saved == true && mounted) {
+      try {
+        await app.publishProfile(
+          name: name.text.trim(),
+          about: about.text.trim(),
+          picture: picture.text.trim(),
+        );
+        if (mounted) {
+          _snack(s.tr('profile.saved'));
+        }
+      } on Object {
+        if (mounted) {
+          _snack(s.tr('profile.saveFailed'));
+        }
+      }
+    }
+    name.dispose();
+    about.dispose();
+    picture.dispose();
   }
 
   Widget _keyBackupCard(Strings s, AppState app) {

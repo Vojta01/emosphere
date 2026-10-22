@@ -20,8 +20,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../models/checkin.dart';
+import '../models/dm.dart';
 import '../models/emotion.dart';
 import '../models/profile.dart';
+import 'nip04.dart';
 
 /// Creates a WebSocket channel for [uri]. Injectable for tests.
 typedef RelayChannelFactory = WebSocketChannel Function(Uri uri);
@@ -60,6 +62,9 @@ class NostrService {
   static const String storageKeyPrivateKey = 'emosphere_private_key';
 
   static final RegExp _hex64 = RegExp(r'^[0-9a-f]{64}$');
+
+  /// Nostr kind for NIP-04 direct messages.
+  static const int dmKind = 4;
 
   static final Nostr _nostr = Nostr.instance..disableLogs();
 
@@ -379,6 +384,78 @@ class NostrService {
     );
   }
 
+  /// Publishes kind 0 metadata for the active identity.
+  Future<NostrProfile> publishProfile({
+    required String name,
+    String about = '',
+    String picture = '',
+  }) async {
+    final keys = _keyPairs;
+    if (keys == null) {
+      throw NostrException('No identity available.');
+    }
+    final cleanName = name.trim();
+    final cleanAbout = about.trim();
+    final cleanPicture = picture.trim();
+    final content = jsonEncode(<String, dynamic>{
+      if (cleanName.isNotEmpty) 'name': cleanName,
+      if (cleanAbout.isNotEmpty) 'about': cleanAbout,
+      if (cleanPicture.isNotEmpty) 'picture': cleanPicture,
+    });
+    final event = NostrEvent.fromPartialData(
+      kind: 0,
+      content: content,
+      keyPairs: keys,
+      tags: const <List<String>>[],
+      createdAt: DateTime.now().toUtc(),
+    );
+    await publishEvent(event);
+    return NostrProfile(
+      pubkey: keys.public,
+      name: cleanName.isEmpty ? null : cleanName,
+      about: cleanAbout.isEmpty ? null : cleanAbout,
+      picture: cleanPicture.isEmpty ? null : cleanPicture,
+      updatedAt: event.createdAt?.toUtc(),
+    );
+  }
+
+  /// Encrypts and publishes a NIP-04 direct message (kind 4).
+  Future<DmMessage> publishDm({
+    required String recipientPubkey,
+    required String text,
+  }) async {
+    final keys = _keyPairs;
+    if (keys == null) {
+      throw NostrException('No identity available.');
+    }
+    final recipient = recipientPubkey.trim().toLowerCase();
+    if (!isValidPubkey(recipient)) {
+      throw NostrException('Invalid recipient pubkey.');
+    }
+    final content = Nip04.encrypt(
+      senderPrivateHex: keys.private,
+      recipientPubkeyHex: recipient,
+      plaintext: text,
+    );
+    final event = NostrEvent.fromPartialData(
+      kind: dmKind,
+      content: content,
+      keyPairs: keys,
+      tags: <List<String>>[
+        <String>['p', recipient],
+      ],
+      createdAt: DateTime.now().toUtc(),
+    );
+    await publishEvent(event);
+    return DmMessage(
+      id: event.id!,
+      senderPubkey: keys.public,
+      recipientPubkey: recipient,
+      text: text,
+      createdAt: (event.createdAt ?? DateTime.now()).toUtc(),
+    );
+  }
+
   /// Signs and publishes a raw event, waiting for a relay `OK`.
   Future<void> publishEvent(NostrEvent event, {Duration? timeout}) async {
     final id = event.id;
@@ -516,6 +593,101 @@ class NostrService {
     return profiles;
   }
 
+  /// Fetches recent NIP-04 messages (incoming + outgoing), oldest first.
+  Future<List<DmMessage>> fetchDms({int limit = 300, Duration? timeout}) async {
+    final keys = _keyPairs;
+    if (keys == null) {
+      return <DmMessage>[];
+    }
+    await _ensureConnected();
+    final byId = <String, DmMessage>{};
+    Future<void> collect(Map<String, dynamic> filter) async {
+      final handle = _openSubscription(filter, autoCloseOnEose: true);
+      final timer = Timer(timeout ?? readTimeout, handle.close);
+      try {
+        await for (final event in handle.controller.stream) {
+          final dm = _toDm(event);
+          if (dm != null) {
+            byId[dm.id] = dm;
+          }
+        }
+      } on Object {
+        // Malformed payloads must not break the whole fetch.
+      } finally {
+        timer.cancel();
+        await handle.close();
+      }
+    }
+
+    await collect(<String, dynamic>{
+      'kinds': <int>[dmKind],
+      '#p': <String>[keys.public],
+      'limit': limit,
+    });
+    await collect(<String, dynamic>{
+      'kinds': <int>[dmKind],
+      'authors': <String>[keys.public],
+      'limit': limit,
+    });
+    final result = byId.values.toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return result;
+  }
+
+  /// Live stream of my NIP-04 messages (incoming and outgoing).
+  Stream<DmMessage> subscribeDms() async* {
+    final keys = _keyPairs;
+    if (keys == null) {
+      return;
+    }
+    await _ensureConnected();
+    final incoming = _openSubscription(<String, dynamic>{
+      'kinds': <int>[dmKind],
+      '#p': <String>[keys.public],
+    });
+    final outgoing = _openSubscription(<String, dynamic>{
+      'kinds': <int>[dmKind],
+      'authors': <String>[keys.public],
+    });
+    final controller = StreamController<DmMessage>();
+    var done = 0;
+    void noteDone() {
+      done++;
+      if (done >= 2 && !controller.isClosed) {
+        controller.close();
+      }
+    }
+
+    void forward(NostrEvent event) {
+      final dm = _toDm(event);
+      if (dm != null && !controller.isClosed) {
+        controller.add(dm);
+      }
+    }
+
+    final incomingSub = incoming.controller.stream.listen(
+      forward,
+      onDone: noteDone,
+      onError: (Object _) {},
+    );
+    final outgoingSub = outgoing.controller.stream.listen(
+      forward,
+      onDone: noteDone,
+      onError: (Object _) {},
+    );
+    try {
+      yield* controller.stream;
+    } finally {
+      await incomingSub.cancel();
+      await outgoingSub.cancel();
+      await incoming.close();
+      await outgoing.close();
+      if (!controller.isClosed) {
+        await controller.close();
+      }
+    }
+  }
+
   /// Publishes kind 5 deletions (NIP-09) for [checkins] (or all stored ones).
   ///
   /// Returns the number of deleted events referenced.
@@ -556,6 +728,50 @@ class NostrService {
     } on Object {
       return null;
     }
+  }
+
+  /// Parses + decrypts one kind 4 event for the active identity.
+  DmMessage? _toDm(NostrEvent event) {
+    final keys = _keyPairs;
+    if (keys == null || event.kind != dmKind) {
+      return null;
+    }
+    final id = event.id;
+    if (id == null) {
+      return null;
+    }
+    final me = keys.public.toLowerCase();
+    final sender = event.pubkey.trim().toLowerCase();
+    var recipient = '';
+    for (final tag in event.tags ?? const <List<String>>[]) {
+      if (tag.length >= 2 && tag[0] == 'p') {
+        recipient = tag[1].trim().toLowerCase();
+        break;
+      }
+    }
+    if (recipient.isEmpty) {
+      return null;
+    }
+    if (sender != me && recipient != me) {
+      return null;
+    }
+    final other = sender == me ? recipient : sender;
+    final text = Nip04.decrypt(
+      recipientPrivateHex: keys.private,
+      senderPubkeyHex: other,
+      content: event.content ?? '',
+    );
+    if (text == null) {
+      return null;
+    }
+    return DmMessage(
+      id: id,
+      senderPubkey: sender,
+      recipientPubkey: recipient,
+      text: text,
+      createdAt: (event.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+          .toUtc(),
+    );
   }
 
   _SubHandle _openSubscription(
