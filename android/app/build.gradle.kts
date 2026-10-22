@@ -4,6 +4,15 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Release signing — CI passes the keystore and its passwords through
+// environment variables (see .github/workflows/android-build.yml). Local
+// builds without the variables fall back to the debug key so that
+// `flutter build apk` keeps working out of the box.
+val releaseSigningEnv: Map<String, String> = listOf(
+    "KEYSTORE_PATH", "KEYSTORE_PASSWORD", "KEY_ALIAS", "KEY_PASSWORD",
+).associateWith { System.getenv(it) ?: "" }
+val hasReleaseSigning = releaseSigningEnv.values.all { it.isNotBlank() }
+
 android {
     namespace = "com.emosphere"
     compileSdk = flutter.compileSdkVersion
@@ -29,11 +38,27 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseSigningEnv.getValue("KEYSTORE_PATH"))
+                storePassword = releaseSigningEnv.getValue("KEYSTORE_PASSWORD")
+                keyAlias = releaseSigningEnv.getValue("KEY_ALIAS")
+                keyPassword = releaseSigningEnv.getValue("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Release-signed when the CI secrets are present; debug key only
+            // for local builds without secrets (updates across such builds
+            // are not installable over each other).
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

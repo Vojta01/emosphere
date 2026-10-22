@@ -1,6 +1,9 @@
 name: Android APK
 
-# Builds a release APK on GitHub runners.
+# Builds a release APK on GitHub runners, signed with the stable release
+# keystore from the repository secrets (so updates install over previous
+# versions and keep the user's identity). The APK is named
+# `emosphere-<version>.apk`.
 #
 # Deliberately NOT triggered on every push to main: the APK build is heavy
 # and the on-push pipeline (CI + Pages deploy) already covers analyze, tests
@@ -37,20 +40,34 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK
+      - name: Decode release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/emosphere-release.jks"
+          test -s "$RUNNER_TEMP/emosphere-release.jks"
+
+      - name: Build APK (release signed)
+        env:
+          KEYSTORE_PATH: ${{ runner.temp }}/emosphere-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: flutter build apk --release
 
-      - name: Checksum
+      - name: Rename to emosphere-<version>.apk and checksum
         run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
           cd build/app/outputs/flutter-apk
-          sha256sum app-release.apk | tee app-release.apk.sha256
+          cp app-release.apk "emosphere-${VERSION}.apk"
+          sha256sum "emosphere-${VERSION}.apk" | tee "emosphere-${VERSION}.apk.sha256"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: emosphere-apk
           path: |
-            build/app/outputs/flutter-apk/app-release.apk
-            build/app/outputs/flutter-apk/app-release.apk.sha256
+            build/app/outputs/flutter-apk/emosphere-*.apk
+            build/app/outputs/flutter-apk/emosphere-*.apk.sha256
           if-no-files-found: error
           retention-days: 30
