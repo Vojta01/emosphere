@@ -477,18 +477,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                CheckboxListTile(
-                  value: _backupConfirmed,
-                  onChanged: (value) =>
-                      setState(() => _backupConfirmed = value ?? false),
-                  title: Text(
-                    s.tr('onb.step3.confirm'),
-                    style: const TextStyle(fontSize: 13, color: Colors.white),
+                // Transparent Material: ListTile paints ink splashes on the
+                // nearest Material ancestor, the decorated card above is not
+                // one (framework asserts otherwise in debug builds).
+                Material(
+                  type: MaterialType.transparency,
+                  child: CheckboxListTile(
+                    value: _backupConfirmed,
+                    onChanged: (value) =>
+                        setState(() => _backupConfirmed = value ?? false),
+                    title: Text(
+                      s.tr('onb.step3.confirm'),
+                      style: const TextStyle(fontSize: 13, color: Colors.white),
+                    ),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    activeColor: AppTheme.accent,
                   ),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  activeColor: AppTheme.accent,
                 ),
               ],
             ),

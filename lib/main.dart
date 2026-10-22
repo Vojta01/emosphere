@@ -18,19 +18,28 @@ void main() {
 
 /// Root widget of the app.
 class EmoSphereApp extends StatefulWidget {
-  const EmoSphereApp({super.key});
+  const EmoSphereApp({super.key, this.app, this.autoSync = true});
+
+  /// Optional pre-built state; widget tests inject a prepared instance.
+  final AppState? app;
+
+  /// Tests pass `false` to keep the relay sync out of the test.
+  final bool autoSync;
 
   @override
   State<EmoSphereApp> createState() => _EmoSphereAppState();
 }
 
 class _EmoSphereAppState extends State<EmoSphereApp> {
-  final AppState _app = AppState();
-  late final Future<void> _ready = _app.init();
+  late final AppState _app = widget.app ?? AppState();
+  late final bool _ownsApp = widget.app == null;
+  late final Future<void> _ready = _app.init(autoSync: widget.autoSync);
 
   @override
   void dispose() {
-    _app.dispose();
+    if (_ownsApp) {
+      _app.dispose();
+    }
     super.dispose();
   }
 
@@ -50,11 +59,14 @@ class _EmoSphereAppState extends State<EmoSphereApp> {
             listenable: _app,
             builder: (context, _) {
               final s = Strings(_app.language);
-              if (!_app.hasIdentity) {
+              // Keep onboarding open until it is explicitly finished: as soon
+              // as the identity exists, the backup step (nsec + QR) must still
+              // be reachable before the home shell appears.
+              if (!_app.hasIdentity || !_app.onboardingComplete) {
                 return OnboardingScreen(
                   state: _app,
                   s: s,
-                  onDone: () => setState(() {}),
+                  onDone: () => _app.completeOnboarding(),
                 );
               }
               return HomeShell(app: _app);

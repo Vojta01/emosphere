@@ -94,6 +94,10 @@ class AppState extends ChangeNotifier {
   /// Preference key of the local my-check-ins cache.
   static const String keyMyCheckins = 'emosphere.myCheckins';
 
+  /// Preference key marking that the first-run onboarding (including the
+  /// key backup step) has been finished on this device.
+  static const String keyOnboardingComplete = 'emosphere.onboardingComplete';
+
   /// How far back the world feed / map loads check-ins.
   static const Duration worldWindow = Duration(days: 30);
 
@@ -117,6 +121,7 @@ class AppState extends ChangeNotifier {
   final Map<String, NostrProfile> _profiles = <String, NostrProfile>{};
   List<String> _friends = <String>[];
   bool _syncInProgress = false;
+  bool _onboardingComplete = false;
   bool _disposed = false;
   StreamSubscription<CheckinEvent>? _liveSub;
 
@@ -136,6 +141,7 @@ class AppState extends ChangeNotifier {
     _locationPrecision = LocationPrecision.fromName(
       prefs.getString(keyLocationPrecision),
     );
+    _onboardingComplete = prefs.getBool(keyOnboardingComplete) ?? false;
     _friends = dedupeFriendKeys(prefs.getStringList(keyFriends) ?? const []);
     final relays = prefs.getStringList(keyRelays);
     if (relays != null && relays.isNotEmpty) {
@@ -172,6 +178,21 @@ class AppState extends ChangeNotifier {
   /// Whether a key pair exists on this device.
   bool get hasIdentity => _service.hasIdentity;
 
+  /// Whether the first-run onboarding (incl. the key backup step) finished.
+  ///
+  /// While this is `false` the app keeps the user in onboarding even after a
+  /// key exists, so the `nsec` backup step is always seen (or the key was
+  /// imported explicitly).
+  bool get onboardingComplete => _onboardingComplete;
+
+  /// Marks the first-run onboarding as finished and persists the flag.
+  Future<void> completeOnboarding() async {
+    if (_onboardingComplete) return;
+    _onboardingComplete = true;
+    await _prefs?.setBool(keyOnboardingComplete, true);
+    _notify();
+  }
+
   /// Hex public key of the active identity.
   String? get pubkeyHex => _service.pubkeyHex;
 
@@ -207,6 +228,9 @@ class AppState extends ChangeNotifier {
     _worldCheckins.clear();
     _friendCheckins.clear();
     _profiles.clear();
+    // A fresh identity needs a fresh backup confirmation.
+    _onboardingComplete = false;
+    await _prefs?.setBool(keyOnboardingComplete, false);
     await _persistMyCheckins();
     _notify();
   }
