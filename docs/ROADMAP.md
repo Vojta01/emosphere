@@ -15,7 +15,7 @@
 | R5 | Privátní zprávy (DM) | rozhodnuto: **NIP-04** (v1) |
 | R6 | APK — název `emosphere-<verze>.apk` + stabilní podpis + zachování dat | připraveno |
 | R7 | Odolnost proti spamu (agregace per npub, limity, verifikace podpisů) | pozdější fáze |
-| R8 | Heatmapa místo kruhů — plynulé slévání blobů | návrh |
+| R8 | Heatmapa místo kruhů — plynulé slévání blobů | hotovo (v0.3.0, oprava polohy v0.3.2) |
 
 ---
 
@@ -265,7 +265,9 @@ bitmapy s rozostřením; nejhladší výsledek, ale složitější (překreslov�
 při zoomu). A stačí; C jen pokud by bylo potřeba.
 
 **Ukázka:** porovnání stylů (`noc/emosphere-artifacts/mockups/heatmap-style.png`)
-— posláno Vojtovi 22. 10. **Stav:** návrh — čeká na „jdi".
+— posláno Vojtovi 22. 10. **Stav:** implementováno (v0.3.0); oprava polohy
+blobu ve v0.3.2 — buňka se kreslí na těžiště svých check-inů, ne na střed
+hrubé buňky (pražské check-iny dřív zářily nad Skandinávií / Maďarskem).
 
 ---
 
@@ -290,6 +292,7 @@ při zoomu). A stačí; C jen pokud by bylo potřeba.
   22. 10.). Limit 1 check-in / npub / 5 min = nápad Vojty.
 - **(g) Heatmapa (R8):** návrh + ukázka stylu (Telegram 22. 10.) — čeká na
   Vojtovo rozhodnutí; při „jdi" se dělá spolu s R1 jako jeden vizuální balík.
+  → **implementováno** (v0.3.0, oprava polohy blobu v0.3.2).
 
 ---
 
