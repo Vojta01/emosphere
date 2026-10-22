@@ -8,11 +8,11 @@
 
 | # | Téma | Stav |
 |---|------|------|
-| R1 | Heat mapa — barva buňky = směs všech check-inů (realtime) | návrh |
-| R2 | Lokalita — oprava granularity: Vypnuto · Město · Oblast | návrh |
+| R1 | Heat mapa — barva buňky = směs všech check-inů (realtime) | rozhodnuto: **A** |
+| R2 | Lokalita — oprava granularity: Vypnuto · Město · Oblast | rozhodnuto |
 | R3 | Profily — jméno + ikonka (kind 0) | návrh |
-| R4 | Feed → klepnutí na check-in → profil uživatele + přidat do přátel | návrh |
-| R5 | Privátní zprávy (DM) — varianta A/B | návrh |
+| R4 | Feed → klepnutí na check-in → profil uživatele + přidat do přátel | rozhodnuto: badge v hlavičce |
+| R5 | Privátní zprávy (DM) | rozhodnuto: **NIP-04** (v1) |
 | R6 | APK — název `emosphere-<verze>.apk` + stabilní podpis + zachování dat | připraveno |
 
 ---
@@ -223,15 +223,15 @@ záloha; GitHub secrets = standardní praxe.
 4. **R1** (barvy) — střední (+ volba A/B)
 5. **R5** (DM) — větší (volba A/B)
 
-## K rozhodnutí Vojtou
+## Rozhodnutí Vojty (22. 10. 2026)
 
-- (a) Barvy: varianta **A** (zachovat paletu + OKLab), nebo **B** (přerovnat do valence)?
-- (b) „Oblast" = geohash-6, tj. **okruh ~0,5 km** — sedí do tvého rozmezí
-  500 m–1 km (doporučuji). Alternativa g7 (≈ 150 m) je přesnější, ale méně
-  soukromá. Souhlasíš s ~0,5 km?
-- (c) DM: **NIP-04** (v1 rychle), nebo NIP-17 (privacy-first, déle)?
-- (d) Zprávy: **badge v hlavičce** feedu, nebo 5. záložka?
-- (e) Souhlas s pořadím R6 → R2 → R3/R4 → R1 → R5?
+- **(a) Barvy: varianta A** — zachovat schválenou paletu + OKLab mix.
+  Před nasazením vygenerovat ukázkovou stránku se všemi 36 dvojicemi emocí.
+- **(b) Oblast = geohash-6** (okruh ~0,5 km); pořadí Vypnuto · Město · Oblast.
+- **(c) DM: NIP-04** pro v1 (NIP-17 ponechat jako budoucí upgrade, stejné UX).
+- **(d) Zprávy: badge v hlavičce** feedu.
+- **(e) Pořadí implementace** (R6 → R2 → R3/R4 → R1 → R5): vysvětleno 22. 10.;
+  čeká se na Vojtovo „jdi".
 
 ---
 
