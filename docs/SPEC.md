@@ -46,8 +46,11 @@ Mobilní + webová aplikace pro sdílení emocí přes Nostr protokol.
 
 ## Nostr technický design
 - Kind: **1074** (EmoSphere check-in) — regular event
-- Tags: ["t","emosphere"], ["e","<emotion-slug>"], ["i","<1-5>"],
+- Tags: ["t","emosphere"], ["emotion","<slug>"], ["intensity","<1-5>"],
   ["g","<geohash>"] (jen pokud je lokalita zapnutá)
+- Pozor: jednopísmenné tagy ("e", "i", …) jsou na moderních relayích
+  validované jako fixed-size ("e" musí být 64znakové id eventu) — emoce
+  a intenzita proto používají plné názvy tagů
 - Content: poznámka (může být prázdná)
 - Mazání: kind 5 (NIP-09) odkazující na moje 1074 eventy; v UI zmizí
 - Klíč: native = flutter_secure_storage; web/PWA = localStorage (bezpečnostní

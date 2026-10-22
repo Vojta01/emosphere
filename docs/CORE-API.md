@@ -28,7 +28,9 @@ GlassCard(child:, padding:, radius:, opacity:, tint:, glowColor:, onTap:)
   - `static const int kindValue = 1074`, `hashtag = 'emosphere'`,
     `maxNoteLength = 140`, `defaultIntensity = 3`
   - `toNostrEvent(NostrKeyPairs keys, {DateTime? createdAt})` — signed kind
-    1074 event; tags `t=emosphere`, `e=<slug>`, `i=<1-5>`, `g=<geohash>`
+    1074 event; tags `t=emosphere`, `emotion=<slug>`, `intensity=<1-5>`,
+    `g=<geohash>` (0.1.2+: full-word tags; `e`/`i` are reserved
+    fixed-size tags on relays and were rejected)
   - `static CheckinEvent? fromNostrEvent(NostrEvent)` — `null` for foreign
     events; clamps bad intensities, drops empty geohashes
   - `toJson()` / `static fromJson(Map)` — local cache

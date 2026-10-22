@@ -46,8 +46,8 @@ NostrEvent relayEvent({
           tags ??
           <List<String>>[
             <String>['t', CheckinEvent.hashtag],
-            <String>['e', 'joy'],
-            <String>['i', '3'],
+            <String>['emotion', 'joy'],
+            <String>['intensity', '3'],
           ],
     },
   ]);
@@ -94,8 +94,8 @@ void main() {
       );
       expect(tags, <List<String>>[
         <String>['t', 'emosphere'],
-        <String>['e', 'joy'],
-        <String>['i', '4'],
+        <String>['emotion', 'joy'],
+        <String>['intensity', '4'],
         <String>['g', 'u2f'],
       ]);
     });
@@ -117,11 +117,11 @@ void main() {
     test('clamps the intensity into 1..5', () {
       expect(
         CheckinEvent.buildTags(emotion: Emotion.anger, intensity: 9)[2],
-        <String>['i', '5'],
+        <String>['intensity', '5'],
       );
       expect(
         CheckinEvent.buildTags(emotion: Emotion.anger, intensity: 0)[2],
-        <String>['i', '1'],
+        <String>['intensity', '1'],
       );
     });
   });
@@ -145,8 +145,8 @@ void main() {
       expect(event.pubkey, testPubkey);
       expect(event.tags, <List<String>>[
         <String>['t', 'emosphere'],
-        <String>['e', 'love'],
-        <String>['i', '5'],
+        <String>['emotion', 'love'],
+        <String>['intensity', '5'],
         <String>['g', 'u2fkb'],
       ]);
       expect(event.createdAt, createdAt);
@@ -233,8 +233,8 @@ void main() {
           CheckinEvent.fromNostrEvent(
             relayEvent(
               tags: <List<String>>[
-                <String>['e', 'joy'],
-                <String>['i', '3'],
+                <String>['emotion', 'joy'],
+                <String>['intensity', '3'],
               ],
             ),
           ),
@@ -245,8 +245,8 @@ void main() {
             relayEvent(
               tags: <List<String>>[
                 <String>['t', 'emosphere'],
-                <String>['e', 'confusion'],
-                <String>['i', '3'],
+                <String>['emotion', 'confusion'],
+                <String>['intensity', '3'],
               ],
             ),
           ),
@@ -260,7 +260,7 @@ void main() {
         relayEvent(
           tags: <List<String>>[
             <String>['t', 'emosphere'],
-            <String>['e', 'joy'],
+            <String>['emotion', 'joy'],
           ],
         ),
       );
@@ -270,8 +270,8 @@ void main() {
         relayEvent(
           tags: <List<String>>[
             <String>['t', 'emosphere'],
-            <String>['e', 'joy'],
-            <String>['i', 'abc'],
+            <String>['emotion', 'joy'],
+            <String>['intensity', 'abc'],
           ],
         ),
       );
@@ -283,8 +283,8 @@ void main() {
         relayEvent(
           tags: <List<String>>[
             <String>['t', 'emosphere'],
-            <String>['e', 'joy'],
-            <String>['i', '42'],
+            <String>['emotion', 'joy'],
+            <String>['intensity', '42'],
           ],
         ),
       );
@@ -294,8 +294,8 @@ void main() {
         relayEvent(
           tags: <List<String>>[
             <String>['t', 'emosphere'],
-            <String>['e', 'joy'],
-            <String>['i', '-3'],
+            <String>['emotion', 'joy'],
+            <String>['intensity', '-3'],
           ],
         ),
       );
@@ -307,8 +307,8 @@ void main() {
         relayEvent(
           tags: <List<String>>[
             <String>['t', 'emosphere'],
-            <String>['e', 'joy'],
-            <String>['i', '3'],
+            <String>['emotion', 'joy'],
+            <String>['intensity', '3'],
             <String>['g', ''],
           ],
         ),

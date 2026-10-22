@@ -5,9 +5,14 @@
 //   content: free note (max 140 chars, may be empty)
 //   tags:
 //     ["t", "emosphere"]      — global hashtag, always present
-//     ["e", "<emotion-slug>"] — EmoSphere-specific: the emotion slug
-//     ["i", "<1-5>"]          — intensity
+//     ["emotion", "<slug>"]   — EmoSphere-specific: the emotion slug
+//     ["intensity", "<1-5>"]  — intensity
 //     ["g", "<geohash>"]      — only when location sharing is enabled
+//
+// NOTE: single-letter NIP-01 tags like `e`/`i` are validated as fixed-size
+// by modern relays (`e` must be a 64-char event id). Relays reject events
+// that put arbitrary values there ("unexpected size for fixed-size tag"),
+// so emotion and intensity use the full-word tag names above.
 
 import 'package:dart_nostr/dart_nostr.dart';
 
@@ -66,8 +71,8 @@ class CheckinEvent {
   }) {
     return <List<String>>[
       <String>['t', hashtag],
-      <String>['e', emotion.slug],
-      <String>['i', normalizeIntensity(intensity).toString()],
+      <String>['emotion', emotion.slug],
+      <String>['intensity', normalizeIntensity(intensity).toString()],
       if (geohash != null && geohash.isNotEmpty) <String>['g', geohash],
     ];
   }
@@ -135,9 +140,11 @@ class CheckinEvent {
           if (tag[1] == hashtag) {
             hasHashtag = true;
           }
-        case 'e':
+        case 'emotion':
+        case 'e': // Legacy name from 0.1.1 — kept so old events still parse.
           slug ??= tag[1];
-        case 'i':
+        case 'intensity':
+        case 'i': // Legacy name from 0.1.1 — kept so old events still parse.
           intensity ??= int.tryParse(tag[1]);
         case 'g':
           geohash = tag[1];
