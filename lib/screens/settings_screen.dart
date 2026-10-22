@@ -9,6 +9,9 @@ import '../theme/app_theme.dart';
 import '../widgets/key_qr_dialog.dart';
 import '../widgets/user_avatar.dart';
 
+/// Version shown in the About card — keep in sync with `pubspec.yaml`.
+const String appVersionLabel = 'v0.2.0';
+
 /// Settings: profile key, language, location precision, relays, my data.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key, required this.app, required this.s});
@@ -551,7 +554,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(width: 6),
               Text(
-                'v0.1.0',
+                appVersionLabel,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,

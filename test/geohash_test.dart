@@ -1,5 +1,5 @@
 // Tests for the geohash helpers — coarse, privacy-preserving locations
-// (SPEC v0.3: precision 3 = area, precision 5 = city, never exact).
+// (SPEC v0.3: precision 5 = city, precision 6 = area, never exact).
 
 import 'package:emosphere/core/geo/geohash.dart';
 import 'package:flutter_test/flutter_test.dart';
