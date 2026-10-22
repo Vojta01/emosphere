@@ -15,6 +15,7 @@
 | R5 | Privátní zprávy (DM) | rozhodnuto: **NIP-04** (v1) |
 | R6 | APK — název `emosphere-<verze>.apk` + stabilní podpis + zachování dat | připraveno |
 | R7 | Odolnost proti spamu (agregace per npub, limity, verifikace podpisů) | pozdější fáze |
+| R8 | Heatmapa místo kruhů — plynulé slévání blobů | návrh |
 
 ---
 
@@ -240,12 +241,40 @@ přebarvit heatmapu. V alpha fázi bez ochrany (záměrně).
 
 ---
 
+## R8 — Heatmapa místo kruhů (vizuální vylepšení mapy)
+
+**Cíl (Vojta, 22. 10.):** mapa má vypadat jako **plynulá heatmapa** — měkké
+bloby, které se v překryvu slévají (jako radar), místo kruhů s ostrými hranami.
+
+**Současný stav:** každá buňka = 3 vrstvy kruhů (`CircleLayer`: glow 1,55×,
+výplň s rámečkem, přátelský prstenec) — ostré hrany, kruhy se neslévají.
+
+**Varianta A (doporučená) — vlastní vyhlazovací vrstva `HeatLayer`:**
+- Custom flutter_map vrstva + `CustomPainter`: každá buňka = **radiální
+  gradient** (střed barvy → průhledná), aditivní blend (`BlendMode.plus`) →
+  bloby se přirozeně slévají; jas/velikost = počet a intenzita.
+- Zachová R1: barva = OKLab mix; klepnutí na buňku = rozpad (hit-test
+  `resolveTap` už existuje — beze změny).
+- Výkon: kreslí se jen viditelné buňky — stovky buněk v pohodě.
+
+**Varianta B — balíček `flutter_map_heatmap`:** ❌ nevhodný — vyžaduje
+flutter_map 6 (máme 8.3) a umí jen jednu barevnou škálu podle hustoty.
+
+**Varianta C — rastrový overlay (budoucí optimalizace):** vykreslit do
+bitmapy s rozostřením; nejhladší výsledek, ale složitější (překreslování
+při zoomu). A stačí; C jen pokud by bylo potřeba.
+
+**Ukázka:** porovnání stylů (`noc/emosphere-artifacts/mockups/heatmap-style.png`)
+— posláno Vojtovi 22. 10. **Stav:** návrh — čeká na „jdi".
+
+---
+
 ## Pořadí a odhady (návrh)
 
 1. **R6** (balení) — malé, odstraní trable s instalací
 2. **R2** (lokalita) — malé
 3. **R3 + R4** (profily + sheet) — střední
-4. **R1** (barvy) — střední (+ volba A/B)
+4. **R1 + R8** (barvy + heatmapa) — jeden vizuální balík (střední)
 5. **R5** (DM) — větší (volba A/B)
 
 ## Rozhodnutí Vojty (22. 10. 2026)
@@ -259,6 +288,8 @@ přebarvit heatmapu. V alpha fázi bez ochrany (záměrně).
   čeká se na Vojtovo „jdi".
 - **(f) Anti-spam (R7):** zapsáno, vědomě odloženo na pozdější fázi (diskuse
   22. 10.). Limit 1 check-in / npub / 5 min = nápad Vojty.
+- **(g) Heatmapa (R8):** návrh + ukázka stylu (Telegram 22. 10.) — čeká na
+  Vojtovo rozhodnutí; při „jdi" se dělá spolu s R1 jako jeden vizuální balík.
 
 ---
 
