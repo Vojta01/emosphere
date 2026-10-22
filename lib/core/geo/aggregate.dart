@@ -143,6 +143,33 @@ Emotion? dominantEmotion(Iterable<CheckinEvent> events) {
   return best;
 }
 
+/// Centre of the check-in cluster inside a cell.
+///
+/// The geometric centre of a coarse cell is a poor stand-in for its check-ins:
+/// a precision-1 cell spans half of Europe, so a Prague cluster used to glow
+/// over Scandinavia, and a precision-2 cell glowed over Hungary. Average the
+/// check-ins' own (finer) geohash centres instead; fall back to the cell
+/// centre only when nothing decodes.
+GeoPoint _clusterCenter(List<CheckinEvent> events, String cellGeohash) {
+  var lat = 0.0;
+  var lon = 0.0;
+  var count = 0;
+  for (final event in events) {
+    final geohash = event.geohash;
+    if (geohash == null || geohash.isEmpty) {
+      continue;
+    }
+    final center = Geohash.decode(geohash);
+    lat += center.latitude;
+    lon += center.longitude;
+    count++;
+  }
+  if (count == 0) {
+    return Geohash.decode(cellGeohash);
+  }
+  return GeoPoint(lat / count, lon / count);
+}
+
 /// Groups [events] into map cells of the given geohash [precision].
 ///
 /// Events without a geohash are skipped (location sharing is optional).
@@ -172,7 +199,7 @@ List<CellAggregate> aggregateByCell(
     cells.add(
       CellAggregate(
         geohash: geohash,
-        center: Geohash.decode(geohash),
+        center: _clusterCenter(cellEvents, geohash),
         count: cellEvents.length,
         counts: counts,
         weights: weights,

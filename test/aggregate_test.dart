@@ -157,6 +157,19 @@ void main() {
       expect(cells.single.dominant, Emotion.anger);
     });
 
+    test('coarse cells centre on the check-ins, not on the cell middle', () {
+      final events = <CheckinEvent>[
+        checkin(Emotion.joy, now, geohash: 'u2fkb'),
+        checkin(Emotion.calm, now, geohash: 'u2fkbe'),
+      ];
+      final cells = aggregateByCell(events, precision: 1);
+      expect(cells.single.geohash, 'u');
+      // The 'u' cell middle is (67.5, 22.5) — deep in Scandinavia — while the
+      // check-ins sit in Prague; the blob must follow the check-ins.
+      expect(cells.single.center.latitude, closeTo(50.0743, 0.001));
+      expect(cells.single.center.longitude, closeTo(14.4388, 0.001));
+    });
+
     test('area precision (6) merges finer cells into one area cell', () {
       final events = <CheckinEvent>[
         checkin(Emotion.joy, now, geohash: 'u2fkbtp'),

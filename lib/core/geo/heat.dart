@@ -112,11 +112,20 @@ CellAggregate? cellAt(
   for (final cell in cells) {
     final distance = distanceMeters(cell.center, point);
     final reach = heatRadiusMeters(cell.geohash) * tolerance;
-    if (distance > reach || distance >= bestDistance) {
+    if (distance > reach) {
       continue;
     }
-    best = cell;
-    bestDistance = distance;
+    // Nearest wins; on an exact tie (cells that share a cluster centre)
+    // prefer the finer geohash, so the more detailed cell answers the tap.
+    final isBetter =
+        distance < bestDistance ||
+        (distance == bestDistance &&
+            best != null &&
+            cell.geohash.length > best.geohash.length);
+    if (isBetter) {
+      best = cell;
+      bestDistance = distance;
+    }
   }
   return best;
 }
