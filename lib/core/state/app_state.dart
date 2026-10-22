@@ -640,15 +640,46 @@ class AppState extends ChangeNotifier {
     }
     try {
       final fetched = await _service.fetchDms(limit: dmFetchLimit);
+      if (fetched.isNotEmpty) {
+        _mergeDms(fetched);
+        _initDmReadIfNeeded();
+        await _persistDms();
+        _notify();
+      }
+    } on NostrException {
+      // Offline — keep the cache.
+    }
+    unawaited(_ensureDmProfiles());
+  }
+
+  /// Fetches kind 0 metadata for conversation partners we have no profile for.
+  ///
+  /// Runs after [refreshDms] and on live messages, so the conversation list
+  /// never triggers network calls from `build()`.
+  Future<void> _ensureDmProfiles() async {
+    final wanted = <String>[];
+    for (final conversation in dmConversations) {
+      final key = conversation.pubkey;
+      if (!_profiles.containsKey(key) &&
+          !_profileFetchAttempted.contains(key)) {
+        wanted.add(key);
+      }
+    }
+    if (wanted.isEmpty) {
+      return;
+    }
+    _profileFetchAttempted.addAll(wanted);
+    try {
+      final fetched = await _service.fetchProfiles(wanted);
       if (fetched.isEmpty) {
         return;
       }
-      _mergeDms(fetched);
-      _initDmReadIfNeeded();
-      await _persistDms();
+      _profiles.addAll(fetched);
+      await _persistProfiles();
       _notify();
     } on NostrException {
-      // Offline — keep the cache.
+      // Offline — allow another attempt on the next refresh.
+      _profileFetchAttempted.removeAll(wanted);
     }
   }
 
@@ -664,6 +695,7 @@ class AppState extends ChangeNotifier {
     _mergeDms(<DmMessage>[dm]);
     await _persistDms();
     _notify();
+    unawaited(_ensureDmProfiles());
     return dm;
   }
 
@@ -678,6 +710,7 @@ class AppState extends ChangeNotifier {
         _mergeDms(<DmMessage>[dm]);
         unawaited(_persistDms());
         _notify();
+        unawaited(_ensureDmProfiles());
       },
       onError: (Object _) {
         // A dropped relay must not kill the UI.

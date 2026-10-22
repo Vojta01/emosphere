@@ -20,7 +20,9 @@ import '../core/nostr/nip19.dart';
 import '../core/social/friends.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
+import '../widgets/intensity_dots.dart';
 import '../widgets/key_qr_dialog.dart';
+import '../widgets/user_avatar.dart';
 import '../widgets/user_sheet.dart';
 import 'messages_screen.dart';
 
@@ -415,7 +417,7 @@ class _FeedScreenState extends State<FeedScreen> {
     );
     return InputChip(
       key: Key('friend_chip_${shortenKey(pubkey, head: 6, tail: 0)}'),
-      avatar: _Avatar(profile: profile, pubkey: pubkey, radius: 13),
+      avatar: UserAvatar(profile: profile, pubkey: pubkey, radius: 13),
       label: Text(
         profile?.bestName ?? shortenKey(pubkey),
         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
@@ -522,61 +524,6 @@ class _Surface extends StatelessWidget {
   }
 }
 
-/// Round avatar of a friend: the kind 0 `picture`, otherwise a coloured initial.
-class _Avatar extends StatelessWidget {
-  const _Avatar({
-    required this.profile,
-    required this.pubkey,
-    this.radius = 16,
-  });
-
-  final NostrProfile? profile;
-  final String pubkey;
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) {
-    final picture = profile?.picture;
-    final fallback = _initial();
-    if (picture == null || picture.isEmpty) {
-      return fallback;
-    }
-    return ClipOval(
-      child: Image.network(
-        picture,
-        width: radius * 2,
-        height: radius * 2,
-        fit: BoxFit.cover,
-        // Offline or a broken URL must not break the card.
-        errorBuilder: (context, error, stackTrace) => fallback,
-      ),
-    );
-  }
-
-  Widget _initial() {
-    final name = profile?.bestName ?? pubkey;
-    final letter = name.isEmpty ? '?' : name.substring(0, 1).toUpperCase();
-    return Container(
-      width: radius * 2,
-      height: radius * 2,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppTheme.accent.withValues(alpha: 0.18),
-        border: Border.all(color: AppTheme.accent.withValues(alpha: 0.5)),
-      ),
-      child: Text(
-        letter,
-        style: TextStyle(
-          fontSize: radius * 0.95,
-          fontWeight: FontWeight.w800,
-          color: AppTheme.accent,
-        ),
-      ),
-    );
-  }
-}
-
 /// Latest check-in of one friend: kind 0 name, accent ring, emotion colour.
 class _FriendTile extends StatelessWidget {
   const _FriendTile({
@@ -615,7 +562,7 @@ class _FriendTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              _Avatar(profile: profile, pubkey: checkin.pubkey, radius: 16),
+              UserAvatar(profile: profile, pubkey: checkin.pubkey, radius: 16),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -749,7 +696,7 @@ class _WorldTile extends StatelessWidget {
   }
 }
 
-/// Five dots, [CheckinEvent.intensity] of them filled in the emotion colour.
+/// Five intensity dots plus the coarse geohash when shared.
 class _IntensityRow extends StatelessWidget {
   const _IntensityRow({required this.checkin});
 
@@ -757,21 +704,12 @@ class _IntensityRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emotion = checkin.emotion;
     return Row(
       children: [
-        for (var i = 1; i <= 5; i++)
-          Container(
-            width: 6,
-            height: 6,
-            margin: const EdgeInsets.only(right: 3),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: i <= checkin.intensity
-                  ? emotion.color.withValues(alpha: 0.9)
-                  : Colors.white.withValues(alpha: 0.12),
-            ),
-          ),
+        IntensityDots(
+          intensity: checkin.intensity,
+          color: checkin.emotion.color,
+        ),
         if (checkin.geohash != null) ...[
           const SizedBox(width: 6),
           Icon(

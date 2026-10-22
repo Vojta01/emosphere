@@ -69,6 +69,8 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuilds on every app change: the tab labels and the FAB follow the
+    // language switch, and History/Settings get fresh `Strings` and check-ins.
     return ListenableBuilder(
       listenable: widget.app,
       builder: (context, _) {

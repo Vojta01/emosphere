@@ -151,6 +151,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           ),
                         )
                       : ListView.builder(
+                          // Newest at the bottom: start scrolled to the
+                          // latest message instead of the oldest.
+                          reverse: true,
                           padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
                           itemCount: messages.length,
                           itemBuilder: (context, index) {

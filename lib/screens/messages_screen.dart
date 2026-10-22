@@ -56,9 +56,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
           listenable: widget.app,
           builder: (context, _) {
             final conversations = widget.app.dmConversations;
-            for (final conversation in conversations) {
-              unawaited(widget.app.ensureProfile(conversation.pubkey));
-            }
             if (conversations.isEmpty) {
               return _empty(s);
             }

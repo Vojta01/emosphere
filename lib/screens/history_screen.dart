@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../core/geo/aggregate.dart';
 import '../core/i18n/strings.dart';
 import '../core/models/checkin.dart';
 import '../core/models/emotion.dart';
 import '../theme/app_theme.dart';
+import '../widgets/intensity_dots.dart';
 
 /// My check-ins: timeline + simple per-emotion statistics.
 class HistoryScreen extends StatelessWidget {
@@ -326,7 +328,7 @@ class HistoryScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      _relTime(checkin.createdAt),
+                      s.timeAgo(checkin.createdAt),
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.white.withValues(alpha: 0.45),
@@ -337,7 +339,11 @@ class HistoryScreen extends StatelessWidget {
                 const SizedBox(height: 5),
                 Row(
                   children: [
-                    _intensityDots(checkin),
+                    IntensityDots(
+                      intensity: checkin.intensity,
+                      color: checkin.emotion.color,
+                      dotSize: 7,
+                    ),
                     if (checkin.geohash != null &&
                         checkin.geohash!.isNotEmpty) ...[
                       const SizedBox(width: 10),
@@ -376,41 +382,6 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _intensityDots(CheckinEvent checkin) {
-    return Row(
-      children: [
-        for (var i = 1; i <= 5; i++)
-          Padding(
-            padding: const EdgeInsets.only(right: 3),
-            child: Container(
-              width: 7,
-              height: 7,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: i <= checkin.intensity
-                    ? checkin.emotion.color
-                    : Colors.white.withValues(alpha: 0.12),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  String _relTime(DateTime time) {
-    final diff = DateTime.now().difference(time);
-    if (diff.inMinutes < 1) return s.tr('hist.now');
-    if (diff.inMinutes < 60) {
-      return s.tr('hist.minAgo').replaceFirst('{n}', '${diff.inMinutes}');
-    }
-    if (diff.inHours < 24) {
-      return s.tr('hist.hAgo').replaceFirst('{n}', '${diff.inHours}');
-    }
-    if (diff.inDays < 7) {
-      return s.tr('hist.dAgo').replaceFirst('{n}', '${diff.inDays}');
-    }
-    return '${time.day}. ${time.month}.';
-  }
 }
 
 /// Check-ins of one local day (used by the seven-day mini chart).
@@ -426,26 +397,9 @@ class _DayBucket {
   /// Number of check-ins on [day].
   int get count => items.length;
 
-  /// The day's dominant emotion — the highest total intensity; ties fall back
-  /// to the first check-in. `null` when nothing was published.
-  Emotion? get dominant {
-    if (items.isEmpty) {
-      return null;
-    }
-    final weights = <Emotion, int>{};
-    for (final item in items) {
-      weights[item.emotion] = (weights[item.emotion] ?? 0) + item.intensity;
-    }
-    var best = items.first.emotion;
-    var bestWeight = -1;
-    for (final entry in weights.entries) {
-      if (entry.value > bestWeight) {
-        best = entry.key;
-        bestWeight = entry.value;
-      }
-    }
-    return best;
-  }
+  /// The day's dominant emotion — the same weighted rule as the map cells;
+  /// `null` when nothing was published.
+  Emotion? get dominant => dominantEmotion(items);
 
   void add(CheckinEvent checkin) => items.add(checkin);
 }
