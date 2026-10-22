@@ -400,14 +400,14 @@ class _CheckinSheetState extends State<CheckinSheet>
               icon: const Icon(Icons.location_off_outlined, size: 15),
             ),
             ButtonSegment(
-              value: LocationPrecision.area,
-              label: Text(s.tr('checkin.locArea')),
-              icon: const Icon(Icons.blur_circular, size: 15),
-            ),
-            ButtonSegment(
               value: LocationPrecision.city,
               label: Text(s.tr('checkin.locCity')),
               icon: const Icon(Icons.location_city, size: 15),
+            ),
+            ButtonSegment(
+              value: LocationPrecision.area,
+              label: Text(s.tr('checkin.locArea')),
+              icon: const Icon(Icons.blur_circular, size: 15),
             ),
           ],
           selected: {_precision},

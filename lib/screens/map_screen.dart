@@ -3,7 +3,8 @@
 // flutter_map with OpenStreetMap tiles (attribution bottom right, darkened with
 // the package's invert + hue-rotate filter so the emotion colours stay the only
 // bright thing on screen). The heat layer is aggregated from the check-in pool:
-// circle colour = dominant emotion of the cell, radius = the geohash cell size,
+// circle colour = blended mix of the cell's check-ins (R1), radius = the
+// geohash cell size,
 // opacity = the number of check-ins. Cells that hold a friend's check-in get a
 // white ring. Tapping a cell opens the emotion breakdown.
 //
@@ -53,10 +54,37 @@ class _MapScreenState extends State<MapScreen> {
   int _precision = precisionForZoom(_initialZoom);
   bool _showHint = true;
 
+  /// Id of the last "show on map" request handled (R4).
+  int _lastFocusId = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.app.addListener(_onAppChanged);
+  }
+
   @override
   void dispose() {
+    widget.app.removeListener(_onAppChanged);
     _controller.dispose();
     super.dispose();
+  }
+
+  /// Handles one-shot "show on map" requests (R4).
+  void _onAppChanged() {
+    final request = widget.app.mapFocusRequest;
+    if (request == null || request.id == _lastFocusId) {
+      return;
+    }
+    _lastFocusId = request.id;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final point = request.point;
+      _controller.move(LatLng(point.latitude, point.longitude), 12);
+      widget.app.clearMapFocus(request.id);
+    });
   }
 
   // ---------------------------------------------------------------------
@@ -99,10 +127,17 @@ class _MapScreenState extends State<MapScreen> {
     final hash = mine.isEmpty ? null : mine.first.geohash;
     if (hash != null && hash.isNotEmpty) {
       final center = Geohash.decode(hash);
-      _controller.move(
-        LatLng(center.latitude, center.longitude),
-        hash.length <= Geohash.areaPrecision ? 6 : 10,
-      );
+      // Coarse (legacy) hashes zoom out more; the newest precision 6
+      // cells zoom in the closest.
+      final double zoom;
+      if (hash.length <= 4) {
+        zoom = 6;
+      } else if (hash.length == Geohash.cityPrecision) {
+        zoom = 10;
+      } else {
+        zoom = 12;
+      }
+      _controller.move(LatLng(center.latitude, center.longitude), zoom);
       return;
     }
     if (cells.isNotEmpty) {
@@ -260,10 +295,11 @@ class _MapScreenState extends State<MapScreen> {
     final maxCount = cells.isEmpty ? 1 : cells.first.count;
     final markers = <CircleMarker<Object>>[];
     for (final cell in cells) {
-      final dominant = cell.dominant;
-      if (dominant == null) {
+      if (cell.dominant == null) {
         continue;
       }
+      // R1: the cell colour is the blended mix of all check-ins.
+      final color = cell.blended;
       final point = LatLng(cell.center.latitude, cell.center.longitude);
       final radius = heatRadiusMeters(cell.geohash);
       final opacity = heatOpacity(cell.count, maxCount: maxCount);
@@ -272,7 +308,7 @@ class _MapScreenState extends State<MapScreen> {
           point: point,
           radius: radius * 1.55,
           useRadiusInMeter: true,
-          color: dominant.color.withValues(alpha: opacity * 0.22),
+          color: color.withValues(alpha: opacity * 0.22),
         ),
       );
       markers.add(
@@ -280,8 +316,8 @@ class _MapScreenState extends State<MapScreen> {
           point: point,
           radius: radius,
           useRadiusInMeter: true,
-          color: dominant.color.withValues(alpha: opacity),
-          borderColor: dominant.color.withValues(
+          color: color.withValues(alpha: opacity),
+          borderColor: color.withValues(
             alpha: (opacity + 0.3).clamp(0.0, 1.0),
           ),
           borderStrokeWidth: 1.2,
@@ -517,7 +553,7 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _showCellDetail(CellAggregate cell, bool hasFriends) async {
     final s = Strings(widget.app.language);
     final dominant = cell.dominant;
-    final accent = dominant?.color ?? AppTheme.accent;
+    final accent = dominant == null ? AppTheme.accent : cell.blended;
     final ranked =
         <Emotion>[
           for (final emotion in Emotion.values)

@@ -53,7 +53,9 @@ void main() {
       expect(precisionForZoom(9), 4);
       expect(precisionForZoom(11.9), 4);
       expect(precisionForZoom(12), 5);
-      expect(precisionForZoom(18), 5);
+      expect(precisionForZoom(13.9), 5);
+      expect(precisionForZoom(14), 6);
+      expect(precisionForZoom(18), 6);
     });
 
     test('never gets coarser as the zoom grows', () {

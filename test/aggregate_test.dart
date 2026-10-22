@@ -157,14 +157,14 @@ void main() {
       expect(cells.single.dominant, Emotion.anger);
     });
 
-    test('precision 3 merges city cells into one area cell', () {
+    test('area precision (6) merges finer cells into one area cell', () {
       final events = <CheckinEvent>[
-        checkin(Emotion.joy, now, geohash: 'u2fkb'),
-        checkin(Emotion.calm, now, geohash: 'u2fzz'),
+        checkin(Emotion.joy, now, geohash: 'u2fkbtp'),
+        checkin(Emotion.calm, now, geohash: 'u2fkbts'),
       ];
       final merged = aggregateByCell(events, precision: Geohash.areaPrecision);
       expect(merged, hasLength(1));
-      expect(merged.single.geohash, 'u2f');
+      expect(merged.single.geohash, 'u2fkbt');
       expect(merged.single.count, 2);
       expect(merged.single.counts[Emotion.joy], 1);
       expect(merged.single.counts[Emotion.calm], 1);

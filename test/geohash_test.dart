@@ -101,7 +101,7 @@ void main() {
   });
 
   test('precision constants follow the SPEC', () {
-    expect(Geohash.areaPrecision, 3);
+    expect(Geohash.areaPrecision, 6);
     expect(Geohash.cityPrecision, 5);
   });
 

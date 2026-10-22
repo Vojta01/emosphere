@@ -1,6 +1,6 @@
 // Geohash encoding/decoding (used for coarse, privacy-preserving locations).
 //
-// EmoSphere only ever stores precision 3 ("area") or precision 5 ("city")
+// EmoSphere only ever stores precision 5 ("city") or precision 6 ("area")
 // geohashes — never the exact position (SPEC v0.3).
 
 /// A WGS84 coordinate pair.
@@ -32,8 +32,9 @@ class Geohash {
 
   static const String _base32 = '0123456789bcdefghjkmnpqrstuvwxyz';
 
-  /// Precision used for the "area" location setting (~156 km x 156 km).
-  static const int areaPrecision = 3;
+  /// Precision used for the "area" location setting (~1.2 km x 0.6 km cell —
+  /// a neighbourhood-sized area with a radius of roughly 0.5 km).
+  static const int areaPrecision = 6;
 
   /// Precision used for the "city" location setting (~4.9 km x 4.9 km).
   static const int cityPrecision = 5;

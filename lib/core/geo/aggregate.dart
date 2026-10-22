@@ -1,10 +1,14 @@
 // Aggregation of check-ins into map heat cells (SPEC v0.3).
 //
-// The map shows one cell per geohash; the cell colour is the dominant emotion
-// weighted by intensity and the glow grows with the number of check-ins.
+// The map shows one cell per geohash; the cell colour is the intensity-
+// weighted OKLab blend of all its check-ins (R1) and the glow grows with the
+// number of check-ins. The dominant emotion is kept for the cell detail.
+
+import 'dart:ui' show Color;
 
 import '../models/checkin.dart';
 import '../models/emotion.dart';
+import 'blend.dart';
 import 'geohash.dart';
 
 /// Time windows offered by the map screen.
@@ -38,7 +42,7 @@ enum MapWindow {
 
 /// One aggregated map cell.
 class CellAggregate {
-  const CellAggregate({
+  CellAggregate({
     required this.geohash,
     required this.center,
     required this.count,
@@ -64,6 +68,13 @@ class CellAggregate {
 
   /// Dominant emotion (highest total intensity weight), or `null` when empty.
   final Emotion? dominant;
+
+  /// Cached blend (R1), computed on first access.
+  Color? _blendedCache;
+
+  /// Blended colour of the cell: the intensity-weighted OKLab average of all
+  /// its check-ins (R1). Transparent when the cell carries no weight.
+  Color get blended => _blendedCache ??= blendEmotionWeights(weights);
 
   /// Total intensity weight of the cell.
   double get totalWeight =>
