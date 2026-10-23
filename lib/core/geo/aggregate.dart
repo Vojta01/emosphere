@@ -109,6 +109,24 @@ List<CheckinEvent> filterByWindow(
       .toList();
 }
 
+/// Filters [events] to the sliding window ending at [end] (R9 time machine).
+///
+/// Keeps exactly the check-ins with `end - duration <= createdAt <= end`.
+/// The upper bound matters: the map must show the state of the world *at*
+/// [end], not the check-ins that only arrived later.
+List<CheckinEvent> filterBySlidingWindow(
+  Iterable<CheckinEvent> events, {
+  required DateTime end,
+  required Duration duration,
+}) {
+  final reference = end.toUtc();
+  final cutoff = reference.subtract(duration);
+  return events.where((event) {
+    final created = event.createdAt.toUtc();
+    return !created.isBefore(cutoff) && !created.isAfter(reference);
+  }).toList();
+}
+
 /// Returns the dominant emotion of [events], weighted by intensity.
 ///
 /// Ties are broken by the plain check-in count and finally by the canonical

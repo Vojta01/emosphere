@@ -26,6 +26,7 @@ import '../core/models/emotion.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../widgets/heat_layer.dart';
+import '../widgets/timeline_bar.dart';
 
 /// World mood map: OSM tiles plus the aggregated emotion heat layer.
 class MapScreen extends StatefulWidget {
@@ -42,7 +43,8 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen>
+    with SingleTickerProviderStateMixin {
   /// Fallback view when there is no check-in and no cell to centre on.
   static const LatLng _fallbackCenter = LatLng(50.0755, 14.4378);
 
@@ -54,6 +56,29 @@ class _MapScreenState extends State<MapScreen> {
   MapWindow _window = MapWindow.hours24;
   int _precision = precisionForZoom(_initialZoom);
   bool _showHint = true;
+
+  // ---------------------------------------------------------------------
+  // Time machine (R9)
+  // ---------------------------------------------------------------------
+
+  /// Length of one replay: the machine scrubs the whole selected window in
+  /// this time (R9 decision: ~8 s).
+  static const Duration _replayDuration = Duration(seconds: 8);
+
+  /// Replay driver: 0 = start of the selected window, 1 = now.
+  late final AnimationController _playback =
+      AnimationController(vsync: this, duration: _replayDuration)
+        ..addListener(_onReplayTick);
+
+  /// Slider position 0..1; `null` in live mode (the whole window is shown).
+  double? _scrub;
+
+  /// Frozen "now" of the current scrub session — the map must not move under
+  /// the user's hands while they replay the past (R9: time is frozen).
+  DateTime? _anchor;
+
+  /// Replay window length picked with the chips (1 h / 6 h / 24 h).
+  Duration _machineWindow = const Duration(hours: 6);
 
   /// Id of the last "show on map" request handled (R4).
   int _lastFocusId = 0;
@@ -67,6 +92,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void dispose() {
     widget.app.removeListener(_onAppChanged);
+    _playback.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -86,6 +112,83 @@ class _MapScreenState extends State<MapScreen> {
       _controller.move(LatLng(point.latitude, point.longitude), 12);
       widget.app.clearMapFocus(request.id);
     });
+  }
+
+  // ---------------------------------------------------------------------
+  // Time machine (R9)
+  // ---------------------------------------------------------------------
+
+  /// Instant the time machine points at; `null` when live.
+  ///
+  /// The scrub axis spans the selected window: 0 = window start, 1 = now.
+  DateTime? _scrubEnd() {
+    final scrub = _scrub;
+    final anchor = _anchor;
+    if (scrub == null || anchor == null) {
+      return null;
+    }
+    return anchor.subtract(_window.duration * (1 - scrub));
+  }
+
+  void _onReplayTick() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      // A finished replay drops back into live mode (R9: play -> now).
+      if (_playback.status == AnimationStatus.completed) {
+        _scrub = null;
+        _anchor = null;
+      } else {
+        _scrub = _playback.value;
+      }
+    });
+  }
+
+  /// Play/pause of the replay. From live it always replays the whole window;
+  /// after a pause it resumes from the scrubbed instant.
+  void _togglePlay() {
+    if (_playback.isAnimating) {
+      _playback.stop();
+      setState(() {});
+      return;
+    }
+    if (_scrub == null) {
+      _anchor = DateTime.now().toUtc();
+      _playback.value = 0;
+    } else {
+      _playback.value = _scrub!.clamp(0.0, 1.0);
+    }
+    _playback.forward();
+    setState(() {});
+  }
+
+  /// Slider changes pause the replay and scrub to the touched instant.
+  void _onScrub(double value) {
+    _playback.stop();
+    if (value >= 0.999) {
+      _goLive();
+      return;
+    }
+    setState(() {
+      _anchor ??= DateTime.now().toUtc();
+      _scrub = value;
+    });
+  }
+
+  /// Returns to live mode (the R9 "Teď" button).
+  void _goLive() {
+    _playback.stop();
+    setState(() {
+      _scrub = null;
+      _anchor = null;
+    });
+  }
+
+  /// R9: pauses the replay where it stands (a tap anywhere on the map).
+  void _pauseReplay() {
+    _playback.stop();
+    setState(() {});
   }
 
   // ---------------------------------------------------------------------
@@ -114,6 +217,12 @@ class _MapScreenState extends State<MapScreen> {
     Set<String> friendCells,
     LatLng point,
   ) {
+    // R9: a tap anywhere pauses the replay and stays in the past (the pause
+    // layer above the map normally catches this before flutter_map sees it).
+    if (_playback.isAnimating) {
+      _pauseReplay();
+      return;
+    }
     final cell = cellAt(cells, GeoPoint(point.latitude, point.longitude));
     if (cell == null) {
       return;
@@ -215,7 +324,16 @@ class _MapScreenState extends State<MapScreen> {
           final s = Strings(widget.app.language);
           final app = widget.app;
           final pool = checkinPool(app.worldCheckins, app.friendCheckins);
-          final windowed = filterByWindow(pool, _window);
+          final scrubEnd = _scrubEnd();
+          // Live = today's whole-window view. Scrubbing replays the past
+          // through the sliding window of the picked length (R9, variant B).
+          final windowed = scrubEnd == null
+              ? filterByWindow(pool, _window)
+              : filterBySlidingWindow(
+                  pool,
+                  end: scrubEnd,
+                  duration: _machineWindow,
+                );
           final cells = aggregateByCell(windowed, precision: _precision);
           final friendCells = friendCellHashes(
             windowed,
@@ -226,13 +344,27 @@ class _MapScreenState extends State<MapScreen> {
           return Stack(
             children: [
               Positioned.fill(child: _map(cells, friendCells, points)),
+              // While the replay runs, the first tap anywhere pauses it
+              // (R9). The layer sits below the control cards so their
+              // buttons stay live, and fires instantly — no flutter_map
+              // double-tap delay.
+              if (_playback.isAnimating)
+                Positioned.fill(
+                  child: GestureDetector(
+                    key: const Key('map_replay_pause_layer'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _pauseReplay,
+                  ),
+                ),
               Positioned(
                 top: 10,
                 left: 10,
                 right: 10,
-                child: _overlay(s, cells, friendCells),
+                child: _overlay(s, cells, friendCells, scrubEnd),
               ),
-              if (cells.isEmpty)
+              // The live empty state is about "nobody shared yet"; an empty
+              // map while scrubbing the past just shows the map.
+              if (cells.isEmpty && scrubEnd == null)
                 Positioned.fill(child: Center(child: _emptyState(s))),
               Positioned(
                 right: 12,
@@ -296,6 +428,7 @@ class _MapScreenState extends State<MapScreen> {
     Strings s,
     List<CellAggregate> cells,
     Set<String> friendCells,
+    DateTime? scrubEnd,
   ) {
     return Column(
       children: [
@@ -349,6 +482,24 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        GlassCard(
+          radius: 18,
+          padding: const EdgeInsets.fromLTRB(10, 2, 10, 6),
+          child: TimelineBar(
+            language: s.language,
+            live: scrubEnd == null,
+            fraction: _scrub ?? 1,
+            playing: _playback.isAnimating,
+            instant: scrubEnd,
+            machineWindow: _machineWindow,
+            onPlayPause: _togglePlay,
+            onScrub: _onScrub,
+            onLive: _goLive,
+            onMachineWindow: (window) =>
+                setState(() => _machineWindow = window),
           ),
         ),
         const SizedBox(height: 8),

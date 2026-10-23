@@ -695,6 +695,11 @@ class Strings {
       'cs': 'Klepni na buňku a uvidíš rozpad emocí.',
       'en': 'Tap a cell to see the emotion breakdown.',
     },
+    'map.live': <String, String>{'cs': 'Naživo', 'en': 'Live'},
+    'map.now': <String, String>{'cs': 'Teď', 'en': 'Now'},
+    'map.play': <String, String>{'cs': 'Přehrát', 'en': 'Play'},
+    'map.pause': <String, String>{'cs': 'Pozastavit', 'en': 'Pause'},
+    'map.replayWindow': <String, String>{'cs': 'okno', 'en': 'window'},
     'friends.addHint': <String, String>{
       'cs': 'Vlož npub přítele (npub1…)',
       'en': "Paste your friend's npub (npub1…)",

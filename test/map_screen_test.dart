@@ -179,6 +179,16 @@ Offset _cellOffset(WidgetTester tester) {
       );
 }
 
+/// Taps the timeline slider at [fraction] of its width (0 = window start,
+/// 1 = now) and lets the map rebuild.
+Future<void> _scrubTo(WidgetTester tester, double fraction) async {
+  final slider = tester.getRect(find.byKey(const Key('map_timeline')));
+  await tester.tapAt(
+    Offset(slider.left + slider.width * fraction, slider.center.dy),
+  );
+  await tester.pumpAndSettle();
+}
+
 void main() {
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -289,5 +299,122 @@ void main() {
       tester.element(find.byType(HeatLayer)),
     );
     expect(moved.zoom, greaterThan(camera.zoom));
+  });
+
+  testWidgets('shows the time machine bar with the replay chips', (
+    tester,
+  ) async {
+    await _pumpMap(tester);
+
+    expect(find.byKey(const Key('map_play')), findsOneWidget);
+    expect(find.byKey(const Key('map_timeline')), findsOneWidget);
+    expect(find.text('Naživo'), findsOneWidget);
+    // Replay window chips (R9: 1 h / 6 h / 24 h; 6 h pre-selected).
+    for (final key in const ['machine_1h', 'machine_6h', 'machine_24h']) {
+      expect(find.byKey(Key(key)), findsOneWidget);
+    }
+    final six = tester.widget<ChoiceChip>(
+      find.byKey(const Key('machine_6h')),
+    );
+    expect(six.selected, isTrue);
+    // "Teď" appears only after leaving live mode.
+    expect(find.byKey(const Key('map_live_now')), findsNothing);
+  });
+
+  testWidgets('scrubbing into the past freezes the map; Teď returns live', (
+    tester,
+  ) async {
+    await _pumpMap(tester);
+
+    await _scrubTo(tester, 0.05);
+
+    // Near the start of the 24 h axis with the default 6 h window there is
+    // nothing to show — and the live empty state must not claim otherwise.
+    expect(find.text('Naživo'), findsNothing);
+    expect(find.byKey(const Key('map_live_now')), findsOneWidget);
+    expect(find.byType(HeatLayer), findsNothing);
+    expect(find.text('V tomto okně zatím nikdo nic nesdílel.'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('map_live_now')));
+    await tester.pumpAndSettle();
+    expect(find.text('Naživo'), findsOneWidget);
+    expect(find.byType(HeatLayer), findsOneWidget);
+  });
+
+  testWidgets('play replays the window and returns to live', (tester) async {
+    await _pumpMap(tester);
+
+    await tester.tap(find.byKey(const Key('map_play')));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
+    expect(find.text('Naživo'), findsNothing);
+
+    await tester.pump(const Duration(seconds: 9));
+    await tester.pump();
+    expect(find.text('Naživo'), findsOneWidget);
+    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+    expect(find.byType(HeatLayer), findsOneWidget);
+  });
+
+  testWidgets('tapping the map pauses the replay in the past', (tester) async {
+    await _pumpMap(tester);
+
+    await tester.tap(find.byKey(const Key('map_play')));
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
+
+    await tester.tapAt(tester.getCenter(find.byType(FlutterMap)));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump();
+    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+    expect(find.text('Naživo'), findsNothing);
+    expect(find.byKey(const Key('map_live_now')), findsOneWidget);
+  });
+
+  testWidgets('the replay window chips change what the past shows', (
+    tester,
+  ) async {
+    // Ages chosen so the 1 h / 6 h / 24 h windows differ by whole check-ins.
+    final events = <CheckinEvent>[
+      _checkin(
+        id: 'ck-2h',
+        pubkey: strangerHex,
+        ago: const Duration(hours: 2),
+        emotion: Emotion.joy,
+        intensity: 3,
+        geohash: pragueCell,
+      ),
+      _checkin(
+        id: 'ck-8h',
+        pubkey: strangerHex,
+        ago: const Duration(hours: 8),
+        emotion: Emotion.calm,
+        intensity: 3,
+        geohash: pragueCell,
+      ),
+      _checkin(
+        id: 'ck-20h',
+        pubkey: strangerHex,
+        ago: const Duration(hours: 20),
+        emotion: Emotion.anger,
+        intensity: 3,
+        geohash: pragueCell,
+      ),
+    ];
+    await _pumpMap(tester, checkins: events);
+
+    await _scrubTo(tester, 0.75);
+
+    HeatLayer layer() => tester.widget<HeatLayer>(find.byType(HeatLayer));
+    // T ≈ now − 6 h; the default 6 h window holds just the 8 h old check-in.
+    expect(layer().cells.first.count, 1);
+
+    await tester.tap(find.byKey(const Key('machine_1h')));
+    await tester.pumpAndSettle();
+    expect(find.byType(HeatLayer), findsNothing);
+
+    await tester.tap(find.byKey(const Key('machine_24h')));
+    await tester.pumpAndSettle();
+    expect(layer().cells.first.count, 2);
   });
 }
