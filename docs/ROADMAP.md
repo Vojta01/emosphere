@@ -1,8 +1,8 @@
 # EmoSphere — Roadmap a návrhy (pipeline)
 
-> **Stav: návrhy k odsouhlasení.** Nic z tohoto není implementované.
-> Až Vojta řekne „jdi", položky se mění na commity / karty noční směny.
-> Zapsáno: 22. 10. 2026 · verze aplikace v době zápisu: **0.1.2+3**
+> **Stav: pipeline návrhů.** Hotové položky jsou označené v tabulce. Ostatní
+> čekají na Vojtovo „jdi“ — pak se mění na commity / karty noční směny.
+> Zapsáno: 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · aplikace **v0.3.2**
 
 ## Přehled
 
@@ -16,6 +16,9 @@
 | R6 | APK — název `emosphere-<verze>.apk` + stabilní podpis + zachování dat | připraveno |
 | R7 | Odolnost proti spamu (agregace per npub, limity, verifikace podpisů) | pozdější fáze |
 | R8 | Heatmapa místo kruhů — plynulé slévání blobů | hotovo (v0.3.0, oprava polohy v0.3.2) |
+| R9 | Stroj času — slider + ▶ play na mapě (vývoj nálady v čase) | návrh |
+| R10 | Animace po odeslání („afterglow“) v barvě emoce | návrh |
+| R11 | Citáty k emocím (20/emoci, CZ+EN) jako součást animace | návrh |
 
 ---
 
@@ -271,6 +274,103 @@ hrubé buňky (pražské check-iny dřív zářily nad Skandinávií / Maďarske
 
 ---
 
+## R9 — Stroj času: časová osa vývoje nálady na mapě
+
+**Cíl (Vojta, 23. 10.):** na mapě slider s časem + tlačítko ▶ — uživatel vidí,
+jak se nálada ve světě vyvíjela (animace).
+
+**Dnes:** mapa umí okna 1 h / 24 h / 7 dní; vždy ukazuje „teď“ (celé okno).
+
+**Návrh:**
+- Pod přepínač oken přibude **časová osa** (slider) + tlačítko **▶ / ⏸**.
+  Osa je svázaná se zvoleným oknem (1 h / 24 h / 7 dní); pravý konec = teď.
+- **Živý režim** = dnešní chování (celé okno). Posun slideru překreslí mapu na
+  stav v čase T; u pravé hrany tlačítko **„Teď“** (návrat k živému).
+- **Play** = přehrání od začátku okna do „teď“ (~8 s), pak návrat do živého
+  režimu. Klepnutí kamkoli přehrávání pauzne.
+- Popisek času: „pá 12. 10. · 14:30“ (čas dle zařízení).
+- Check-iny, které dorazí během přehrávání, se projeví až po návratu do živého
+  režimu (čas je zamrzlý — mapa se nepřepočítává pod rukama).
+
+**Dvě varianty vykreslování (k rozhodnutí):**
+
+| Varianta | Co záře v čase T ukazuje | Výhody | Nevýhody |
+|---|---|---|---|
+| **A — kumulativní (doporučeno)** | všechny check-iny od začátku okna do T | svět „ožívá“ postupně; funguje i při málo datech; dobře čitelné | méně „právě teď“ |
+| B — klouzavé okno | jen check-iny za poslední zlomek okna (např. 2 h z 24 h) | ukazuje aktuální dění; bloby se objevují a mizí | při alpha objemu dat často prázdné blikání |
+
+**Technika:** události předtříděné podle času → kumulativní agregace
+přírůstkově (O(1) na krok); scrubbing = přepočet z nuly (levné). Kreslí
+stávající `HeatLayer` beze změny — mění se jen vstupní agregát. Nová komponenta
+`TimelineBar` + stav přehrávání v `app_state`.
+
+**K rozhodnutí:** varianta A/B; délka přehrání; slider i u okna 1 h?
+
+---
+
+## R10 — Animace po odeslání („afterglow“)
+
+**Cíl (Vojta, 23. 10.):** po odeslání check-inu krátká „satisfying“ animace,
+která uživateli pomůže emoci zpracovat (motivace + uzavření).
+
+**Návrh:**
+- Po úspěšném odeslání se sheet plynule přelije do tmavého overlay (300 ms)
+  s částicovou animací **v barvě zvolené emoce** (~4 s).
+- Na konci plynule naskočí **citát** (R11) — jeden zážitek: animace → citát.
+- **Skip:** klepnutím přeskočit na citát, dalším klepnutím zavřít.
+- **Haptika:** jemný impuls na začátku + doprovodné pulzy (vypnutelné
+  v Nastavení). Respektovat systémové „omezit animace“ (pak rovnou citát).
+- Selhání odeslání: beze změny (červený snackbar, sheet zůstává).
+
+**Styly per emoce (společný engine; per-emoce jen parametry — barva, směr,
+tvar, rychlost):**
+
+| Emoce | Barva | Animace |
+|---|---|---|
+| Radost | `#FFD93D` | stoupající jiskry, jemné rozprsknutí |
+| Klid | `#4ADE80` | dýchající soustředné kruhy (nádech/výdech) |
+| Láska | `#F472B6` | srdíčka / částice pomalu odplouvající vzhůru |
+| Překvapení | `#FB923C` | rychlý radiální záblesk → jiskření, které se zklidní |
+| Smutek | `#60A5FA` | kapky pomalu stékající a rozplývající se |
+| Vztek | `#EF4444` | uhlíky stoupají a dohasínají |
+| Strach | `#A78BFA` | jemný dým, který se rozptýlí |
+| Únava | `#94A3B8` | tlumené pomalé pulzy, které se zpomalí a ztiší |
+
+**Technika:** vlastní `CustomPainter` + `AnimationController` (žádný balíček,
+stejně jako `HeatLayer`); desítky částic, 60 fps, nízká zátěž.
+
+**K rozhodnutí:** délka (2 / 4 / 8 s); haptika ano/ne; storyboard (4 klíčové
+snímky) k ukázce před implementací?
+
+---
+
+## R11 — Citáty k emocím
+
+**Cíl (Vojta, 23. 10.):** po animaci citát vztahující se k emoci — pomáhá
+reflektovat a emoci zpracovat. ~20 citátů na emoci (celkem 160).
+
+**Zdroj (návrh):**
+- buddhistické/zenové texty (Dhammapada, zen), stoikové (Marcus Aurelius,
+  Seneca, Epiktétos), psychologové (Jung, Frankl, Rogers), moderní autoři
+  (Thich Nhat Hanh, Rumi, Laozi).
+- **Politika ověřování:** preferovat dohledatelné citáty. Oblíbené apokryfy
+  (např. „Držet vztek je jako držet žhavé uhlí“, připisováno Buddhovi) vynechat
+  nebo označit „připisováno“ — bez falešných atribucí.
+- Každý citát **CZ + EN** (aplikace je dvojjazyčná). Uloženo v `assets/quotes.json`
+  — plně offline, bez serveru a stahování.
+- Seznam ke kontrole Vojtovi před nasazením (návrh).
+
+**Výběr a zobrazení:**
+- Výběr **deterministicky podle ID check-inu** (stejný check-in → stejný citát;
+  nic se neukládá, přepočet z ID). Varianta: pokaždé náhodný.
+- Zobrazení: karta v overlay po animaci — citát + autor, jemný fade-in.
+- Bonus: citát i v detailu check-inu v Historii (lze vypnout).
+
+**K rozhodnutí:** jazyk (CZ+EN — doporučeno); výběr citátu; citát v Historii;
+schválení seznamu před nasazením.
+
+---
+
 ## Pořadí a odhady (návrh)
 
 1. **R6** (balení) — malé, odstraní trable s instalací
@@ -278,6 +378,14 @@ hrubé buňky (pražské check-iny dřív zářily nad Skandinávií / Maďarske
 3. **R3 + R4** (profily + sheet) — střední
 4. **R1 + R8** (barvy + heatmapa) — jeden vizuální balík (střední)
 5. **R5** (DM) — větší (volba A/B)
+
+**Nové položky R9–R11 (23. 10.):**
+
+6. **R10 + R11** (afterglow + citáty) — jeden zážitek; návrh: první balík
+   z nových nápadů (Vojta: uživatel má být motivován)
+7. **R9** (stroj času) — po R10/R11; plně vynikne, až bude víc dat
+
+*(pořadí potvrdí Vojta)*
 
 ## Rozhodnutí Vojty (22. 10. 2026)
 
@@ -296,4 +404,4 @@ hrubé buňky (pražské check-iny dřív zářily nad Skandinávií / Maďarske
 
 ---
 
-*Zapsal Hermes · 22. 10. 2026 · zdroj: zadání Vojty (chat) · nic neimplementováno*
+*Zapsal Hermes · 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · zdroj: zadání Vojty (chat) · položky bez „hotovo“ čekají na Vojtovo „jdi“*
