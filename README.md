@@ -24,27 +24,27 @@ right now.
   <tr>
     <td align="center"><img src="docs/screenshots/01-onboarding.png" width="230" alt="Onboarding"><br><sub>Onboarding — welcome</sub></td>
     <td align="center"><img src="docs/screenshots/02-onboarding-key.png" width="230" alt="Generate or import your key"><br><sub>Generate or import your Nostr key</sub></td>
-    <td align="center"><img src="docs/screenshots/03-mapa.png" width="230" alt="World mood map"><br><sub>World mood map (empty state)</sub></td>
+    <td align="center"><img src="docs/screenshots/03-map.png" width="230" alt="World mood map"><br><sub>World mood map — live emotion heat</sub></td>
   </tr>
   <tr>
     <td align="center"><img src="docs/screenshots/04-checkin-sheet.png" width="230" alt="Check-in"><br><sub>Check-in — emotion, intensity, note</sub></td>
     <td align="center"><img src="docs/screenshots/05-feed.png" width="230" alt="Feed"><br><sub>Feed — my people &amp; the world</sub></td>
-    <td align="center"><img src="docs/screenshots/06-nastaveni.png" width="230" alt="Settings"><br><sub>Settings — profile, key, language</sub></td>
+    <td align="center"><img src="docs/screenshots/06-settings.png" width="230" alt="Settings"><br><sub>Settings — profile, key, language</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/07-historie.png" width="230" alt="History"><br><sub>History — my check-ins</sub></td>
+    <td align="center"><img src="docs/screenshots/07-history.png" width="230" alt="History"><br><sub>History — my check-ins</sub></td>
     <td></td>
     <td></td>
   </tr>
 </table>
 
-The screenshots show the Czech UI — the app ships in Czech and English.
+The screenshots show the English UI — the app ships in English and Czech.
 
 ## Get the app
 
 | Platform | How to install |
 |---|---|
-| **Android** | Download `app-release.apk` from the [latest release](https://github.com/Vojta01/emosphere/releases/latest), allow installation from unknown sources and open the file. Android 7.0+ (API 24+). |
+| **Android** | Download the `emosphere-<version>.apk` from the [latest release](https://github.com/Vojta01/emosphere/releases/latest), allow installation from unknown sources and open the file. Android 7.0+ (API 24+). |
 | **iPhone / iPad** | Open https://vojta01.github.io/emosphere/ in **Safari** → *Share* → **Add to Home Screen**. It then behaves like a native app — no App Store, no Mac needed. |
 | **Web** | https://vojta01.github.io/emosphere/ — an installable PWA, works in any modern browser. |
 
@@ -99,14 +99,16 @@ More docs: [docs/SPEC.md](docs/SPEC.md) · [docs/CORE-API.md](docs/CORE-API.md) 
 
 ## Status
 
-**v0.1.0 — MVP, released 22 Oct 2026.** All planned MVP features are in: onboarding + key backup, check-in, world mood map, feed, friends, history, settings, Czech/English UI — shipped as an Android APK and an installable PWA. 156 unit/widget tests are green and CI is green on `main`.
+**v0.3.2 — released 22 Oct 2026.** All MVP features are in: onboarding + key backup, check-in, world mood map with a continuous emotion heat layer, feed, friends, history, settings, Czech/English UI — shipped as a release-signed Android APK and an installable PWA. 195 unit/widget tests are green, `flutter analyze` is clean and CI is green on `main`.
+
+Recently shipped: the heat map (v0.3.0), publish resilience — retries and stale-socket recovery (v0.3.1), heat cells centred on the actual check-ins rather than the coarse cell middle (v0.3.2).
 
 Remaining work:
 
-- **UI polish** — the check-in "Send" button can sit partially under the system navigation bar, and the floating "How do you feel?" button overlaps the language selector in Settings.
+- **Anti-spam** — check-ins are open by design; per-key aggregation and rate limits are planned.
 - **PWA** — Flutter currently registers the service worker from its bootstrap; switch to an app-owned registration once upstream lands ([flutter#156910](https://github.com/flutter/flutter/issues/156910)).
-- **Android release** — the APK is signed with the Android debug key (sideload only). A production keystore and a Play Store listing are not set up yet.
 - **iOS** — no native iOS app; the PWA is the iOS path (by design).
+- **Play Store** — the APK is release-signed for sideloading; a Play Store listing is not set up.
 
 ## License
 
