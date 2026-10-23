@@ -2,7 +2,7 @@
 
 > **Stav: pipeline návrhů.** Hotové položky jsou označené v tabulce. Ostatní
 > čekají na Vojtovo „jdi“ — pak se mění na commity / karty noční směny.
-> Zapsáno: 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · aplikace **v0.3.2**
+> Zapsáno: 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · aplikace **v0.4.0**
 
 ## Přehled
 
@@ -17,8 +17,8 @@
 | R7 | Odolnost proti spamu (agregace per npub, limity, verifikace podpisů) | pozdější fáze |
 | R8 | Heatmapa místo kruhů — plynulé slévání blobů | hotovo (v0.3.0, oprava polohy v0.3.2) |
 | R9 | Stroj času — slider + ▶ play na mapě (vývoj nálady v čase) | návrh |
-| R10 | Animace po odeslání („afterglow“) v barvě emoce | návrh |
-| R11 | Citáty k emocím (20/emoci, CZ+EN) jako součást animace | návrh |
+| R10 | Animace po odeslání („afterglow“) v barvě emoce | hotovo (v0.4.0) |
+| R11 | Citáty k emocím (20/emoci, CZ+EN) jako součást animace | hotovo (v0.4.0) |
 
 ---
 
@@ -344,6 +344,11 @@ stejně jako `HeatLayer`); desítky částic, 60 fps, nízká zátěž.
 **Rozhodnuto (Vojta, 23. 10.):** délka **~4 s** (jemná částicová); haptika
 zapnutá (s přepínačem v Nastavení); storyboard netřeba — staví se přímo.
 
+**Implementováno (v0.4.0):** `showAfterglow` — průhledná route nad celou
+appkou (~4,4 s); klepnutí během částic přeskočí na citát, další klepnutí
+zavře; respektuje systémové „omezit animace“ (rovnou citát); haptika řízená
+přepínačem v Nastavení; když citát chybí, zůstává potvrzovací snackbar.
+
 ---
 
 ## R11 — Citáty k emocím
@@ -373,6 +378,11 @@ reflektovat a emoci zpracovat. ~20 citátů na emoci (celkem 160).
 seznam bez předchozího schválení („věřím ti, jdi rovnou“) — atribuce přesto
 ověřené, bez falešných.
 
+**Implementováno (v0.4.0):** `assets/quotes.json` — 160 citátů (8 × 20, CZ+EN);
+atribuce ověřené, nejisté označené „připisováno“; výběr náhodný při každém
+zobrazení; citát je součástí afterglow a nově i detailu check-inu v Historii
+(klepnutí na kartu v časové ose).
+
 ---
 
 ## Pořadí a odhady (návrh)
@@ -385,8 +395,8 @@ ověřené, bez falešných.
 
 **Nové položky R9–R11 (23. 10.):**
 
-6. **R10 + R11** (afterglow + citáty) — jeden zážitek; návrh: první balík
-   z nových nápadů (Vojta: uživatel má být motivován)
+6. **R10 + R11** (afterglow + citáty) — jeden zážitek; první balík
+   z nových nápadů (Vojta: uživatel má být motivován) — **hotovo (v0.4.0)**
 7. **R9** (stroj času) — po R10/R11; plně vynikne, až bude víc dat
 
 *(potvrzeno Vojtou 23. 10.: první **R10 + R11**, pak **R9**)*
@@ -413,4 +423,4 @@ ověřené, bez falešných.
 
 ---
 
-*Zapsal Hermes · 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · zdroj: zadání Vojty (chat) · položky bez „hotovo“ čekají na Vojtovo „jdi“*
+*Zapsal Hermes · 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · zdroj: zadání Vojty (chat) · R10+R11 hotovo 23. 10. 2026 (v0.4.0) · položky bez „hotovo“ čekají na Vojtovo „jdi“*
