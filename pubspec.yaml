@@ -1,7 +1,7 @@
 name: emosphere
 description: "EmoSphere — share how you feel with the world. A global mood map built on Nostr."
 publish_to: 'none'
-version: 0.3.2+7
+version: 0.4.0+8
 
 environment:
   sdk: ^3.13.5
@@ -40,6 +40,8 @@ dependency_overrides:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/quotes.json
 
 # ---------------------------------------------------------------------------
 # Branding codegen. Order matters - flutter_launcher_icons rewrites

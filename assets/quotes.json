@@ -1,0 +1,979 @@
+{
+ "version": 1,
+ "joy": [
+  {
+   "en": "Happy indeed we live, free from hatred among those who hate.",
+   "cz": "Blaze věru žijeme, prosti nenávisti mezi těmi, kdo nenávidí.",
+   "author": "Dhammapada, verse 197",
+   "note": ""
+  },
+  {
+   "en": "My heart leaps up when I behold a rainbow in the sky: so was it when my life began, so is it now I am a man.",
+   "cz": "Srdce mi poskočí, když na nebi spatřím duhu: tak tomu bylo, když můj život začínal, tak je tomu i teď, když jsem muž.",
+   "author": "William Wordsworth, My Heart Leaps Up",
+   "note": ""
+  },
+  {
+   "en": "Look within. Within is the fountain of good, and it will ever bubble up, if you will but dig.",
+   "cz": "Pohleď do sebe. Uvnitř je pramen dobra a bude věčně tryskat, budeš-li jen kopat.",
+   "author": "Marcus Aurelius, Meditations (7.59",
+   "note": ""
+  },
+  {
+   "en": "Believe me, true joy is a serious thing.",
+   "cz": "Věř mi, opravdová radost je vážná věc.",
+   "author": "Seneca, Letters to Lucilius (23",
+   "note": ""
+  },
+  {
+   "en": "Happiness depends upon ourselves.",
+   "cz": "Štěstí závisí na nás samotných.",
+   "author": "Aristotle",
+   "note": "attributed"
+  },
+  {
+   "en": "If you realize that you have enough, you are truly rich.",
+   "cz": "Uvědomíš-li si, že máš dost, jsi skutečně bohatý.",
+   "author": "Laozi, Tao Te Ching (33",
+   "note": "trans. Stephen Mitchell"
+  },
+  {
+   "en": "Happiness is the absence of the striving for happiness.",
+   "cz": "Štěstí je nepřítomnost úsilí o štěstí.",
+   "author": "Chuang Tzu (Zhuangzi",
+   "note": "attributed"
+  },
+  {
+   "en": "When you do things from your soul, you feel a river moving in you, a joy.",
+   "cz": "Když jednáš z hloubi duše, cítíš, jak se v tobě pohybuje řeka — radost.",
+   "author": "Rumi, The Soul of Rumi",
+   "note": "trans. Coleman Barks"
+  },
+  {
+   "en": "Sometimes your joy is the source of your smile, but sometimes your smile can be the source of your joy.",
+   "cz": "Někdy je tvá radost zdrojem tvého úsměvu, jindy se tvůj úsměv může stát zdrojem radosti.",
+   "author": "Thich Nhat Hanh",
+   "note": ""
+  },
+  {
+   "en": "Happiness cannot be pursued; it must ensue, as the unintended side effect of one's personal dedication to a cause greater than oneself.",
+   "cz": "Po štěstí nelze jít; musí vzniknout samo — jako nechtěný vedlejší účinek oddanosti věci, která je větší než my sami.",
+   "author": "Viktor Frankl, Man's Search for Meaning",
+   "note": ""
+  },
+  {
+   "en": "Joy is the simplest form of gratitude.",
+   "cz": "Radost je nejjednodušší formou vděčnosti.",
+   "author": "Karl Barth",
+   "note": ""
+  },
+  {
+   "en": "If you suddenly and unexpectedly feel joy, don't hesitate. Give in to it.",
+   "cz": "Když náhle a nečekaně pocítíš radost, neváhej. Vpusť ji dovnitř.",
+   "author": "Mary Oliver, Don't Hesitate",
+   "note": ""
+  },
+  {
+   "en": "He who binds to himself a joy does the winged life destroy; but he who kisses the joy as it flies lives in eternity's sun rise.",
+   "cz": "Kdo si radost připoutá, tomu okřídlený život zahyne; kdo ji však políbí, když ulétá, žije v úsvitu věčnosti.",
+   "author": "William Blake, Eternity",
+   "note": ""
+  },
+  {
+   "en": "Shared joy is double joy.",
+   "cz": "Sdílená radost je dvojnásobná radost.",
+   "author": "German proverb",
+   "note": ""
+  },
+  {
+   "en": "Think of all the beauty still left around you and be happy.",
+   "cz": "Mysli na všechnu krásu, která kolem tebe ještě zbývá, a buď šťastná.",
+   "author": "Anne Frank, The Diary of a Young Girl",
+   "note": ""
+  },
+  {
+   "en": "To see a world in a grain of sand, and a heaven in a wild flower.",
+   "cz": "Vidět svět v zrnku písku a nebe v polní květině.",
+   "author": "William Blake, Auguries of Innocence",
+   "note": ""
+  },
+  {
+   "en": "I exist as I am, that is enough.",
+   "cz": "Jsem takový, jaký jsem, a to stačí.",
+   "author": "Walt Whitman, Song of Myself",
+   "note": ""
+  },
+  {
+   "en": "It is not happiness that makes us grateful; it is gratefulness that makes us happy.",
+   "cz": "Ne štěstí z nás činí vděčné — vděčnost z nás činí šťastné.",
+   "author": "Brother David Steindl-Rast",
+   "note": ""
+  },
+  {
+   "en": "If you have a garden and a library, you have everything you need.",
+   "cz": "Máš-li zahradu a knihovnu, nic ti nechybí.",
+   "author": "Cicero, Letters to Varro (Ad Fam. IX.4",
+   "note": ""
+  },
+  {
+   "en": "A cheerful heart is good medicine.",
+   "cz": "Veselé srdce je dobrý lék.",
+   "author": "Bible, Proverbs 17:22",
+   "note": ""
+  }
+ ],
+ "calm": [
+  {
+   "en": "Just as a solid rock is not shaken by the wind, so the wise are unmoved by praise and blame.",
+   "cz": "Jako pevná skála nezakolísá ve větru, tak ani moudrého neotřese chvála ani hana.",
+   "author": "Dhammapada, verse 81",
+   "note": ""
+  },
+  {
+   "en": "Like a deep lake, clear, unruffled and calm, so do the wise become calm and clear.",
+   "cz": "Tak jako je hluboké jezero čisté a klidné, i moudrý se ztiší a projasní.",
+   "author": "Dhammapada, verse 82",
+   "note": ""
+  },
+  {
+   "en": "Peace comes from within. Do not seek it without.",
+   "cz": "Mír vychází z nitra. Nehledej ho venku.",
+   "author": "Buddha",
+   "note": "attributed"
+  },
+  {
+   "en": "If you are distressed by anything external, the pain is not due to the thing itself, but to your estimate of it — and you can revoke that at any moment.",
+   "cz": "Trápí-li tě něco vnějšího, nebolí to sama věc, ale tvůj úsudek o ní — a ten můžeš kdykoli odvolat.",
+   "author": "Marcus Aurelius, Meditations (8.47",
+   "note": ""
+  },
+  {
+   "en": "Nowhere can a person find a quieter or more untroubled retreat than in their own soul.",
+   "cz": "Nikde nenajde člověk tišší a nerušenější útočiště než ve vlastní duši.",
+   "author": "Marcus Aurelius, Meditations (4.3",
+   "note": ""
+  },
+  {
+   "en": "Smile, breathe and go slowly.",
+   "cz": "Usmívej se, dýchej a jdi pomalu.",
+   "author": "Thich Nhat Hanh",
+   "note": ""
+  },
+  {
+   "en": "The primary indication of a well-ordered mind is a person's ability to remain in one place and linger in their own company.",
+   "cz": "Nejlepším znakem urovnané mysli je, když člověk dokáže zůstat na jednom místě a pobýt ve vlastní společnosti.",
+   "author": "Seneca, Letters to Lucilius (Letter 2",
+   "note": ""
+  },
+  {
+   "en": "It is not that we have a short time to live, but that we waste much of it.",
+   "cz": "Ne že by nám byl vyměřen krátký čas, ale že ho mnoho promarníme.",
+   "author": "Seneca, On the Shortness of Life (ch. 1",
+   "note": ""
+  },
+  {
+   "en": "Men are disturbed not by things, but by the views they take of them.",
+   "cz": "Lidé nejsou znepokojeni věcmi, ale svými názory na ně.",
+   "author": "Epictetus, Enchiridion (ch. 5",
+   "note": ""
+  },
+  {
+   "en": "Do not seek for events to happen as you wish, but wish them to happen as they do happen, and your life will go smoothly.",
+   "cz": "Nežádej, aby se události děly, jak si přeješ; chtěj, aby se děly tak, jak se dějí — a tvůj život poplyne hladce.",
+   "author": "Epictetus, Enchiridion (ch. 8",
+   "note": ""
+  },
+  {
+   "en": "Sitting quietly, doing nothing, spring comes, and the grass grows by itself.",
+   "cz": "Sedět tiše, nic nedělat — přijde jaro a tráva roste sama.",
+   "author": "Matsuo Bashō",
+   "note": "zen tradition, attributed"
+  },
+  {
+   "en": "Be still, and know that I am God.",
+   "cz": "Utiš se a věz, že já jsem Bůh.",
+   "author": "Bible, Psalm 46:10",
+   "note": ""
+  },
+  {
+   "en": "Peace is present right here and now, in ourselves and in everything we do and see.",
+   "cz": "Mír je tady a teď — v nás samých i ve všem, co děláme a vidíme.",
+   "author": "Thich Nhat Hanh, Peace Is Every Step",
+   "note": ""
+  },
+  {
+   "en": "Returning to the source is stillness, which is the way of nature.",
+   "cz": "Návrat ke kořeni je klid; to je cesta přírody.",
+   "author": "Laozi, Tao Te Ching (ch. 16",
+   "note": "trans. Stephen Mitchell"
+  },
+  {
+   "en": "Do you have the patience to wait until your mud settles and the water is clear?",
+   "cz": "Máš trpělivost čekat, až se kal usadí a voda se vyčeří?",
+   "author": "Laozi, Tao Te Ching (ch. 15",
+   "note": "trans. Stephen Mitchell"
+  },
+  {
+   "en": "The supreme good is like water: it benefits all things and does not compete; it is content to dwell in low places.",
+   "cz": "Nejvyšší dobro je jako voda — prospívá všemu a nesoupeří; spokojí se i s nízkými místy.",
+   "author": "Laozi, Tao Te Ching (ch. 8",
+   "note": "trans. Stephen Mitchell"
+  },
+  {
+   "en": "The perfect man employs his mind as a mirror. It grasps nothing, it refuses nothing; it receives, but does not keep.",
+   "cz": "Dokonalý člověk užívá svou mysl jako zrcadlo. Nic neuchvacuje, nic neodmítá; přijímá, ale nic si nenechává.",
+   "author": "Chuang Tzu, Zhuangzi (ch. 7",
+   "note": "trans. Lin Yutang"
+  },
+  {
+   "en": "Muddy water is best cleared by leaving it alone.",
+   "cz": "Kalnou vodu nejlépe vyčeříš, když ji necháš být.",
+   "author": "Alan Watts",
+   "note": "attributed"
+  },
+  {
+   "en": "Be patient toward all that is unsolved in your heart and try to love the questions themselves.",
+   "cz": "Buď trpělivý ke všemu nevyřešenému ve svém srdci a snaž se mít rád samotné otázky.",
+   "author": "Rainer Maria Rilke, Letters to a Young Poet",
+   "note": ""
+  },
+  {
+   "en": "Live in each season as it passes; breathe the air, drink the drink, taste the fruit, and resign yourself to the influence of each.",
+   "cz": "Žij v každém ročním období, jak přichází: dýchej vzduch, pij nápoj, ochutnej ovoce a poddej se jeho vlivu.",
+   "author": "Henry David Thoreau, Journal",
+   "note": ""
+  }
+ ],
+ "love": [
+  {
+   "en": "Love is the bridge between you and everything.",
+   "cz": "Láska je most mezi tebou a vším ostatním.",
+   "author": "Rumi",
+   "note": "attributed"
+  },
+  {
+   "en": "Immature love says: I love you because I need you. Mature love says: I need you because I love you.",
+   "cz": "Nezralá láska říká: Miluji tě, protože tě potřebuji. Zralá láska říká: Potřebuji tě, protože tě miluji.",
+   "author": "Erich Fromm, The Art of Loving",
+   "note": ""
+  },
+  {
+   "en": "Love is the only sane and satisfactory answer to the problem of human existence.",
+   "cz": "Láska je jediná rozumná a uspokojivá odpověď na problém lidské existence.",
+   "author": "Erich Fromm, The Art of Loving",
+   "note": ""
+  },
+  {
+   "en": "To love at all is to be vulnerable.",
+   "cz": "Milovat vůbec znamená být zranitelný.",
+   "author": "C. S. Lewis, The Four Loves",
+   "note": ""
+  },
+  {
+   "en": "Love consists in this, that two solitudes protect and border and salute each other.",
+   "cz": "Láska spočívá v tom, že dvě osamělosti se navzájem chrání, vymezují a zdraví.",
+   "author": "Rainer Maria Rilke, Letters to a Young Poet",
+   "note": ""
+  },
+  {
+   "en": "For one human being to love another: that is perhaps the most difficult of all our tasks, the ultimate, the last test and proof.",
+   "cz": "Milovat druhého člověka: to je snad ze všech našich úkolů nejtěžší, ta poslední zkouška a poslední důkaz.",
+   "author": "Rainer Maria Rilke, Letters to a Young Poet",
+   "note": ""
+  },
+  {
+   "en": "Understanding is love's other name. If you don't understand, you can't love.",
+   "cz": "Porozumění je druhé jméno lásky. Kdo nerozumí, ten nemůže milovat.",
+   "author": "Thich Nhat Hanh, How to Love",
+   "note": ""
+  },
+  {
+   "en": "The most precious gift you can give to the one you love is your true presence.",
+   "cz": "Nejvzácnější dar, který můžeš dát tomu, koho miluješ, je tvá opravdová přítomnost.",
+   "author": "Thich Nhat Hanh",
+   "note": "attributed"
+  },
+  {
+   "en": "We are made for cooperation, like feet, like hands, like eyelids, like the rows of the upper and lower teeth.",
+   "cz": "Jsme stvořeni pro spolupráci, jako nohy, jako ruce, jako oční víčka, jako řady horních a dolních zubů.",
+   "author": "Marcus Aurelius, Meditations (2.1",
+   "note": ""
+  },
+  {
+   "en": "Where there is love there is life.",
+   "cz": "Kde je láska, tam je život.",
+   "author": "Mahatma Gandhi",
+   "note": "attributed"
+  },
+  {
+   "en": "I am a human being, and I consider nothing human to be foreign to me.",
+   "cz": "Jsem člověk a nic lidského mi není cizí.",
+   "author": "Terence, Heauton Timorumenos (quoted by Seneca, Letters 95",
+   "note": ""
+  },
+  {
+   "en": "Hatred is never appeased by hatred in this world. By love alone is hatred appeased. This is a law eternal.",
+   "cz": "Nenávist se na tomto světě nikdy neztiší nenávistí; jen láskou se nenávist ztiší. To je odvěký zákon.",
+   "author": "Dhammapada, verse 5",
+   "note": "non-hatred rendered as love"
+  },
+  {
+   "en": "Love is patient and is kind. Love does not envy; it does not brag, it is not proud.",
+   "cz": "Láska je trpělivá a laskavá; nezávidí, nevychloubá se, není pyšná.",
+   "author": "Bible, 1 Corinthians 13:4 (World English Bible",
+   "note": "public-domain translation"
+  },
+  {
+   "en": "To love another person is to see the face of God.",
+   "cz": "Milovat druhého člověka znamená spatřit Boží tvář.",
+   "author": "Victor Hugo, Les Misérables",
+   "note": ""
+  },
+  {
+   "en": "Love all God's creation, the whole and every grain of sand in it. Love every leaf, every ray of God's light.",
+   "cz": "Miluj vše, co Bůh stvořil, celé i každé zrnko písku v něm. Miluj každý list, každý paprsek Božího světla.",
+   "author": "Fyodor Dostoevsky, The Brothers Karamazov",
+   "note": ""
+  },
+  {
+   "en": "Do not waste time bothering whether you love your neighbour; act as if you did.",
+   "cz": "Neztrácej čas přemýšlením o tom, zda svého bližního miluješ; jednej, jako bys ho miloval.",
+   "author": "C. S. Lewis, Mere Christianity",
+   "note": ""
+  },
+  {
+   "en": "It is the time you have wasted for your rose that makes your rose so important.",
+   "cz": "Právě čas, který jsi věnoval své růži, dělá tvou růži tak důležitou.",
+   "author": "Antoine de Saint-Exupéry, The Little Prince",
+   "note": ""
+  },
+  {
+   "en": "What do we live for, if it is not to make life less difficult to each other?",
+   "cz": "Pro co vlastně žijeme, když ne pro to, abychom si navzájem usnadňovali život?",
+   "author": "George Eliot, Middlemarch",
+   "note": ""
+  },
+  {
+   "en": "That love is all there is, is all we know of love.",
+   "cz": "Že láska je všechno, co jest, je vše, co o lásce víme.",
+   "author": "Emily Dickinson, That love is all there is (poem 1765",
+   "note": ""
+  },
+  {
+   "en": "Love, and do what you will.",
+   "cz": "Miluj a dělej, co chceš.",
+   "author": "St. Augustine, Homilies on the First Epistle of John (7",
+   "note": ""
+  }
+ ],
+ "surprise": [
+  {
+   "en": "If you do not expect the unexpected, you will not find it; for it is hard to be sought out and difficult.",
+   "cz": "Kdo neočekává neočekávané, nenajde je; je těžké je vyslídit a nalézt.",
+   "author": "Heraclitus, Fragments (DK B18, tr. John Burnet",
+   "note": ""
+  },
+  {
+   "en": "The only thing I know is that I know nothing.",
+   "cz": "Vím jen to, že nic nevím.",
+   "author": "Socrates, in Plato's Apology (21d",
+   "note": "attributed"
+  },
+  {
+   "en": "Philosophy begins in wonder.",
+   "cz": "Filosofie začíná údivem.",
+   "author": "Aristotle, Metaphysics (I.2",
+   "note": "condensed from the Greek"
+  },
+  {
+   "en": "The Tao that can be told is not the eternal Tao.",
+   "cz": "Tao, které lze vyslovit, není věčné Tao.",
+   "author": "Laozi, Tao Te Ching (ch. 1, tr. Gia-Fu Feng & Jane English",
+   "note": ""
+  },
+  {
+   "en": "I do not know whether I was then a man dreaming I was a butterfly, or whether I am now a butterfly dreaming I am a man.",
+   "cz": "Nevím, zda jsem tehdy byl člověkem, který sní, že je motýlem, anebo zda jsem nyní motýl, který sní, že je člověkem.",
+   "author": "Zhuangzi, ch. 2 (The Butterfly Dream, tr. Lin Yutang",
+   "note": ""
+  },
+  {
+   "en": "Better it is to live one day seeing the rise and fall of things than to live a hundred years without ever seeing the rise and fall of things.",
+   "cz": "Lepší je žít jediný den a spatřit vznikání a zánik věcí než žít sto let a nespatřit vznikání a zánik věcí.",
+   "author": "Dhammapada, verse 113 (tr. Acharya Buddharakkhita",
+   "note": ""
+  },
+  {
+   "en": "Man proposes, but God disposes.",
+   "cz": "Člověk míní, pán Bůh mění.",
+   "author": "Thomas à Kempis, The Imitation of Christ (I.19",
+   "note": "Latin: Homo proponit, Deus disponit"
+  },
+  {
+   "en": "In the beginner's mind there are many possibilities, but in the expert's there are few.",
+   "cz": "V mysli začátečníka je mnoho možností, v mysli odborníka jich je jen málo.",
+   "author": "Shunryu Suzuki, Zen Mind, Beginner's Mind",
+   "note": ""
+  },
+  {
+   "en": "Sell your cleverness and buy bewilderment.",
+   "cz": "Prodej svou chytrost a kup si údiv.",
+   "author": "Rumi, Masnavi",
+   "note": "loose English rendering"
+  },
+  {
+   "en": "The real voyage of discovery consists not in seeking new landscapes, but in having new eyes.",
+   "cz": "Skutečná cesta objevů nespočívá v hledání nových krajin, ale v novém pohledu.",
+   "author": "Marcel Proust, The Prisoner",
+   "note": ""
+  },
+  {
+   "en": "Loss is nothing else but change, and change is Nature's delight.",
+   "cz": "Ztráta není nic jiného než změna a změna je radostí Přírody.",
+   "author": "Marcus Aurelius, Meditations (tr. George Long",
+   "note": ""
+  },
+  {
+   "en": "Life can only be understood backwards; but it must be lived forwards.",
+   "cz": "Život lze pochopit jen zpětně, ale žít se musí vpřed.",
+   "author": "Søren Kierkegaard, Journals (1843",
+   "note": ""
+  },
+  {
+   "en": "I dwell in Possibility — a fairer House than Prose.",
+   "cz": "Bydlím v Možnosti — v domě krásnějším, než je próza.",
+   "author": "Emily Dickinson, I dwell in Possibility (c. 1862",
+   "note": ""
+  },
+  {
+   "en": "Expect nothing. Live frugally on surprise.",
+   "cz": "Nečekej nic. Žij skromně z překvapení.",
+   "author": "Alice Walker",
+   "note": "attributed"
+  },
+  {
+   "en": "Why, sometimes I've believed as many as six impossible things before breakfast.",
+   "cz": "Víš, někdy jsem před snídaní uvěřila i šesti nemožným věcem.",
+   "author": "Lewis Carroll, Through the Looking-Glass (ch. 5",
+   "note": ""
+  },
+  {
+   "en": "The only way to make sense out of change is to plunge into it, move with it, and join the dance.",
+   "cz": "Jediný způsob, jak porozumět změně, je vrhnout se do ní, jít s ní a zapojit se do tance.",
+   "author": "Alan Watts, The Wisdom of Insecurity (1951",
+   "note": ""
+  },
+  {
+   "en": "The most beautiful thing we can experience is the mysterious. It is the source of all true art and science.",
+   "cz": "To nejkrásnější, co můžeme prožít, je tajemno. Je zdrojem všeho pravého umění i vědy.",
+   "author": "Albert Einstein, The World As I See It (1931",
+   "note": ""
+  },
+  {
+   "en": "The old pond; a frog jumps in — the sound of water.",
+   "cz": "Starý rybník; žába do něj skočí — zvuk vody.",
+   "author": "Matsuo Bashō, The Old Pond (tr. R. H. Blyth",
+   "note": "common English rendering"
+  },
+  {
+   "en": "It is only with the heart that one can see rightly; what is essential is invisible to the eye.",
+   "cz": "Správně vidíme jen srdcem. Co je důležité, je očím neviditelné.",
+   "author": "Antoine de Saint-Exupéry, The Little Prince (1943, tr. Katherine Woods",
+   "note": "Czech tr. Richard Podaný"
+  },
+  {
+   "en": "I was gratified to be able to answer promptly, and I did. I said I didn't know.",
+   "cz": "Potěšilo mě, že mohu odpovědět okamžitě, a také jsem odpověděl. Řekl jsem, že to nevím.",
+   "author": "Mark Twain, Life on the Mississippi (1883",
+   "note": ""
+  }
+ ],
+ "sadness": [
+  {
+   "en": "All conditioned things are impermanent. When one sees this with wisdom, one turns away from suffering.",
+   "cz": "Vše, co je podmíněné, pomíjí. Kdo to spatří s moudrostí, odvrací se od utrpení.",
+   "author": "Dhammapada, verse 277 (trans. Buddharakkhita",
+   "note": ""
+  },
+  {
+   "en": "Feelings come and go like clouds in a windy sky. Conscious breathing is my anchor.",
+   "cz": "Pocity přicházejí a odcházejí jako mraky na větrném nebi. Vědomé dýchání je mou kotvou.",
+   "author": "Thich Nhat Hanh",
+   "note": ""
+  },
+  {
+   "en": "The deeper that sorrow carves into your being, the more joy you can contain.",
+   "cz": "Čím hlouběji do tebe zármutek vrývá, tím více radosti dovedeš pojmout.",
+   "author": "Kahlil Gibran, The Prophet",
+   "note": ""
+  },
+  {
+   "en": "Things falling apart is a kind of testing and also a kind of healing.",
+   "cz": "Když se věci hroutí, je to zkouška i uzdravení zároveň.",
+   "author": "Pema Chödrön, When Things Fall Apart",
+   "note": ""
+  },
+  {
+   "en": "Even the darkest night will end and the sun will rise.",
+   "cz": "I ta nejtemnější noc jednou skončí a slunce vyjde.",
+   "author": "Victor Hugo, Les Misérables",
+   "note": ""
+  },
+  {
+   "en": "Perhaps everything terrible is in its deepest being something helpless that wants help from us.",
+   "cz": "Možná je všechno strašné ve své nejhlubší podstatě něčím bezmocným, co od nás chce pomoc.",
+   "author": "Rainer Maria Rilke, Letters to a Young Poet (Letter 8",
+   "note": ""
+  },
+  {
+   "en": "An abnormal reaction to an abnormal situation is normal behavior.",
+   "cz": "Abnormální reakce na abnormální situaci je normální chování.",
+   "author": "Viktor E. Frankl, Man's Search for Meaning",
+   "note": ""
+  },
+  {
+   "en": "Even a happy life cannot be without a measure of darkness, and the word happy would lose its meaning if it were not balanced by sadness.",
+   "cz": "Ani šťastný život se neobejde bez určité míry temnoty a slovo štěstí by ztratilo smysl, kdyby nebylo vyváženo smutkem.",
+   "author": "Carl Jung",
+   "note": "attributed"
+  },
+  {
+   "en": "Heavy hearts, like heavy clouds in the sky, are best relieved by the letting of a little water.",
+   "cz": "Těžkým srdcím, jako těžkým mrakům na nebi, nejlépe uleví trocha vody.",
+   "author": "Christopher Morley",
+   "note": ""
+  },
+  {
+   "en": "Let us see to it that the recollection of those whom we have lost becomes a pleasant memory to us.",
+   "cz": "Hleďme, aby se nám vzpomínka na ty, které jsme ztratili, stala příjemnou.",
+   "author": "Seneca, Letters to Lucilius (63), trans. Gummere",
+   "note": ""
+  },
+  {
+   "en": "When you are sorrowful look again in your heart, and you shall see that in truth you are weeping for that which has been your delight.",
+   "cz": "Když jsi smutný, pohlédni znovu do svého srdce a uvidíš, že ve skutečnosti pláčeš pro to, co bylo tvou radostí.",
+   "author": "Kahlil Gibran, The Prophet (On Joy and Sorrow",
+   "note": ""
+  },
+  {
+   "en": "The wound is the place where the Light enters you.",
+   "cz": "Rána je místem, kudy do tebe vstupuje světlo.",
+   "author": "Rumi (trans. Coleman Barks",
+   "note": "attributed"
+  },
+  {
+   "en": "It is such a secret place, the land of tears.",
+   "cz": "Země slz je takové tajemné místo.",
+   "author": "Antoine de Saint-Exupéry, The Little Prince",
+   "note": ""
+  },
+  {
+   "en": "Someone I loved once gave me a box full of darkness. It took me years to understand that this, too, was a gift.",
+   "cz": "Někdo, koho jsem milovala, mi jednou dal krabici plnou temnoty. Trvalo mi roky, než jsem pochopila, že i to byl dar.",
+   "author": "Mary Oliver, Thirst (The Uses of Sorrow",
+   "note": ""
+  },
+  {
+   "en": "I thought I could describe a state; make a map of sorrow. Sorrow, however, turns out to be not a state but a process.",
+   "cz": "Myslel jsem, že dokážu popsat stav a nakreslit mapu zármutku. Zármutek se však ukázal být nikoli stavem, ale procesem.",
+   "author": "C. S. Lewis, A Grief Observed",
+   "note": ""
+  },
+  {
+   "en": "Before you know kindness as the deepest thing inside, you must know sorrow as the other deepest thing.",
+   "cz": "Než poznáš laskavost jako to nejhlubší v sobě, musíš poznat zármutek jako tu druhou nejhlubší věc.",
+   "author": "Naomi Shihab Nye, Kindness (Words Under the Words",
+   "note": ""
+  },
+  {
+   "en": "I wish I could show you, when you are lonely or in darkness, the astonishing light of your own being.",
+   "cz": "Přál bych si ukázat ti, když jsi sám a ve tmě, to podivuhodné světlo tvé vlastní bytosti.",
+   "author": "Hafiz (trans. Daniel Ladinsky",
+   "note": "attributed"
+  },
+  {
+   "en": "There is a crack in everything. That's how the light gets in.",
+   "cz": "Ve všem je trhlina. A právě skrze ni dovnitř proniká světlo.",
+   "author": "Leonard Cohen, Anthem",
+   "note": "lyric, abridged"
+  },
+  {
+   "en": "Joy and woe are woven fine, a clothing for the soul divine.",
+   "cz": "Radost a žal jsou utkány v jemný šat pro duši božskou.",
+   "author": "William Blake, Auguries of Innocence",
+   "note": ""
+  },
+  {
+   "en": "Hope is the thing with feathers that perches in the soul, and sings the tune without the words, and never stops at all.",
+   "cz": "Naděje je to ptáče s peřím, které dlí v duši, zpívá melodii beze slov a nikdy neustane.",
+   "author": "Emily Dickinson, Hope is the thing with feathers (c. 1861",
+   "note": ""
+  }
+ ],
+ "anger": [
+  {
+   "en": "How much more grievous are the consequences of anger than the causes of it.",
+   "cz": "Oč tíživější jsou následky hněvu než jeho příčiny.",
+   "author": "Marcus Aurelius, Meditations (11.18",
+   "note": ""
+  },
+  {
+   "en": "The best way of avenging yourself is not to become like the wrongdoer.",
+   "cz": "Nejlepší způsob pomsty je nepodobat se tomu, kdo ti ublížil.",
+   "author": "Marcus Aurelius, Meditations (6.6",
+   "note": ""
+  },
+  {
+   "en": "The greatest remedy for anger is delay.",
+   "cz": "Nejlepším lékem na hněv je odklad.",
+   "author": "Seneca, On Anger (2.29",
+   "note": ""
+  },
+  {
+   "en": "It is not the one who reviles or strikes you, but your opinion of these things, that angers you.",
+   "cz": "Nerozhněvá tě ten, kdo tě uráží nebo udeří, ale tvůj vlastní názor na to.",
+   "author": "Epictetus, Enchiridion (20",
+   "note": ""
+  },
+  {
+   "en": "If someone tells you that a certain person speaks ill of you, do not defend yourself, but answer: He did not know my other faults, or he would not have mentioned only these.",
+   "cz": "Řekne-li ti někdo, že o tobě jistý člověk mluví špatně, neobhajuj se, ale odpověz: Neznal mé ostatní chyby, jinak by nezmínil jen tyto.",
+   "author": "Epictetus, Enchiridion (33",
+   "note": ""
+  },
+  {
+   "en": "Anger is a short madness.",
+   "cz": "Hněv je krátké šílenství.",
+   "author": "Horace, Epistles (1.2",
+   "note": ""
+  },
+  {
+   "en": "Anyone can become angry — that is easy. But to be angry with the right person, to the right degree, at the right time, for the right purpose, and in the right way — that is not easy.",
+   "cz": "Rozzlobit se dokáže každý — to je snadné. Ale hněvat se na správného člověka, ve správné míře, ve správný čas, ze správného důvodu a správným způsobem — to snadné není.",
+   "author": "Aristotle, Nicomachean Ethics (Book IV",
+   "note": ""
+  },
+  {
+   "en": "Speak when you are angry and you will make the best speech you will ever regret.",
+   "cz": "Mluvíš-li ve hněvu, proneseš tu nejlepší řeč, které budeš kdy litovat.",
+   "author": "Ambrose Bierce",
+   "note": "attributed"
+  },
+  {
+   "en": "Overcome the angry by non-anger; overcome the wicked by goodness.",
+   "cz": "Přemáhej rozhněvaného mírností, přemáhej zlého dobrem.",
+   "author": "Dhammapada, verse 223",
+   "note": ""
+  },
+  {
+   "en": "A good soldier is not violent; a good fighter is not angry.",
+   "cz": "Dobrý voják nebývá násilný, dobrý bojovník se nedá strhnout k hněvu.",
+   "author": "Laozi, Tao Te Ching (chapter 68",
+   "note": ""
+  },
+  {
+   "en": "He who conquers others is strong; he who conquers himself is mighty.",
+   "cz": "Kdo přemáhá druhé, je silný; kdo přemáhá sebe, je mocný.",
+   "author": "Laozi, Tao Te Ching (chapter 33",
+   "note": ""
+  },
+  {
+   "en": "If a man crosses a river and an empty boat collides with his own skiff, even a bad-tempered man will not become very angry.",
+   "cz": "Přeplouvá-li člověk řeku a do jeho loďky narazí prázdná loď, nerozzlobí se — ani kdyby byl vznětlivý.",
+   "author": "Chuang Tzu, Zhuangzi (The Empty Boat, ch. 20",
+   "note": ""
+  },
+  {
+   "en": "When another person makes you suffer, it is because he suffers deeply within himself, and his suffering is spilling over.",
+   "cz": "Když vám někdo působí utrpení, je to proto, že sám hluboko uvnitř trpí a jeho utrpení přetéká.",
+   "author": "Thich Nhat Hanh, The Heart of the Buddha's Teaching",
+   "note": ""
+  },
+  {
+   "en": "From anger comes delusion; from delusion, confusion of memory; from confusion of memory, loss of intellect; and from loss of intellect, one perishes.",
+   "cz": "Z hněvu vzniká zaslepenost, ze zaslepenosti zmatení paměti, ze zmatení paměti zánik rozumu a se zánikem rozumu člověk hyne.",
+   "author": "Bhagavad Gita (2.63",
+   "note": ""
+  },
+  {
+   "en": "To cover all the earth with sheets of leather — where could such amounts of skin be found? But with the leather soles of just my shoes, it is as though I cover all the earth.",
+   "cz": "Potáhnout celou zemi kůží — kde by se tolik kůže vzalo? Když si však podrážím boty, je to, jako bych potáhl celou zemi.",
+   "author": "Shantideva, Bodhicaryavatara (5.13",
+   "note": ""
+  },
+  {
+   "en": "A gentle answer turns away wrath, but a harsh word stirs up anger.",
+   "cz": "Mírná odpověď odvrací hněv, kdežto drsné slovo vzbuzuje zlobu.",
+   "author": "Proverbs (15:1",
+   "note": ""
+  },
+  {
+   "en": "Everyone should be quick to listen, slow to speak, and slow to become angry.",
+   "cz": "Každý má být rychlý k naslouchání, pomalý k mluvení a pomalý k hněvu.",
+   "author": "James (1:19",
+   "note": ""
+  },
+  {
+   "en": "Holding on to anger is like grasping a hot coal with the intent of throwing it at someone else — you are the one who gets burned.",
+   "cz": "Držet se hněvu je jako svírat rozžhavený uhlík s úmyslem hodit ho po někom jiném — popálíme se sami.",
+   "author": "Buddha",
+   "note": "attributed"
+  },
+  {
+   "en": "When anger rises, think of the consequences.",
+   "cz": "Když se zvedá hněv, pomysli na následky.",
+   "author": "Confucius",
+   "note": "attributed"
+  },
+  {
+   "en": "Raise your words, not your voice. It is rain that grows flowers, not thunder.",
+   "cz": "Pozvedej slova, ne hlas. Květiny roste déšť, ne hrom.",
+   "author": "Rumi",
+   "note": "attributed"
+  }
+ ],
+ "fear": [
+  {
+   "en": "We are more often frightened than hurt; and we suffer more from imagination than from reality.",
+   "cz": "Častěji se bojíme, než abychom skutečně trpěli; více nás trápí představivost než skutečnost.",
+   "author": "Seneca, Letters to Lucilius (Letter 13",
+   "note": ""
+  },
+  {
+   "en": "It is not because things are difficult that we dare not venture. It is because we dare not venture that they are difficult.",
+   "cz": "Ne proto, že jsou věci těžké, se do nich neodvažujeme; proto, že se neodvažujeme, jsou těžké.",
+   "author": "Seneca, Letters to Lucilius (Letter 104",
+   "note": "attributed"
+  },
+  {
+   "en": "He who has a why to live for can bear almost any how.",
+   "cz": "Kdo má proč žít, snese téměř každé jak.",
+   "author": "Friedrich Nietzsche, Twilight of the Idols",
+   "note": ""
+  },
+  {
+   "en": "Never let the future disturb you. You will meet it, if you have to, with the same weapons of reason which today arm you against the present.",
+   "cz": "Nedej se nikdy znepokojit budoucností. Přijde-li na to, střetneš se s ní se stejnými zbraněmi rozumu, jaké tě dnes chrání před přítomností.",
+   "author": "Marcus Aurelius, Meditations",
+   "note": ""
+  },
+  {
+   "en": "It is not death or pain that is to be dreaded, but the fear of pain or death.",
+   "cz": "Není to smrt ani bolest, čeho se máme děsit, nýbrž strach z bolesti a ze smrti.",
+   "author": "Epictetus",
+   "note": "attributed"
+  },
+  {
+   "en": "Courage doesn't always roar. Sometimes courage is the quiet voice at the end of the day saying, I will try again tomorrow.",
+   "cz": "Odvaha nemusí vždy řvát. Někdy je to tichý hlas na konci dne: Zítra to zkusím znovu.",
+   "author": "Mary Anne Radmacher",
+   "note": "attributed"
+  },
+  {
+   "en": "Perhaps all the dragons in our lives are princesses who are only waiting to see us act, just once, with beauty and courage.",
+   "cz": "Možná jsou všichni draci v našich životech jen princezny, které čekají, až jednou jedinkrát budeme jednat krásně a odvážně.",
+   "author": "Rainer Maria Rilke, Letters to a Young Poet (Letter 8",
+   "note": ""
+  },
+  {
+   "en": "Let everything happen to you: beauty and terror. Just keep going. No feeling is final.",
+   "cz": "Nech ať se ti přihodí všechno: krása i hrůza. Jen jdi dál. Žádný pocit není konečný.",
+   "author": "Rainer Maria Rilke, Rilke's Book of Hours",
+   "note": "translation by Barrows and Macy"
+  },
+  {
+   "en": "When we are no longer able to change a situation, we are challenged to change ourselves.",
+   "cz": "Když už nedokážeme změnit situaci, jsme vyzváni, abychom změnili sami sebe.",
+   "author": "Viktor E. Frankl, Man's Search for Meaning",
+   "note": ""
+  },
+  {
+   "en": "Everything can be taken from a man but one thing: the last of the human freedoms — to choose one's attitude in any given set of circumstances.",
+   "cz": "Člověku lze vzít všechno kromě jediného: poslední z lidských svobod — zvolit si svůj postoj k daným okolnostem.",
+   "author": "Viktor E. Frankl, Man's Search for Meaning",
+   "note": ""
+  },
+  {
+   "en": "Fear keeps us focused on the past or worried about the future. If we can acknowledge our fear, we can realize that right now we are okay.",
+   "cz": "Strach nás drží v minulosti, nebo nás žene do obav o budoucnost. Když si svůj strach přiznáme, můžeme zjistit, že právě teď je nám dobře.",
+   "author": "Thich Nhat Hanh, Fear: Essential Wisdom for Getting Through the Storm",
+   "note": ""
+  },
+  {
+   "en": "The only way to ease our fear and be truly happy is to acknowledge our fear and look deeply at its source.",
+   "cz": "Jediná cesta, jak zmírnit strach a být opravdu šťastný, je přiznat si ho a podívat se hluboko na jeho zdroj.",
+   "author": "Thich Nhat Hanh, Fear: Essential Wisdom for Getting Through the Storm",
+   "note": ""
+  },
+  {
+   "en": "Through diligence, vigilance, self-discipline and self-control, let the wise build an island that no flood can overwhelm.",
+   "cz": "Pílí, bdělostí, kázní a sebeovládáním si moudrý buduje ostrov, který žádná povodeň nezaplaví.",
+   "author": "Dhammapada, verse 25",
+   "note": ""
+  },
+  {
+   "en": "A journey of a thousand miles begins with a single step.",
+   "cz": "Cesta dlouhá tisíc mil začíná jediným krokem.",
+   "author": "Laozi, Tao Te Ching (ch. 64",
+   "note": "popular rendering"
+  },
+  {
+   "en": "This being human is a guest house. Every morning a new arrival. Welcome and entertain them all.",
+   "cz": "Být člověkem je jako hostinec. Každé ráno přichází nový host. Přivítej je všechny a dopřej jim pohostinství.",
+   "author": "Rumi, The Essential Rumi",
+   "note": "translation by Coleman Barks"
+  },
+  {
+   "en": "Fear is a natural reaction to moving closer to the truth.",
+   "cz": "Strach je přirozenou reakcí na to, když se přibližujeme pravdě.",
+   "author": "Pema Chödrön, When Things Fall Apart",
+   "note": ""
+  },
+  {
+   "en": "Nothing ever goes away until it has taught us what we need to know.",
+   "cz": "Nic nezmizí, dokud nás nenaučí to, co potřebujeme vědět.",
+   "author": "Pema Chödrön, When Things Fall Apart",
+   "note": ""
+  },
+  {
+   "en": "I learned that courage was not the absence of fear, but the triumph over it. The brave man is not he who does not feel afraid, but he who conquers that fear.",
+   "cz": "Naučil jsem se, že odvaha není nepřítomnost strachu, ale jeho překonání. Statečný není ten, kdo strach necítí, ale ten, kdo nad ním zvítězí.",
+   "author": "Nelson Mandela, Long Walk to Freedom",
+   "note": ""
+  },
+  {
+   "en": "Courage is resistance to fear, mastery of fear — not absence of fear.",
+   "cz": "Odvaha znamená strachu vzdorovat a strach ovládat, ne strach necítit.",
+   "author": "Mark Twain, Pudd'nhead Wilson",
+   "note": ""
+  },
+  {
+   "en": "If there is a remedy, what need is there for worry? If there is no remedy, what use is there in worrying?",
+   "cz": "Je-li lék, proč se trápit? Není-li lék, co je trápení platné?",
+   "author": "Shantideva, Bodhicaryavatara (6.10",
+   "note": ""
+  }
+ ],
+ "tiredness": [
+  {
+   "en": "Do your work, then step back. The only path to serenity.",
+   "cz": "Konej své dílo, a pak se stáhni. Jedině tak dojdeš klidu.",
+   "author": "Laozi, Tao Te Ching (ch. 9, tr. Stephen Mitchell",
+   "note": ""
+  },
+  {
+   "en": "Rest is the sweet sauce of labor.",
+   "cz": "Odpočinek je sladká omáčka práce.",
+   "author": "Plutarch, Moralia",
+   "note": ""
+  },
+  {
+   "en": "Breathing in, I calm my body. Breathing out, I smile.",
+   "cz": "S nádechem zklidňuji své tělo, s výdechem se usmívám.",
+   "author": "Thich Nhat Hanh, Being Peace",
+   "note": ""
+  },
+  {
+   "en": "Tired nature's sweet restorer, balmy sleep.",
+   "cz": "Sladký spánku, jenž unavenou přírodu obnovuješ.",
+   "author": "Edward Young, Night-Thoughts",
+   "note": ""
+  },
+  {
+   "en": "Be empty of worrying. Think of who created thought.",
+   "cz": "Buď prázdný od starostí. Pomysli na toho, kdo stvořil myšlenku.",
+   "author": "Rumi, The Essential Rumi (tr. Coleman Barks",
+   "note": ""
+  },
+  {
+   "en": "Sometimes even to live is an act of courage.",
+   "cz": "Někdy je i samo žití projevem odvahy.",
+   "author": "Seneca, Letters to Lucilius (Letter 78",
+   "note": ""
+  },
+  {
+   "en": "The time to relax is when you don't have time for it.",
+   "cz": "Na odpočinek je čas právě tehdy, když na něj nemáš čas.",
+   "author": "Sydney J. Harris",
+   "note": ""
+  },
+  {
+   "en": "The sleep of a labouring man is sweet, whether he eat little or much.",
+   "cz": "Sladký je spánek pracujícího, ať jí málo nebo mnoho.",
+   "author": "Ecclesiastes 5:12 (Bible, KJV",
+   "note": ""
+  },
+  {
+   "en": "He makes me lie down in green pastures, he leads me beside quiet waters, he refreshes my soul.",
+   "cz": "Nechává mě odpočívat na zelených pastvinách, vede mě k tichým vodám, mou duši osvěžuje.",
+   "author": "Psalm 23:2-3 (Bible, NIV",
+   "note": ""
+  },
+  {
+   "en": "Come to me, all you who are weary and burdened, and I will give you rest.",
+   "cz": "Pojďte ke mně všichni, kdo se namáháte a jste obtíženi, a já vám dám odpočinout.",
+   "author": "Matthew 11:28 (Bible, NIV",
+   "note": ""
+  },
+  {
+   "en": "There is a time for many words, and there is also a time for sleep.",
+   "cz": "Je čas pro mnohá slova a je také čas pro spánek.",
+   "author": "Homer, Odyssey",
+   "note": ""
+  },
+  {
+   "en": "What lacks alternate rest cannot endure.",
+   "cz": "Co nemá střídavý odpočinek, nemůže trvat.",
+   "author": "Ovid, Heroides (4.89",
+   "note": ""
+  },
+  {
+   "en": "Sleep that knits up the ravelled sleave of care, the death of each day's life, sore labour's bath.",
+   "cz": "Spánek, jenž splétá roztřepené nitky starostí, smrt života každého dne, lázeň po lopotě.",
+   "author": "William Shakespeare, Macbeth (2.2",
+   "note": ""
+  },
+  {
+   "en": "And so we came forth, and once again beheld the stars.",
+   "cz": "A tak jsme vyšli a znovu spatřili hvězdy.",
+   "author": "Dante Alighieri, Inferno (XXXIV",
+   "note": ""
+  },
+  {
+   "en": "Rest belongs to the work as the eyelids to the eyes.",
+   "cz": "Odpočinek náleží k práci jako víčka k očím.",
+   "author": "Rabindranath Tagore, Stray Birds",
+   "note": ""
+  },
+  {
+   "en": "Nature does not hurry, yet everything is accomplished.",
+   "cz": "Příroda nespěchá, a přece je vše dokonáno.",
+   "author": "Laozi, Tao Te Ching",
+   "note": "attributed"
+  },
+  {
+   "en": "Rest is not idleness, and to lie sometimes on the grass under trees on a summer's day, listening to the murmur of the water, or watching the clouds float across the sky, is by no means a waste of time.",
+   "cz": "Odpočinek není lenošení; ležet někdy v letní den na trávě pod stromy, naslouchat šumění vody nebo sledovat oblaka plující po obloze přece není ztráta času.",
+   "author": "John Lubbock, The Use of Life",
+   "note": ""
+  },
+  {
+   "en": "You are the sky. Everything else is just the weather.",
+   "cz": "Ty jsi obloha. Všechno ostatní je jen počasí.",
+   "author": "Pema Chödrön",
+   "note": "attributed"
+  },
+  {
+   "en": "How beautiful it is to do nothing, and then rest afterwards.",
+   "cz": "Jak krásné je nedělat nic a pak si odpočinout.",
+   "author": "Spanish proverb",
+   "note": ""
+  },
+  {
+   "en": "Almost everything will work again if you unplug it for a few minutes, including you.",
+   "cz": "Téměř všechno zase funguje, když to na pár minut odpojíš od proudu — včetně tebe.",
+   "author": "Anne Lamott",
+   "note": "attributed"
+  }
+ ]
+}

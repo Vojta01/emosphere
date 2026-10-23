@@ -26,7 +26,7 @@ Future<void> _openSheet(
   required CheckinPublish publish,
   Strings s = Strings.cs,
   LocationPrecision initialPrecision = LocationPrecision.off,
-  void Function(bool? result)? onResult,
+  void Function(CheckinResult? result)? onResult,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
@@ -101,7 +101,7 @@ void main() {
   ) async {
     await _useTallSurface(tester);
     final log = _PublishLog();
-    bool? result;
+    CheckinResult? result;
     await _openSheet(
       tester,
       publish: (emotion, intensity, note, precision) async {
@@ -141,7 +141,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(CheckinSheet), findsNothing);
-    expect(result, isTrue);
+    expect(result?.emotion, Emotion.calm);
+    expect(result?.intensity, 5);
   });
 
   testWidgets('a failed publish keeps the sheet open and shows the error', (

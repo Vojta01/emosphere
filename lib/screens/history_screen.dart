@@ -5,6 +5,7 @@ import '../core/i18n/strings.dart';
 import '../core/models/checkin.dart';
 import '../core/models/emotion.dart';
 import '../theme/app_theme.dart';
+import '../widgets/checkin_detail_sheet.dart';
 import '../widgets/intensity_dots.dart';
 
 /// My check-ins: timeline + simple per-emotion statistics.
@@ -16,7 +17,7 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(child: checkins.isEmpty ? _empty() : _content());
+    return SafeArea(child: checkins.isEmpty ? _empty() : _content(context));
   }
 
   Widget _empty() {
@@ -43,7 +44,7 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _content() {
+  Widget _content(BuildContext context) {
     final counts = <Emotion, int>{};
     for (final checkin in checkins) {
       counts[checkin.emotion] = (counts[checkin.emotion] ?? 0) + 1;
@@ -65,7 +66,7 @@ class HistoryScreen extends StatelessWidget {
         _weekCard(),
         const SizedBox(height: 18),
         for (final checkin in checkins) ...[
-          _checkinCard(checkin),
+          _checkinCard(context, checkin),
           const SizedBox(height: 10),
         ],
       ],
@@ -283,7 +284,15 @@ class HistoryScreen extends StatelessWidget {
     return labels[day.weekday - 1];
   }
 
-  Widget _checkinCard(CheckinEvent checkin) {
+  Widget _checkinCard(BuildContext context, CheckinEvent checkin) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => showCheckinDetailSheet(context, s: s, checkin: checkin),
+      child: _checkinCardBody(checkin),
+    );
+  }
+
+  Widget _checkinCardBody(CheckinEvent checkin) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(

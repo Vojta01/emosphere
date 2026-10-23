@@ -14,15 +14,27 @@ typedef CheckinPublish = Future<void> Function(
   LocationPrecision precision,
 );
 
+/// Result of a successful check-in: what the user sent. The host screen
+/// uses it to open the after-send afterglow (R10/R11).
+class CheckinResult {
+  const CheckinResult({required this.emotion, required this.intensity});
+
+  /// The emotion the user picked.
+  final Emotion emotion;
+
+  /// The intensity 1–5 the user picked.
+  final int intensity;
+}
+
 /// Opens the check-in bottom sheet.
-/// Returns `true` when a check-in was published successfully.
-Future<bool?> showCheckinSheet(
+/// Returns the published check-in, or null when the sheet was dismissed.
+Future<CheckinResult?> showCheckinSheet(
   BuildContext context, {
   required Strings s,
   required CheckinPublish publish,
   LocationPrecision initialPrecision = LocationPrecision.off,
 }) {
-  return showModalBottomSheet<bool>(
+  return showModalBottomSheet<CheckinResult>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -100,7 +112,9 @@ class _CheckinSheetState extends State<CheckinSheet>
       await Future<void>.delayed(const Duration(milliseconds: 900));
       if (!mounted) return;
       if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop(true);
+        Navigator.of(context).pop(
+          CheckinResult(emotion: emotion, intensity: _intensity),
+        );
       }
     } catch (_) {
       if (!mounted) return;

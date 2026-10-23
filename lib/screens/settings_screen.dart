@@ -10,7 +10,7 @@ import '../widgets/key_qr_dialog.dart';
 import '../widgets/user_avatar.dart';
 
 /// Version shown in the About card — keep in sync with `pubspec.yaml`.
-const String appVersionLabel = 'v0.3.2';
+const String appVersionLabel = 'v0.4.0';
 
 /// Settings: profile key, language, location precision, relays, my data.
 class SettingsScreen extends StatefulWidget {
@@ -111,6 +111,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _keyBackupCard(s, app),
           const SizedBox(height: 12),
           _languageCard(s, app),
+          const SizedBox(height: 12),
+          _afterglowCard(s, app),
           const SizedBox(height: 12),
           _locationCard(s, app),
           const SizedBox(height: 12),
@@ -426,6 +428,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
         selected: <String>{app.language},
         onSelectionChanged: (selection) => app.setLanguage(selection.first),
+      ),
+    );
+  }
+
+  Widget _afterglowCard(Strings s, AppState app) {
+    return _section(
+      title: s.tr('settings.afterglow'),
+      child: Material(
+        color: Colors.transparent,
+        child: SwitchListTile(
+          key: const Key('afterglow_haptics'),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+          value: app.afterglowHaptics,
+          title: Text(
+            s.tr('settings.afterglowHaptics'),
+            style: const TextStyle(fontSize: 14, color: Colors.white),
+          ),
+          subtitle: Text(
+            s.tr('settings.afterglowHapticsHint'),
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.white.withValues(alpha: 0.55),
+            ),
+          ),
+          onChanged: (value) => app.setAfterglowHaptics(value),
+        ),
       ),
     );
   }

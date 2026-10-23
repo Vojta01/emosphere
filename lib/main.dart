@@ -4,9 +4,12 @@
 // settings). The app runs offline-first: [AppState.init] loads local state and
 // starts the relay sync in the background.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'core/i18n/strings.dart';
+import 'core/quotes/quotes.dart';
 import 'core/state/app_state.dart';
 import 'screens/home_shell.dart';
 import 'screens/onboarding_screen.dart';
@@ -40,6 +43,19 @@ class _EmoSphereAppState extends State<EmoSphereApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Best-effort background load of the quote library (R10/R11).
+    // Deliberately not awaited by [_ready]: a slow or failed asset must
+    // never block the first frame — without it the check-in flow falls
+    // back to the plain confirmation.
+    unawaited(_loadQuotes());
+  }
+
+  Future<void> _loadQuotes() async {
+    try {
+      await QuotesLibrary.load();
+    } catch (_) {
+      // Keep the app usable without the quotes.
+    }
   }
 
   @override

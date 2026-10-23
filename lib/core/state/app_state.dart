@@ -108,6 +108,9 @@ class AppState extends ChangeNotifier {
   /// key backup step) has been finished on this device.
   static const String keyOnboardingComplete = 'emosphere.onboardingComplete';
 
+  /// Preference key of the after-send animation haptics toggle (R10).
+  static const String keyAfterglowHaptics = 'emosphere.afterglowHaptics';
+
   /// How far back the world feed / map loads check-ins.
   static const Duration worldWindow = Duration(days: 30);
 
@@ -138,6 +141,7 @@ class AppState extends ChangeNotifier {
   List<String> _friends = <String>[];
   bool _syncInProgress = false;
   bool _onboardingComplete = false;
+  bool _afterglowHaptics = true;
   bool _disposed = false;
   StreamSubscription<CheckinEvent>? _liveSub;
 
@@ -174,6 +178,7 @@ class AppState extends ChangeNotifier {
       prefs.getString(keyLocationPrecision),
     );
     _onboardingComplete = prefs.getBool(keyOnboardingComplete) ?? false;
+    _afterglowHaptics = prefs.getBool(keyAfterglowHaptics) ?? true;
     _friends = dedupeFriendKeys(prefs.getStringList(keyFriends) ?? const []);
     final relays = prefs.getStringList(keyRelays);
     if (relays != null && relays.isNotEmpty) {
@@ -307,6 +312,19 @@ class AppState extends ChangeNotifier {
     }
     _language = value;
     await _prefs?.setString(keyLanguage, value);
+    _notify();
+  }
+
+  /// Whether the after-send afterglow plays haptic feedback (R10).
+  bool get afterglowHaptics => _afterglowHaptics;
+
+  /// Enables/disables the afterglow haptics; stores the choice.
+  Future<void> setAfterglowHaptics(bool value) async {
+    if (value == _afterglowHaptics) {
+      return;
+    }
+    _afterglowHaptics = value;
+    await _prefs?.setBool(keyAfterglowHaptics, value);
     _notify();
   }
 

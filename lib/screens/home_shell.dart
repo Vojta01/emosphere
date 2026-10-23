@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../core/i18n/strings.dart';
+import '../core/quotes/quotes.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
+import '../widgets/afterglow_overlay.dart';
 import '../widgets/checkin_sheet.dart';
 import 'feed_screen.dart';
 import 'history_screen.dart';
@@ -44,7 +46,7 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _openCheckin() async {
     final s = Strings(widget.app.language);
-    final published = await showCheckinSheet(
+    final result = await showCheckinSheet(
       context,
       s: s,
       initialPrecision: widget.app.locationPrecision,
@@ -56,7 +58,13 @@ class _HomeShellState extends State<HomeShell> {
             precision: precision,
           ),
     );
-    if (published == true && mounted) {
+    if (result == null || !mounted) {
+      return;
+    }
+    // R10/R11: the sheet closed, so play the afterglow with a quote. When
+    // the quote asset failed to load, keep the plain confirmation instead.
+    final quote = QuotesLibrary.instance?.randomFor(result.emotion);
+    if (quote == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(s.tr('checkin.sent')),
@@ -64,7 +72,16 @@ class _HomeShellState extends State<HomeShell> {
           backgroundColor: const Color(0xFF14532D),
         ),
       );
+      return;
     }
+    await showAfterglow(
+      context,
+      s: s,
+      emotion: result.emotion,
+      intensity: result.intensity,
+      quote: quote,
+      haptics: widget.app.afterglowHaptics,
+    );
   }
 
   @override

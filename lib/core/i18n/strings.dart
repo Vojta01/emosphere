@@ -800,5 +800,29 @@ class Strings {
       'cs': 'Profil se nepodařilo uložit.',
       'en': 'Could not save the profile.',
     },
+    'afterglow.closeHint': <String, String>{
+      'cs': 'Klepnutím kamkoli zavřít',
+      'en': 'Tap anywhere to close',
+    },
+    'quote.attributed': <String, String>{
+      'cs': 'připisováno',
+      'en': 'attributed',
+    },
+    'hist.reflection': <String, String>{
+      'cs': 'Zamyšlení k této emoci',
+      'en': 'A reflection for this emotion',
+    },
+    'settings.afterglow': <String, String>{
+      'cs': 'Animace po odeslání',
+      'en': 'After-send animation',
+    },
+    'settings.afterglowHaptics': <String, String>{
+      'cs': 'Haptická odezva',
+      'en': 'Haptic feedback',
+    },
+    'settings.afterglowHapticsHint': <String, String>{
+      'cs': 'Jemné vibrace doprovázejí animaci i citát.',
+      'en': 'Gentle vibrations accompany the animation and the quote.',
+    },
   };
 }

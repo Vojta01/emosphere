@@ -1,12 +1,16 @@
 // Widget tests for the history screen (card 2/7): the check-in timeline plus
-// the per-emotion and seven-day statistics.
+// the per-emotion and seven-day statistics, and the check-in detail sheet
+// with the reflective quote (R11).
 
 import 'package:emosphere/core/i18n/strings.dart';
 import 'package:emosphere/core/models/checkin.dart';
 import 'package:emosphere/core/models/emotion.dart';
+import 'package:emosphere/core/quotes/quotes.dart';
 import 'package:emosphere/screens/history_screen.dart';
 import 'package:emosphere/theme/app_theme.dart';
+import 'package:flutter/foundation.dart' show SynchronousFuture;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 CheckinEvent _checkin({
@@ -124,4 +128,53 @@ void main() {
     const english = <String>['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
     expect(find.text(english[DateTime.now().weekday - 1]), findsOneWidget);
   });
+
+  testWidgets('tapping a check-in opens the detail with a reflective quote', (
+    tester,
+  ) async {
+    // A tiny in-memory library: two joy quotes (the pick is random).
+    await QuotesLibrary.load(bundle: _FakeQuotesBundle());
+
+    await _pumpHistory(tester, <CheckinEvent>[
+      _checkin(
+        emotion: Emotion.joy,
+        intensity: 4,
+        createdAt: DateTime.now().toUtc(),
+        note: 'Slunce',
+        id: 'd1',
+      ),
+    ]);
+
+    await tester.tap(find.text('Slunce'));
+    await tester.pumpAndSettle();
+
+    // The sheet: the emotion header, the reflection label and one of the
+    // two quotes ("Author" appears in both attributions).
+    expect(find.byKey(const Key('detail_emotion')), findsOneWidget);
+    expect(find.text(Strings.cs.tr('hist.reflection')), findsOneWidget);
+    expect(find.byKey(const Key('history_quote')), findsOneWidget);
+    expect(find.textContaining('Author'), findsOneWidget);
+  });
+}
+
+/// `assets/quotes.json` stand-in with two joy quotes and empty other lists.
+const String _quotesJson = '{'
+    '"joy":['
+    '{"en":"Twinkle","cz":"Třpyt","author":"A. Author","note":""},'
+    '{"en":"Sunny","cz":"Slunečno","author":"B. Author","note":"attributed"}'
+    '],'
+    '"calm":[],"love":[],"surprise":[],"sadness":[],"anger":[],"fear":[],'
+    '"tiredness":[]'
+    '}';
+
+/// In-memory asset bundle: resolves the quotes asset synchronously so the
+/// widget test does not need real file I/O.
+class _FakeQuotesBundle extends CachingAssetBundle {
+  @override
+  Future<ByteData> load(String key) =>
+      throw FlutterError('Unexpected asset load: $key');
+
+  @override
+  Future<String> loadString(String key, {bool cache = true}) =>
+      SynchronousFuture(_quotesJson);
 }
