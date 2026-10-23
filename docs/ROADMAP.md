@@ -2,7 +2,7 @@
 
 > **Stav: pipeline návrhů.** Hotové položky jsou označené v tabulce. Ostatní
 > čekají na Vojtovo „jdi“ — pak se mění na commity / karty noční směny.
-> Zapsáno: 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · aplikace **v0.4.0**
+> Zapsáno: 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · aplikace **v0.5.0**
 
 ## Přehled
 
@@ -16,7 +16,7 @@
 | R6 | APK — název `emosphere-<verze>.apk` + stabilní podpis + zachování dat | připraveno |
 | R7 | Odolnost proti spamu (agregace per npub, limity, verifikace podpisů) | pozdější fáze |
 | R8 | Heatmapa místo kruhů — plynulé slévání blobů | hotovo (v0.3.0, oprava polohy v0.3.2) |
-| R9 | Stroj času — slider + ▶ play na mapě (vývoj nálady v čase) | návrh |
+| R9 | Stroj času — slider + ▶ play na mapě (vývoj nálady v čase) | hotovo (v0.5.0) |
 | R10 | Animace po odeslání („afterglow“) v barvě emoce | hotovo (v0.4.0) |
 | R11 | Citáty k emocím (20/emoci, CZ+EN) jako součást animace | hotovo (v0.4.0) |
 
@@ -308,6 +308,17 @@ stávající `HeatLayer` beze změny — mění se jen vstupní agregát. Nová 
 (chipy **1 h / 6 h / 24 h** — žádané „více variant“; výchozí 6 h). Kumulativní
 varianta zůstává jako možný budoucí přepínač; délka přehrání ~8 s.
 
+**Implementováno (v0.5.0):** `lib/widgets/timeline_bar.dart` (`TimelineBar` —
+▶/⏸, slider, popisek instantu, chipy 1h/6h/24h); stav přehrávání žije v
+`_MapScreenState` (je to vlastnost mapy, ne globálního stavu). Osu tvoří
+zvolené okno (1 h / 24 h / 7 dní), pravý konec = teď; scrubbing kreslí
+klouzavé okno `[T − D, T]` (`filterBySlidingWindow` v `aggregate.dart`,
+D = chipy, výchozí 6 h); ▶ = ~8s přehrání celého okna → návrat do živého;
+tap kamkoli přehrávání pauzne (průhledná vrstva nad mapou — okamžitá, bez
+double-tap prodlevy flutter_mapu); čas se během scrubu mrazí (kotva
+`_anchor`); popisek `pá 12. 10. · 14:30`; prázdný stav „nikdo nic nesdílel“
+se během scrubu nezobrazuje. **Live režim beze změny** (celé okno, jak dnes).
+
 ---
 
 ## R10 — Animace po odeslání („afterglow“)
@@ -398,8 +409,9 @@ zobrazení; citát je součástí afterglow a nově i detailu check-inu v Histor
 6. **R10 + R11** (afterglow + citáty) — jeden zážitek; první balík
    z nových nápadů (Vojta: uživatel má být motivován) — **hotovo (v0.4.0)**
 7. **R9** (stroj času) — po R10/R11; plně vynikne, až bude víc dat
+   — **hotovo (v0.5.0)**
 
-*(potvrzeno Vojtou 23. 10.: první **R10 + R11**, pak **R9**)*
+*(potvrzeno Vojtou 23. 10.: první **R10 + R11**, pak **R9**; R9 doručen 23. 10.)*
 
 ## Rozhodnutí Vojty (22. 10. 2026)
 
@@ -423,4 +435,4 @@ zobrazení; citát je součástí afterglow a nově i detailu check-inu v Histor
 
 ---
 
-*Zapsal Hermes · 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · zdroj: zadání Vojty (chat) · R10+R11 hotovo 23. 10. 2026 (v0.4.0) · položky bez „hotovo“ čekají na Vojtovo „jdi“*
+*Zapsal Hermes · 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · zdroj: zadání Vojty (chat) · R10+R11 hotovo 23. 10. 2026 (v0.4.0) · R9 hotovo 23. 10. 2026 (v0.5.0) · položky bez „hotovo“ čekají na Vojtovo „jdi“*
