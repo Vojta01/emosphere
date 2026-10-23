@@ -304,7 +304,9 @@ přírůstkově (O(1) na krok); scrubbing = přepočet z nuly (levné). Kreslí
 stávající `HeatLayer` beze změny — mění se jen vstupní agregát. Nová komponenta
 `TimelineBar` + stav přehrávání v `app_state`.
 
-**K rozhodnutí:** varianta A/B; délka přehrání; slider i u okna 1 h?
+**Rozhodnuto (Vojta, 23. 10.):** **B — klouzavé okno** s volitelnou délkou okna
+(chipy **1 h / 6 h / 24 h** — žádané „více variant“; výchozí 6 h). Kumulativní
+varianta zůstává jako možný budoucí přepínač; délka přehrání ~8 s.
 
 ---
 
@@ -339,8 +341,8 @@ tvar, rychlost):**
 **Technika:** vlastní `CustomPainter` + `AnimationController` (žádný balíček,
 stejně jako `HeatLayer`); desítky částic, 60 fps, nízká zátěž.
 
-**K rozhodnutí:** délka (2 / 4 / 8 s); haptika ano/ne; storyboard (4 klíčové
-snímky) k ukázce před implementací?
+**Rozhodnuto (Vojta, 23. 10.):** délka **~4 s** (jemná částicová); haptika
+zapnutá (s přepínačem v Nastavení); storyboard netřeba — staví se přímo.
 
 ---
 
@@ -366,8 +368,10 @@ reflektovat a emoci zpracovat. ~20 citátů na emoci (celkem 160).
 - Zobrazení: karta v overlay po animaci — citát + autor, jemný fade-in.
 - Bonus: citát i v detailu check-inu v Historii (lze vypnout).
 
-**K rozhodnutí:** jazyk (CZ+EN — doporučeno); výběr citátu; citát v Historii;
-schválení seznamu před nasazením.
+**Rozhodnuto (Vojta, 23. 10.):** jazyk **CZ+EN**; **20 citátů na emoci**
+(celkem 160), výběr **náhodný** při každém zobrazení; citát i v Historii;
+seznam bez předchozího schválení („věřím ti, jdi rovnou“) — atribuce přesto
+ověřené, bez falešných.
 
 ---
 
@@ -385,7 +389,7 @@ schválení seznamu před nasazením.
    z nových nápadů (Vojta: uživatel má být motivován)
 7. **R9** (stroj času) — po R10/R11; plně vynikne, až bude víc dat
 
-*(pořadí potvrdí Vojta)*
+*(potvrzeno Vojtou 23. 10.: první **R10 + R11**, pak **R9**)*
 
 ## Rozhodnutí Vojty (22. 10. 2026)
 
@@ -401,6 +405,11 @@ schválení seznamu před nasazením.
 - **(g) Heatmapa (R8):** návrh + ukázka stylu (Telegram 22. 10.) — čeká na
   Vojtovo rozhodnutí; při „jdi" se dělá spolu s R1 jako jeden vizuální balík.
   → **implementováno** (v0.3.0, oprava polohy blobu v0.3.2).
+- **(h) Nové nápady (R9–R11), 23. 10.:** pořadí **R10 + R11 první, pak R9**
+  („věřím ti, jdi rovnou“ — seznam citátů bez předchozího schválení).
+- **(i) R9 — stroj času:** **klouzavé okno** s volitelnou délkou (1 h / 6 h / 24 h).
+- **(j) R10 — afterglow:** **~4 s**, jemná částicová animace; storyboard netřeba.
+- **(k) R11 — citáty:** 20/emoci (160), výběr **náhodný**; citát i v Historii.
 
 ---
 
