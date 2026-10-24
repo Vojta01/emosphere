@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../core/app_links.dart';
 import '../core/i18n/strings.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
@@ -10,7 +11,7 @@ import '../widgets/key_qr_dialog.dart';
 import '../widgets/user_avatar.dart';
 
 /// Version shown in the About card — keep in sync with `pubspec.yaml`.
-const String appVersionLabel = 'v0.5.1';
+const String appVersionLabel = 'v0.5.2';
 
 /// Settings: profile key, language, location precision, relays, my data.
 class SettingsScreen extends StatefulWidget {
@@ -117,6 +118,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _locationCard(s, app),
           const SizedBox(height: 12),
           _relaysCard(s),
+          const SizedBox(height: 12),
+          _linksCard(s),
           const SizedBox(height: 12),
           _dangerCard(s),
           const SizedBox(height: 12),
@@ -511,6 +514,74 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: FilledButton(onPressed: _saveRelays, child: Text(s.save)),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Project links: source code, the Android build and the hosted web app.
+  Widget _linksCard(Strings s) {
+    return _section(
+      title: s.tr('links'),
+      child: Column(
+        children: [
+          _linkRow(
+            keyName: 'settings_link_github',
+            icon: Icons.code,
+            label: s.tr('links.github'),
+            url: AppLinks.github,
+          ),
+          _linkRow(
+            keyName: 'settings_link_apk',
+            icon: Icons.android,
+            label: s.tr('links.apk'),
+            url: AppLinks.androidApk,
+          ),
+          _linkRow(
+            keyName: 'settings_link_web',
+            icon: Icons.public,
+            label: s.tr('links.web'),
+            url: AppLinks.web,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _linkRow({
+    required String keyName,
+    required IconData icon,
+    required String label,
+    required String url,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        key: Key(keyName),
+        borderRadius: BorderRadius.circular(12),
+        onTap: () async {
+          HapticFeedback.lightImpact();
+          await openAppLink(url);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
+          child: Row(
+            children: [
+              Icon(icon, size: 18, color: AppTheme.accent),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                ),
+              ),
+              Icon(
+                Icons.open_in_new,
+                size: 14,
+                color: Colors.white.withValues(alpha: 0.35),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

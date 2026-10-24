@@ -183,6 +183,17 @@ void main() {
     },
   );
 
+  testWidgets('the welcome screen shows the project links', (tester) async {
+    await _pumpApp(tester);
+    expect(find.byKey(const Key('onb_link_github')), findsOneWidget);
+    expect(find.byKey(const Key('onb_link_apk')), findsOneWidget);
+
+    // Shared footer strip stays visible on the key step too.
+    await tester.tap(find.byKey(const Key('onb_next')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('onb_link_github')), findsOneWidget);
+  });
+
   test('fresh-install default language follows the system locale', () {
     expect(AppState.defaultLanguageFor('cs'), 'cs');
     expect(AppState.defaultLanguageFor('cs-CZ'), 'cs');

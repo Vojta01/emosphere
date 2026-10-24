@@ -23,7 +23,7 @@ Future<AppState> _pumpSettings(
   WidgetTester tester, {
   bool withIdentity = false,
 }) async {
-  await tester.binding.setSurfaceSize(const Size(500, 2200));
+  await tester.binding.setSurfaceSize(const Size(500, 2600));
   addTearDown(() => tester.binding.setSurfaceSize(null));
   final app = AppState();
   addTearDown(app.dispose);
@@ -71,6 +71,7 @@ void main() {
       'Jazyk',
       'Přesnost lokace',
       'Relaye',
+      'Odkazy',
       'Smazat moje data',
       'O aplikaci',
     ]) {
@@ -86,6 +87,17 @@ void main() {
     final field = tester.widget<TextField>(find.byType(TextField));
     expect(field.controller!.text, app.relays.join('\n'));
     expect(app.relays, hasLength(4));
+  });
+
+  testWidgets('the links card lists the project links', (tester) async {
+    await _pumpSettings(tester);
+
+    expect(find.byKey(const Key('settings_link_github')), findsOneWidget);
+    expect(find.byKey(const Key('settings_link_apk')), findsOneWidget);
+    expect(find.byKey(const Key('settings_link_web')), findsOneWidget);
+    expect(find.text('GitHub'), findsOneWidget);
+    expect(find.text('Android APK'), findsOneWidget);
+    expect(find.text('Web (PWA)'), findsOneWidget);
   });
 
   testWidgets('switching the language re-renders the screen at runtime', (

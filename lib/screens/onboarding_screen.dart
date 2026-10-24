@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../core/app_links.dart';
 import '../core/i18n/strings.dart';
 import '../core/state/app_state.dart';
 import '../theme/app_theme.dart';
@@ -112,6 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
               _footer(s),
+              _linksBar(s),
             ],
           ),
         ),
@@ -623,6 +625,57 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  /// Slim strip of project links under the footer — a first-time visitor can
+  /// reach the source code and the Android build without leaving this screen.
+  Widget _linksBar(Strings s) {
+    final link = TextStyle(
+      fontSize: 11.5,
+      fontWeight: FontWeight.w700,
+      color: AppTheme.accent.withValues(alpha: 0.95),
+    );
+    final muted = TextStyle(
+      fontSize: 11.5,
+      color: Colors.white.withValues(alpha: 0.45),
+    );
+    Widget dot() => Text(
+      '·',
+      style: TextStyle(
+        fontSize: 11.5,
+        color: Colors.white.withValues(alpha: 0.3),
+      ),
+    );
+    Widget item(String keyName, String label, String url) {
+      return GestureDetector(
+        key: Key(keyName),
+        behavior: HitTestBehavior.opaque,
+        onTap: () async {
+          HapticFeedback.lightImpact();
+          await openAppLink(url);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Text(label, style: link),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 6,
+        children: [
+          Text(s.tr('links.openSource'), style: muted),
+          dot(),
+          item('onb_link_github', s.tr('links.github'), AppLinks.github),
+          dot(),
+          item('onb_link_apk', s.tr('links.apk'), AppLinks.androidApk),
         ],
       ),
     );

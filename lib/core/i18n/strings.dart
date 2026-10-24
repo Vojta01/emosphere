@@ -499,6 +499,14 @@ class Strings {
     'onb.next': <String, String>{'cs': 'Pokračovat', 'en': 'Continue'},
     'onb.back': <String, String>{'cs': 'Zpět', 'en': 'Back'},
     'onb.finish': <String, String>{'cs': 'Dokončit', 'en': 'Finish'},
+    'links': <String, String>{'cs': 'Odkazy', 'en': 'Links'},
+    'links.openSource': <String, String>{
+      'cs': 'Open source',
+      'en': 'Open source',
+    },
+    'links.github': <String, String>{'cs': 'GitHub', 'en': 'GitHub'},
+    'links.apk': <String, String>{'cs': 'Android APK', 'en': 'Android APK'},
+    'links.web': <String, String>{'cs': 'Web (PWA)', 'en': 'Web (PWA)'},
     'onb.step1.title': <String, String>{
       'cs': 'Vítej v EmoSphere',
       'en': 'Welcome to EmoSphere',

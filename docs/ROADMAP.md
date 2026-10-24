@@ -410,6 +410,8 @@ zobrazení; citát je součástí afterglow a nově i detailu check-inu v Histor
    z nových nápadů (Vojta: uživatel má být motivován) — **hotovo (v0.4.0)**
 7. **R9** (stroj času) — po R10/R11; plně vynikne, až bude víc dat
    — **hotovo (v0.5.0)**
+8. **Odkazy v appce + vlastní doména** — sdílecí odkaz pro propagaci
+   (`emosphere.digitalni-vedomi.cz`) — **hotovo (v0.5.2)**
 
 *(potvrzeno Vojtou 23. 10.: první **R10 + R11**, pak **R9**; R9 doručen 23. 10.)*
 
@@ -435,4 +437,4 @@ zobrazení; citát je součástí afterglow a nově i detailu check-inu v Histor
 
 ---
 
-*Zapsal Hermes · 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · zdroj: zadání Vojty (chat) · R10+R11 hotovo 23. 10. 2026 (v0.4.0) · R9 hotovo 23. 10. 2026 (v0.5.0) · v0.5.1 hotovo 24. 10. 2026 (přepínač jazyka hned na úvodní obrazovce, EN pro non-CZ systémy, EN náhled pro sdílení) · položky bez „hotovo“ čekají na Vojtovo „jdi“*
+*Zapsal Hermes · 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · zdroj: zadání Vojty (chat) · R10+R11 hotovo 23. 10. 2026 (v0.4.0) · R9 hotovo 23. 10. 2026 (v0.5.0) · v0.5.1 hotovo 24. 10. 2026 (přepínač jazyka hned na úvodní obrazovce, EN pro non-CZ systémy, EN náhled pro sdílení) · v0.5.2 hotovo 24. 10. 2026 (vlastní doména emosphere.digitalni-vedomi.cz, odkazy GitHub + Android APK v appce i na úvodní obrazovce) · položky bez „hotovo“ čekají na Vojtovo „jdi“*
