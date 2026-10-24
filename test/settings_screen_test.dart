@@ -49,7 +49,9 @@ Future<AppState> _pumpSettings(
 
 void main() {
   setUp(() {
-    SharedPreferences.setMockInitialValues(<String, Object>{});
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      AppState.keyLanguage: 'cs',
+    });
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_secureStorageChannel, (call) async => null);
   });

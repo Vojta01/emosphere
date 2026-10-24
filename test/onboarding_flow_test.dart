@@ -86,7 +86,10 @@ void main() {
   testWidgets('generating a key keeps onboarding open until backup confirmed', (
     tester,
   ) async {
-    final app = await _pumpApp(tester);
+    final app = await _pumpApp(
+      tester,
+      prefs: <String, Object>{AppState.keyLanguage: 'cs'},
+    );
 
     // Step 1 → 2.
     expect(find.text(s.tr('onb.step1.title')), findsOneWidget);
@@ -130,7 +133,10 @@ void main() {
   ) async {
     await _seedStoredIdentity();
 
-    final app = await _pumpApp(tester);
+    final app = await _pumpApp(
+      tester,
+      prefs: <String, Object>{AppState.keyLanguage: 'cs'},
+    );
 
     expect(app.hasIdentity, isTrue);
     expect(find.text(s.tr('onb.step3.title')), findsOneWidget);
@@ -144,10 +150,44 @@ void main() {
 
     final app = await _pumpApp(
       tester,
-      prefs: <String, Object>{AppState.keyOnboardingComplete: true},
+      prefs: <String, Object>{
+        AppState.keyOnboardingComplete: true,
+        AppState.keyLanguage: 'cs',
+      },
     );
 
     expect(app.onboardingComplete, isTrue);
     expect(find.text(s.tr('home.fab')), findsOneWidget);
+  });
+
+  testWidgets(
+    'a fresh install defaults to English and the header pill switches language',
+    (tester) async {
+      // No stored language → the platform locale (en-US in tests) wins over CS.
+      final app = await _pumpApp(tester);
+      expect(app.language, 'en');
+      expect(find.text(Strings('en').tr('onb.step1.title')), findsOneWidget);
+      expect(find.text(Strings('cs').tr('onb.step1.title')), findsNothing);
+
+      // Switch to Czech right on the first screen.
+      await tester.tap(find.byKey(const Key('onb_lang_cs')));
+      await tester.pumpAndSettle();
+      expect(app.language, 'cs');
+      expect(find.text(Strings('cs').tr('onb.step1.title')), findsOneWidget);
+
+      // And back to English.
+      await tester.tap(find.byKey(const Key('onb_lang_en')));
+      await tester.pumpAndSettle();
+      expect(app.language, 'en');
+      expect(find.text(Strings('en').tr('onb.step1.title')), findsOneWidget);
+    },
+  );
+
+  test('fresh-install default language follows the system locale', () {
+    expect(AppState.defaultLanguageFor('cs'), 'cs');
+    expect(AppState.defaultLanguageFor('cs-CZ'), 'cs');
+    expect(AppState.defaultLanguageFor('en'), 'en');
+    expect(AppState.defaultLanguageFor('de'), 'en');
+    expect(AppState.defaultLanguageFor('sk'), 'en');
   });
 }

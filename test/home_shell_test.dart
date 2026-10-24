@@ -21,7 +21,9 @@ const MethodChannel _secureStorageChannel = MethodChannel(
 Future<AppState> _pumpShell(WidgetTester tester) async {
   await tester.binding.setSurfaceSize(const Size(500, 1400));
   addTearDown(() => tester.binding.setSurfaceSize(null));
-  SharedPreferences.setMockInitialValues(<String, Object>{});
+  SharedPreferences.setMockInitialValues(<String, Object>{
+    AppState.keyLanguage: 'cs',
+  });
   final app = AppState();
   addTearDown(app.dispose);
   await app.init(autoSync: false);

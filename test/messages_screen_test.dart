@@ -91,6 +91,7 @@ Future<(AppState, FakeRelayService)> _pumpMessages(
           .millisecondsSinceEpoch,
     });
   }
+  initial[AppState.keyLanguage] = 'cs';
   SharedPreferences.setMockInitialValues(initial);
 
   final service = FakeRelayService(

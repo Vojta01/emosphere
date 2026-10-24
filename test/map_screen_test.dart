@@ -124,7 +124,9 @@ Future<AppState> _pumpMap(
 }) async {
   await tester.binding.setSurfaceSize(const Size(500, 1200));
   addTearDown(() => tester.binding.setSurfaceSize(null));
-  SharedPreferences.setMockInitialValues(<String, Object>{});
+  SharedPreferences.setMockInitialValues(<String, Object>{
+    AppState.keyLanguage: 'cs',
+  });
   final world = checkins ?? _world();
 
   final service = FakeRelayService(

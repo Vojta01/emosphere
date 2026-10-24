@@ -173,7 +173,9 @@ class AppState extends ChangeNotifier {
   Future<void> init({bool autoSync = true}) async {
     _prefs ??= await SharedPreferences.getInstance();
     final prefs = _prefs!;
-    _language = prefs.getString(keyLanguage) ?? 'cs';
+    _language =
+        prefs.getString(keyLanguage) ??
+        defaultLanguageFor(PlatformDispatcher.instance.locale.languageCode);
     _locationPrecision = LocationPrecision.fromName(
       prefs.getString(keyLocationPrecision),
     );
@@ -303,6 +305,14 @@ class AppState extends ChangeNotifier {
 
   /// Localized strings for the current language.
   Strings get strings => Strings(_language);
+
+  /// Default UI language for a fresh install.
+  ///
+  /// Czech systems get Czech; every other system gets English, so a first run
+  /// never drops non-Czech users into a Czech-only UI.
+  static String defaultLanguageFor(String systemLanguageCode) {
+    return systemLanguageCode.toLowerCase().startsWith('cs') ? 'cs' : 'en';
+  }
 
   /// Switches the UI language; stores the choice.
   Future<void> setLanguage(String code) async {

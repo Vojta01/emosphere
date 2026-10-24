@@ -108,7 +108,9 @@ Future<AppState> _pumpFeed(
 }) async {
   await tester.binding.setSurfaceSize(const Size(500, 2000));
   addTearDown(() => tester.binding.setSurfaceSize(null));
-  SharedPreferences.setMockInitialValues(<String, Object>{});
+  SharedPreferences.setMockInitialValues(<String, Object>{
+    AppState.keyLanguage: 'cs',
+  });
 
   final service = FakeRelayService(
     mine: <CheckinEvent>[_world().first],

@@ -102,7 +102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              _stepIndicator(),
+              _header(),
               Expanded(
                 child: PageView(
                   controller: _pages,
@@ -119,27 +119,93 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _stepIndicator() {
+  Widget _header() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
       child: Row(
         children: [
-          for (var i = 0; i < _stepCount; i++) ...[
-            Expanded(
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                height: 4,
-                decoration: BoxDecoration(
-                  color: i <= _step
-                      ? AppTheme.accent
-                      : Colors.white.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(2),
-                ),
+          Expanded(child: _stepIndicator()),
+          const SizedBox(width: 14),
+          _languagePill(),
+        ],
+      ),
+    );
+  }
+
+  Widget _stepIndicator() {
+    return Row(
+      children: [
+        for (var i = 0; i < _stepCount; i++) ...[
+          Expanded(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              height: 4,
+              decoration: BoxDecoration(
+                color: i <= _step
+                    ? AppTheme.accent
+                    : Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            if (i < _stepCount - 1) const SizedBox(width: 6),
-          ],
+          ),
+          if (i < _stepCount - 1) const SizedBox(width: 6),
         ],
+      ],
+    );
+  }
+
+  /// Compact CZ/EN switcher — visible from the very first screen, so a
+  /// non-Czech visitor is never forced through a Czech-only onboarding.
+  Widget _languagePill() {
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+      ),
+      child: Row(
+        children: [
+          _languageOption('cs', 'Čeština'),
+          _languageOption('en', 'English'),
+        ],
+      ),
+    );
+  }
+
+  Widget _languageOption(String code, String label) {
+    final selected = widget.state.language == code;
+    return GestureDetector(
+      key: Key('onb_lang_$code'),
+      behavior: HitTestBehavior.opaque,
+      onTap: () => widget.state.setLanguage(code),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? AppTheme.accent : Colors.transparent,
+          borderRadius: BorderRadius.circular(13),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppTheme.accent.withValues(alpha: 0.45),
+                    blurRadius: 12,
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+            color: selected
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.55),
+          ),
+        ),
       ),
     );
   }
