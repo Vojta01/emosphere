@@ -1,7 +1,7 @@
 name: emosphere
 description: "EmoSphere — share how you feel with the world. A global mood map built on Nostr."
 publish_to: 'none'
-version: 0.5.0+9
+version: 0.5.1+10
 
 environment:
   sdk: ^3.13.5

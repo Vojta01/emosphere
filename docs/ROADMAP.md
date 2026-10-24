@@ -2,7 +2,7 @@
 
 > **Stav: pipeline návrhů.** Hotové položky jsou označené v tabulce. Ostatní
 > čekají na Vojtovo „jdi“ — pak se mění na commity / karty noční směny.
-> Zapsáno: 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · aplikace **v0.5.0**
+> Zapsáno: 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · doplněno 24. 10. 2026 (v0.5.1) · aplikace **v0.5.1**
 
 ## Přehled
 
@@ -435,4 +435,4 @@ zobrazení; citát je součástí afterglow a nově i detailu check-inu v Histor
 
 ---
 
-*Zapsal Hermes · 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · zdroj: zadání Vojty (chat) · R10+R11 hotovo 23. 10. 2026 (v0.4.0) · R9 hotovo 23. 10. 2026 (v0.5.0) · položky bez „hotovo“ čekají na Vojtovo „jdi“*
+*Zapsal Hermes · 22. 10. 2026 (R1–R8) · doplněno 23. 10. 2026 (R9–R11) · zdroj: zadání Vojty (chat) · R10+R11 hotovo 23. 10. 2026 (v0.4.0) · R9 hotovo 23. 10. 2026 (v0.5.0) · v0.5.1 hotovo 24. 10. 2026 (přepínač jazyka hned na úvodní obrazovce, EN pro non-CZ systémy, EN náhled pro sdílení) · položky bez „hotovo“ čekají na Vojtovo „jdi“*

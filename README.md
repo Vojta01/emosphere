@@ -99,9 +99,9 @@ More docs: [docs/SPEC.md](docs/SPEC.md) · [docs/CORE-API.md](docs/CORE-API.md) 
 
 ## Status
 
-**v0.5.0 — released 23 Oct 2026.** All MVP features are in: onboarding + key backup, check-in, world mood map with a continuous emotion heat layer and a **time machine** (timeline slider, 8-second replay, 1 h / 6 h / 24 h replay windows), feed, friends, history, settings, Czech/English UI — shipped as a release-signed Android APK and an installable PWA. 217 unit/widget tests are green, `flutter analyze` is clean and CI is green on `main`.
+**v0.5.1 — released 24 Oct 2026.** All MVP features are in: onboarding + key backup, check-in, world mood map with a continuous emotion heat layer and a **time machine** (timeline slider, 8-second replay, 1 h / 6 h / 24 h replay windows), feed, friends, history, settings, Czech/English UI with a **first-run language picker** (English-first unless the system is Czech) — shipped as a release-signed Android APK and an installable PWA. 219 unit/widget tests are green, `flutter analyze` is clean and CI is green on `main`.
 
-Recently shipped: the heat map (v0.3.0), publish resilience — retries and stale-socket recovery (v0.3.1), heat cells centred on the actual check-ins rather than the coarse cell middle (v0.3.2), emotion-matched afterglow animations with 160 reflective quotes (v0.4.0) and the map time machine (v0.5.0).
+Recently shipped: the heat map (v0.3.0), publish resilience — retries and stale-socket recovery (v0.3.1), heat cells centred on the actual check-ins rather than the coarse cell middle (v0.3.2), emotion-matched afterglow animations with 160 reflective quotes (v0.4.0), the map time machine (v0.5.0) and a first-run CZ/EN language picker with locale-aware defaults plus an English social preview for the PWA (v0.5.1).
 
 Remaining work:
 
