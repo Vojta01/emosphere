@@ -1,8 +1,8 @@
 {
     "name": "EmoSphere",
     "short_name": "EmoSphere",
-    "description": "Podívej se, jak se svět právě teď cítí — globální mapa nálad na Nostr.",
-    "lang": "cs",
+    "description": "See how the world feels right now — a global mood map on Nostr.",
+    "lang": "en",
     "start_url": ".",
     "scope": ".",
     "display": "standalone",
