@@ -5,7 +5,7 @@
 [![CI](https://github.com/Vojta01/emosphere/actions/workflows/ci.yml/badge.svg)](https://github.com/Vojta01/emosphere/actions/workflows/ci.yml)
 [![Deploy to GitHub Pages](https://github.com/Vojta01/emosphere/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Vojta01/emosphere/actions/workflows/deploy-pages.yml)
 
-🌐 **Web / PWA:** https://vojta01.github.io/emosphere/ &nbsp;·&nbsp; 📱 **Android APK:** [download the latest release](https://github.com/Vojta01/emosphere/releases/latest)
+🌐 **Web / PWA:** https://emosphere.digitalni-vedomi.cz/ &nbsp;·&nbsp; 📱 **Android APK:** [download the latest release](https://github.com/Vojta01/emosphere/releases/latest)
 
 ## What is EmoSphere?
 
@@ -45,8 +45,8 @@ The screenshots show the English UI — the app ships in English and Czech.
 | Platform | How to install |
 |---|---|
 | **Android** | Download the `emosphere-<version>.apk` from the [latest release](https://github.com/Vojta01/emosphere/releases/latest), allow installation from unknown sources and open the file. Android 7.0+ (API 24+). |
-| **iPhone / iPad** | Open https://vojta01.github.io/emosphere/ in **Safari** → *Share* → **Add to Home Screen**. It then behaves like a native app — no App Store, no Mac needed. |
-| **Web** | https://vojta01.github.io/emosphere/ — an installable PWA, works in any modern browser. |
+| **iPhone / iPad** | Open https://emosphere.digitalni-vedomi.cz/ in **Safari** → *Share* → **Add to Home Screen**. It then behaves like a native app — no App Store, no Mac needed. |
+| **Web** | https://emosphere.digitalni-vedomi.cz/ — an installable PWA, works in any modern browser. |
 
 ## Features
 

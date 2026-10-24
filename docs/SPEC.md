@@ -16,7 +16,7 @@ Mobilní + webová aplikace pro sdílení emocí přes Nostr protokol.
 1. **Android** — nativní appka (Flutter, APK ke stažení; později případně Google Play).
 2. **Web/PWA** — Flutter web build, instalovatelná na **iPhone** přes Safari
    → „Sdílet" → „Přidat na plochu". Bez App Storu, bez Macu, zdarma.
-   Hosting: GitHub Pages → **https://vojta01.github.io/emosphere/**
+   Hosting: GitHub Pages → **https://emosphere.digitalni-vedomi.cz/**
 3. Nativní iOS: **vynecháno** (pokryto PWA). Scaffold odstraněn; případně později.
 
 ## Klíčová rozhodnutí (potvrzeno 21. 10.)

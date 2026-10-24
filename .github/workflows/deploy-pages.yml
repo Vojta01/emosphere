@@ -39,7 +39,7 @@ jobs:
       # (the hidden flag still works, ServiceWorkerStrategy.offlineFirst is the
       # default anyway). Kept explicit to pin the PWA caching strategy.
       - name: Build web
-        run: flutter build web --release --base-href /emosphere/ --pwa-strategy offline-first
+        run: flutter build web --release --base-href / --pwa-strategy offline-first
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
